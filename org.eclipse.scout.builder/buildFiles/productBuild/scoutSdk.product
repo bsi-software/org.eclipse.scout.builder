@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?pde version="3.5"?>
+
+<product name="Scout SDK" uid="Scout SDK" id="org.eclipse.scout.sdk.ui.product" application="org.eclipse.ui.ide.workbench" useFeatures="true" includeLaunchers="true">
+
+   <configIni use="default">
+   </configIni>
+
+   <launcherArgs>
+      <programArgs>-consolelog -console</programArgs>
+      <vmArgsMac>-XstartOnFirstThread -Dorg.eclipse.swt.internal.carbon.smallFonts</vmArgsMac>
+   </launcherArgs>
+
+   <windowImages/>
+
+   <launcher name="scoutSdk">
+      <solaris/>
+      <win useIco="false">
+         <bmp/>
+      </win>
+   </launcher>
+
+   <vm>
+   </vm>
+
+   <plugins>
+   </plugins>
+
+   <features>
+      <feature id="org.eclipse.pde"/>
+      <feature id="org.eclipse.help"/>
+      <feature id="org.eclipse.equinox.p2.user.ui"/>
+      <feature id="org.eclipse.cvs"/>
+      <feature id="org.eclipse.platform"/>
+      <feature id="org.eclipse.jdt"/>
+      <feature id="org.eclipse.scout.sdk.feature"/>
+      <feature id="org.eclipse.scout.sdk.feature.source"/>
+      <feature id="org.eclipse.scout.rt.feature"/>
+      <feature id="org.eclipse.scout.rt.feature.source"/>
+   </features>
+
+
+</product>

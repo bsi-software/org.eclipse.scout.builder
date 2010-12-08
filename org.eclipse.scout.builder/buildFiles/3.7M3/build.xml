@@ -1,0 +1,29 @@
+<project name="org.eclipse.scout.build" default="build">
+	<property environment="env" />
+	<property file="3.7M3/build.properties" />
+	<property name="buildTemplate" location="buildTemplate.xml" />
+
+
+	<target name="logVars">
+		<ant antfile="${buildTemplate}" target="test" />
+	</target>
+
+	<target name="build">
+		<antcall target="productBuild"/>
+		<antcall target="p2FeatureBuild"/>
+	</target>
+
+
+	<target name="productBuild">
+		<ant antfile="${buildTemplate}" target="productBuild" />
+	</target>
+
+	<target name="p2FeatureBuild">
+		<ant antfile="${buildTemplate}" target="p2FeatureBuild" />
+	</target>
+	
+	<target name="featureBuild">
+		<ant antfile="${buildTemplate}" target="featureBuild" />
+	</target>
+
+</project>

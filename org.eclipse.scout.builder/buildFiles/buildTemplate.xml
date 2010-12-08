@@ -1,0 +1,208 @@
+<!--
+   Copyright (c) 2010 BSI Business Systems Integration AG.
+   All rights reserved. This program and the accompanying materials
+   are made available under the terms of the Eclipse Public License v1.0
+   which accompanies this distribution, and is available at
+   http://www.eclipse.org/legal/epl-v10.html
+   
+   Contributors:
+       BSI Business Systems Integration AG - initial API and implementation
+ -->
+<project name="buildTemplate" default="">
+
+	<target name="test">
+		<echo message="test ${eclipseDownloadUrl}" />
+	</target>
+
+	<target name="cleanAll">
+		<delete dir="${workingDir}" />
+		<echo message="workspace cleared" />
+	</target>
+
+	<target name="cleanBuildWorkspace">
+		<delete dir="${buildWorkspace}">
+		</delete>
+	</target>
+
+	<target name="setupEclipse">
+		<mkdir dir="${workingDir}" />
+		<antcall target="downloadEclipse" />
+		<antcall target="downloadDeltapack" />
+		<!-- setup eclipse to the ${workingDir} -->
+		<!-- unzip eclipse and delta pack -->
+		<unzip dest="${workingDir}" overwrite="true" src="${downloadDir}/${eclipseFileName}" />
+		<unzip dest="${workingDir}" overwrite="true" src="${downloadDir}/${eclipseDeltapackName}" />
+		<copy todir="${workingDir}" failonerror="false">
+			<fileset dir="${templateDir}/dropins" />
+		</copy>
+	</target>
+
+	<target name="downloadEclipse" depends="checkDownloadEclipse" unless="skipDownloadEclipse">
+		<echo message="download eclipse from '${eclipseDownloadUrl}'.">
+		</echo>
+		<get src="${eclipseDownloadUrl}" dest="${downloadDir}/${eclipseFileName}" />
+	</target>
+
+	<target name="checkDownloadEclipse">
+		<echo message="------ ${workingDir}">
+		</echo>
+		<available file="${downloadDir}/${eclipseFileName}" property="skipDownloadEclipse" />
+	</target>
+
+	<target name="downloadDeltapack" depends="checkDownloadDeltapack" unless="skipDownloadDeltapack">
+		<echo message="download delta pack from '${eclipseDeltapackUrl}'.">
+		</echo>
+		<get src="${eclipseDeltapackUrl}" dest="${downloadDir}/${eclipseDeltapackName}" />
+	</target>
+
+	<target name="checkDownloadDeltapack">
+		<available file="${downloadDir}/${eclipseDeltapackName}" property="skipDownloadDeltapack" />
+	</target>
+
+	<target name="setupBuildWorkspace">
+		<!-- mkdirs -->
+		<mkdir dir="${buildWorkspace}/plugins" />
+		<mkdir dir="${buildWorkspace}/features" />
+		<!-- move plugins to build to the buildDirectory -->
+		<copy todir="${buildWorkspace}/plugins">
+			<fileset dir="${workspace}">
+				<include name="org.eclipse.scout.*/**" />
+				<include name="javax.*/**" />
+				<exclude name="org.eclipse.scout*build*/**" />
+				<exclude name="*testing*/**" />
+				<exclude name="*test*/**" />
+				<exclude name="*feature*/**" />
+			</fileset>
+		</copy>
+		<copy todir="${buildWorkspace}/features">
+			<fileset dir="${workspace}/">
+				<include name="*scout.*feature*/**" />
+			</fileset>
+		</copy>
+		<!-- source tamplate -->
+		<copy todir="${buildWorkspace}/features/org.eclipse.scout.rt.feature.source" failonerror="false">
+			<fileset dir="${buildBundle}/templates/sourceTemplateFeature">
+				<include name="**" />
+			</fileset>
+		</copy>
+	</target>
+
+	<target name="p2FeatureBuild" depends="cleanAll, setupEclipse, setupWorkspaceFeatureBuild, internal.p2FeatureBuild, createP2Repository">
+	</target>
+
+	<target name="internal.p2FeatureBuild">
+		<echo message="workspace = ${env.WORKSPACE}">
+		</echo>
+		<java classname="org.eclipse.equinox.launcher.Main" fork="true" failonerror="true">
+			<arg line="-application org.eclipse.ant.core.antRunner " />
+			<arg line="-buildfile ${workingDir}/eclipse/plugins/org.eclipse.pde.build_${pdeBuildPluginVersion}/scripts/build.xml" />
+			<arg line="-DbuildId=all" />
+			<arg line="-Dtimestamp=${timestamp}" />
+			<arg line="-Dbuilder=${buildBundle}/buildFiles/p2FeatureBuild" />
+			<arg line="-Dworkspace=${env.WORKSPACE}" />
+			<arg line="-DIndividualSourceBundles=true" />
+			<classpath>
+				<pathelement location="${workingDir}/eclipse/plugins/org.eclipse.equinox.launcher_${equinoxLauncherPluginVersion}.jar" />
+			</classpath>
+		</java>
+	</target>
+
+	<target name="setupWorkspaceFeatureBuild" depends="setupBuildWorkspace">
+		<copy todir="${buildWorkspace}/features">
+			<fileset dir="${buildBundle}/templates/workspace/features">
+				<include name="org.eclipse.scout.build.feature/**" />
+			</fileset>
+		</copy>
+	</target>
+
+
+
+	<target name="createP2Repository">
+		<delete dir="${p2RepositoryPath}" />
+		<mkdir dir="${p2RepositoryPath}" />
+		<zip destfile="${p2RepositoryPath}/artifacts.jar" basedir="${buildWorkspace}/buildRepo" includes="artifacts.xml" />
+		<zip destfile="${p2RepositoryPath}/content.jar" basedir="${buildWorkspace}/buildRepo" includes="content.xml" />
+		<mkdir dir="${p2RepositoryPath}/features" />
+		<copy todir="${p2RepositoryPath}/features">
+			<fileset dir="${buildWorkspace}/buildRepo/features">
+				<exclude name="*build*" />
+			</fileset>
+		</copy>
+		<echo message="plugins folder > ${buildWorkspace}/buildRepo/plugins">
+		</echo>
+		<mkdir dir="${p2RepositoryPath}/plugins" />
+		<copy todir="${p2RepositoryPath}/plugins">
+			<fileset dir="${buildWorkspace}/buildRepo/plugins">
+				<include name="*" />
+			</fileset>
+		</copy>
+	</target>
+
+
+	<target name="featureBuild" depends="cleanAll, setupEclipse, setupWorkspaceFeatureBuild, internal.featureBuild">
+
+	</target>
+
+	<target name="internal.featureBuild">
+		<echo message="workspace = ${env.WORKSPACE}">
+		</echo>
+		<java classname="org.eclipse.equinox.launcher.Main" fork="true" failonerror="true">
+			<arg line="-application org.eclipse.ant.core.antRunner " />
+			<arg line="-buildfile ${workingDir}/eclipse/plugins/org.eclipse.pde.build_${pdeBuildPluginVersion}/scripts/build.xml" />
+			<arg line="-DbuildId=all" />
+			<arg line="-Dtimestamp=${timestamp}" />
+			<arg line="-Dbuilder=${buildBundle}/buildFiles/featureBuild" />
+			<arg line="-Dworkspace=${env.WORKSPACE}" />
+			<arg line="-DIndividualSourceBundles=true" />
+			<classpath>
+				<pathelement location="${workingDir}/eclipse/plugins/org.eclipse.equinox.launcher_${equinoxLauncherPluginVersion}.jar" />
+			</classpath>
+		</java>
+	</target>
+
+
+	<target name="productBuild" depends="featureBuild , internal.productBuild, packProduct">
+	</target>
+
+	<target name="internal.productBuild">
+		<!-- put features and plugins in base -->
+		<unzip dest="${workingDir}" >
+			<patternset>
+				<exclude name="feature/org.eclipse.scout.build.feature*/**"/>
+			</patternset>
+			<fileset dir="${buildWorkspace}/I.all">
+				<include name="*.zip"/>
+			</fileset>
+		</unzip>
+		<delete dir="${buildWorkspace}"/>
+		<java classname="org.eclipse.equinox.launcher.Main" fork="true" failonerror="true" maxmemory="1024m">
+			<arg value="-application" />
+			<arg value="org.eclipse.ant.core.antRunner" />
+			<arg value="-buildfile" />
+			<arg value="${workingDir}/eclipse/plugins/org.eclipse.pde.build_${pdeBuildPluginVersion}/scripts/productBuild/productBuild.xml" />
+			<!--			<arg value="-Dproduct=/${product}" /> -->
+			<arg value="-DbuildId=all" />
+			<arg value="-Dtimestamp=${timestamp}" />
+			<arg line="-Dbuilder=${buildBundle}/buildFiles/productBuild" />
+			<arg line="-Dworkspace=${env.WORKSPACE}" />
+			<arg line="-DIndividualSourceBundles=true" />
+			<arg line="-DarchiveNamePrefix=${productBuildPrefix}" />
+			<classpath>
+				<pathelement location="${workingDir}/eclipse/plugins/org.eclipse.equinox.launcher_${equinoxLauncherPluginVersion}.jar" />
+			</classpath>
+		</java>
+
+	</target>
+
+	<target name="packProduct">
+		<property name="outputProductPath" location="${buildBundle}/output/download/${p2Repository}" />
+		<delete dir="${outputProductPath}" />
+		<mkdir dir="${outputProductPath}" />
+		<move todir="${outputProductPath}">
+			<fileset dir="${buildWorkspace}/I.all/">
+				<include name="*.zip" />
+			</fileset>
+		</move>
+	</target>
+
+</project>
