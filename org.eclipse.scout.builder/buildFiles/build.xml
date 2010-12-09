@@ -12,6 +12,7 @@
 <project name="org.eclipse.scout.build" default="buildAll">
 	<property environment="env" />
 	<property file="build.properties" />
+	<property name="workspace" value="${env.WORKSPACE}"/>
 
 
 	<target name="clean">
@@ -23,6 +24,7 @@
 		<tstamp>
 			<format property="BUILD_TIMESTAMP" pattern="yyyyMMdd" locale="en,UK" />
 		</tstamp>
+		
 	</target>
 
 	<target name="buildAll" depends="setupEnvironment, build_3.6, build_3.7M3">
