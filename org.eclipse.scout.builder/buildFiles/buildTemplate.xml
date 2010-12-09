@@ -63,7 +63,7 @@
 		<mkdir dir="${buildWorkspace}/features" />
 		<!-- move plugins to build to the buildDirectory -->
 		<copy todir="${buildWorkspace}/plugins">
-			<fileset dir="${workspace}">
+			<fileset dir="${workspace}/scout.rt">
 				<include name="org.eclipse.scout.*/**" />
 				<include name="javax.*/**" />
 				<exclude name="org.eclipse.scout*build*/**" />
@@ -71,9 +71,18 @@
 				<exclude name="*test*/**" />
 				<exclude name="*feature*/**" />
 			</fileset>
+			<fileset dir="${workspace}/scout.sdk">
+				<include name="org.eclipse.scout.*/**" />
+				<exclude name="*testing*/**" />
+				<exclude name="*test*/**" />
+				<exclude name="*feature*/**" />
+			</fileset>
 		</copy>
 		<copy todir="${buildWorkspace}/features">
-			<fileset dir="${workspace}/">
+			<fileset dir="${workspace}/scout.rt">
+				<include name="*scout.*feature*/**" />
+		    </fileset>
+			<fileset dir="${workspace}/scout.sdk">
 				<include name="*scout.*feature*/**" />
 			</fileset>
 		</copy>

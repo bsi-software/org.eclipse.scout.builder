@@ -1,0 +1,35 @@
+check out the following workspace:
+- org.eclipse.scout.builder
+- scout.rt
+  + org.eclipse.scout.rt.feature
+  + org.eclipse.scout.rt.server.jdbc.db2_97.fragment
+  + org.eclipse.scout.rt.server.jdbc.mysql517.fragment
+  + org.eclipse.scout.rt.server.jdbc.oracle10g.fragment
+  + org.eclipse.scout.rt.server.jdbc.oracle11g.fragment
+  + org.eclipse.scout.rt.server.jdbc.oracle9i.fragment
+  + org.eclipse.scout.rt.testing.common.ant.optional.junit.fragment
+  + javax.jms
+  + javax.mail.jre15
+  + javax.mail.jre16
+  + org.eclipse.scout.commons
+  + org.eclipse.scout.http.servletfilter
+  + org.eclipse.scout.net
+  + org.eclipse.scout.rt.client
+  + org.eclipse.scout.rt.jdbc.derby
+  + org.eclipse.scout.rt.server
+  + org.eclipse.scout.rt.server.jdbc.mssql2005.fragment
+  + org.eclipse.scout.rt.shared
+  + org.eclipse.scout.rt.testing.client
+  + org.eclipse.scout.rt.testing.server
+  + org.eclipse.scout.rt.testing.shared
+  + org.eclipse.scout.rt.testing.ui.swing
+  + org.eclipse.scout.rt.testing.ui.swt
+  + org.eclipse.scout.rt.ui.swing
+  + org.eclipse.scout.rt.ui.swt
+  + org.eclipse.scout.service
+- scout.sdk
+  + org.eclipse.scout.sdk.feature
+  + org.eclipse.scout.nls.sdk
+  + org.eclipse.scout.sdk
+  + org.eclipse.scout.sdk.test
+  + org.eclipse.scout.sdk.ui
