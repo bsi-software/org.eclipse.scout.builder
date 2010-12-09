@@ -41,6 +41,7 @@
 	<target name="downloadEclipse" depends="checkDownloadEclipse" unless="skipDownloadEclipse">
 		<echo message="download eclipse from '${eclipseDownloadUrl}'.">
 		</echo>
+		<mkdir dir="${downloadDir}"/>
 		<get src="${eclipseDownloadUrl}" dest="${downloadDir}/${eclipseFileName}" />
 	</target>
 
