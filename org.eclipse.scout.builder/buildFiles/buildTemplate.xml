@@ -9,6 +9,7 @@
        BSI Business Systems Integration AG - initial API and implementation
  -->
 <project name="buildTemplate" default="">
+	<property environment="env" />
 
 	<target name="test">
 		<echo message="test ${eclipseDownloadUrl}" />
