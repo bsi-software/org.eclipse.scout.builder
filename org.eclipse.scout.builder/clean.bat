@@ -32,8 +32,7 @@ PATH=%JAVA_HOME%\bin;%ANT_HOME%\bin;%PATH%
 
 :# call ant -f build.xml %buildOpts% %workspaceDir% %* 
 :# call ant -f releases/releaseBuild.xml %buildOpts% %workspaceDir%  %* build3_6  > %logfile%
-call ant -f org.eclipse.scout.builder/buildFiles/build.xml %buildOpts% %workspaceDir%  %* buildScoutRepository 
+call ant -f org.eclipse.scout.builder/buildFiles/build.xml %buildOpts% %workspaceDir%  %* clean 
 
 endlocal
-pause
 

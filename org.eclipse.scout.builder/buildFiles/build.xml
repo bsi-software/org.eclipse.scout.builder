@@ -9,19 +9,35 @@
        BSI Business Systems Integration AG - initial API and implementation
  -->
 
-	<project name="org.eclipse.scout.build" default="buildAll">
+<project name="org.eclipse.scout.build" default="buildAll">
 	<property environment="env" />
 	<property file="build.properties" />
 
-	<target name="buildAll" depends="build_3.6, build_3.7M3">
+
+	<target name="clean">
+		<delete dir="${workingDir}"></delete>
+		<delete dir="${buildBundle}/output"></delete>
+	</target>
+	
+	<target name="setupEnvironment" unless="BUILD_TIMESTAMP">
+		<tstamp>
+			<format property="BUILD_TIMESTAMP" pattern="yyyyMMdd" locale="en,UK" />
+		</tstamp>
 	</target>
 
-	<target name="build_3.6">
-<!--		<ant antfile="3.6.1/build.xml" target="build" /> -->
+	<target name="buildAll" depends="setupEnvironment, build_3.6, build_3.7M3">
 	</target>
 
-	<target name="build_3.7M3">
+	<target name="build_3.6" depends="setupEnvironment">
+		<ant antfile="3.6.1/build.xml" target="build" />
+	</target>
+
+	<target name="build_3.7M3" depends="setupEnvironment">
 		<ant antfile="3.7M3/build.xml" target="build" />
+	</target>
+
+	<target name="buildScoutRepository" depends="setupEnvironment">
+		<ant antfile="3.6.1/build.xml" target="p2FeatureBuild" />
 	</target>
 
 </project>

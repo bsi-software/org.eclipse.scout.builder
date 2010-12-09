@@ -9,7 +9,7 @@
 		 - archiveFullPath : the full path of the final archive once it is created
 		 
 		 ===================================================================== -->
-		 
+
 	<!-- =====================================================================  -->
 	<!-- Called after each invocation of the gather.bin.parts target on the     -->
 	<!-- individual plugins and features.                                       -->
@@ -23,7 +23,7 @@
 	<!-- =====================================================================  -->
 	<target name="gather.bin.parts">
 	</target>
-	
+
 	<!-- ===================================================================== -->
 	<!-- Called after invoking the gather.bin.parts targets for all plugins    -->
 	<!-- and features. Results exist as folders and have not yet been jarred.  -->
@@ -39,6 +39,7 @@
 	<!--                   (eg "org.eclipse.foo_1.0.0"                         -->
 	<!-- ===================================================================== -->
 	<target name="pre.jarSigning">
+
 	</target>
 
 	<!-- ===================================================================== -->
@@ -55,7 +56,7 @@
 	<!-- ===================================================================== -->
 	<target name="pre.archive">
 	</target>
-	
+
 	<!-- ===================================================================== -->
 	<!-- Default target                                                        -->
 	<!-- ===================================================================== -->

@@ -44,8 +44,6 @@
 	</target>
 
 	<target name="checkDownloadEclipse">
-		<echo message="------ ${workingDir}">
-		</echo>
 		<available file="${downloadDir}/${eclipseFileName}" property="skipDownloadEclipse" />
 	</target>
 
@@ -136,6 +134,16 @@
 				<include name="*" />
 			</fileset>
 		</copy>
+		<antcall target="signP2Repository"/>
+	</target>
+	
+	<target name="signP2Repository" unless="skipSign">
+		<ant antfile="sign.xml" target="setup"/>
+		<zip destfile="${workingDir}/sign/in/sign.zip" basedir="${p2RepositoryPath}" includes="**/**"/>
+		<delete dir="${p2RepositoryPath}" />
+		<mkdir dir="${p2RepositoryPath}" />
+		<ant antfile="sign.xml" target="signAndWaitResult"/>
+		<unzip dest="${p2RepositoryPath}" src="${workingDir}/sign/out/sign.zip"/>
 	</target>
 
 
