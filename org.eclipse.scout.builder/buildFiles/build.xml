@@ -24,8 +24,8 @@
 		<tstamp>
 			<format property="BUILD_TIMESTAMP" pattern="yyyyMMdd" locale="en,UK" />
 		</tstamp>
-		<echo message="env.WORKSPACE '${env.WORKSPACE}'"></echo>
-		<echo message="workspace '${workspace}'"></echo>
+		<echo message="env.WORKSPACE '${env.WORKSPACE}'"/>
+		<echo message="workspace '${workspace}'"/>
 	</target>
 
 	<target name="buildAll" depends="setupEnvironment, build_3.6, build_3.7M3">

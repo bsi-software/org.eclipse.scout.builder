@@ -39,8 +39,7 @@
 	</target>
 
 	<target name="downloadEclipse" depends="checkDownloadEclipse" unless="skipDownloadEclipse">
-		<echo message="download eclipse from '${eclipseDownloadUrl}'.">
-		</echo>
+		<echo message="download eclipse from '${eclipseDownloadUrl}'."/>
 		<mkdir dir="${downloadDir}"/>
 		<get src="${eclipseDownloadUrl}" dest="${downloadDir}/${eclipseFileName}" />
 	</target>
@@ -50,8 +49,7 @@
 	</target>
 
 	<target name="downloadDeltapack" depends="checkDownloadDeltapack" unless="skipDownloadDeltapack">
-		<echo message="download delta pack from '${eclipseDeltapackUrl}'.">
-		</echo>
+		<echo message="download delta pack from '${eclipseDeltapackUrl}'."/>
 		<get src="${eclipseDeltapackUrl}" dest="${downloadDir}/${eclipseDeltapackName}" />
 	</target>
 
@@ -100,8 +98,7 @@
 	</target>
 
 	<target name="internal.p2FeatureBuild">
-		<echo message="workspace = ${env.WORKSPACE}">
-		</echo>
+		<echo message="workspace = ${env.WORKSPACE}"/>
 		<java classname="org.eclipse.equinox.launcher.Main" fork="true" failonerror="true">
 			<arg line="-application org.eclipse.ant.core.antRunner " />
 			<arg line="-buildfile ${workingDir}/eclipse/plugins/org.eclipse.pde.build_${pdeBuildPluginVersion}/scripts/build.xml" />
@@ -137,8 +134,7 @@
 				<exclude name="*build*" />
 			</fileset>
 		</copy>
-		<echo message="plugins folder > ${buildWorkspace}/buildRepo/plugins">
-		</echo>
+		<echo message="plugins folder > ${buildWorkspace}/buildRepo/plugins"/>
 		<mkdir dir="${p2RepositoryPath}/plugins" />
 		<copy todir="${p2RepositoryPath}/plugins">
 			<fileset dir="${buildWorkspace}/buildRepo/plugins">
@@ -163,8 +159,7 @@
 	</target>
 
 	<target name="internal.featureBuild">
-		<echo message="workspace = ${env.WORKSPACE}">
-		</echo>
+		<echo message="workspace = ${env.WORKSPACE}"/>
 		<java classname="org.eclipse.equinox.launcher.Main" fork="true" failonerror="true">
 			<arg line="-application org.eclipse.ant.core.antRunner " />
 			<arg line="-buildfile ${workingDir}/eclipse/plugins/org.eclipse.pde.build_${pdeBuildPluginVersion}/scripts/build.xml" />
