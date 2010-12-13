@@ -43,6 +43,8 @@
 	</target>
 
 	<target name="testSign" depends="setup">
+		<available file="/home/data/httpd/download-staging.priv/technology/scout" property="aprop" />
+		<echo message="has sign dir = ${aprop}"/>
 		<copy todir="${signOutputFolder}">
 			<fileset dir="${templateDir}/sign" >
 				<include name="*.zip"/>
