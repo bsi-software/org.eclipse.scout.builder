@@ -4,27 +4,27 @@
 	and is available at http://www.eclipse.org/legal/epl-v10.html Contributors: 
 	BSI Business Systems Integration AG - initial API and implementation -->
 
-<project name="org.eclipse.scout.builder.sign" >
+<project name="org.eclipse.scout.builder.sign">
 	<property environment="env" />
-	
+
 	<target name="setup">
+		<!--		<echo message="start signing..." />
 		<delete dir="${signInputFolder}"/>
 		<delete dir="${signOutputFolder}"/>
 		<mkdir dir="${signInputFolder}"/>
 		<mkdir dir="${signOutputFolder}"/>
+		-->
 	</target>
-	
+
 	<target name="signAndWaitResult">
-		<available file="/home/data/httpd/download.eclipse.org/scout/updates" property="foundScout" />
-		<echo message="found scout ${foundScout}"/>
-<!--		<echo message="start signing..." />
-		<antcall target="startSign"/>
+
+		<antcall target="startSign" />
 		<antcall target="checkSignedOutput" />
-		<echo message="done signing..." /> -->
+		<echo message="done signing..." />
 	</target>
 
 	<target name="checkSignedOutput" unless="stopSleep">
-		<echo message="check file existance in ${buildWorkspace}"/>
+		<echo message="check file existance in ${buildWorkspace}" />
 		<available file="${signOutputFolder}/sign.zip" property="stopSleep" />
 		<antcall target="waitForBetterTimes" />
 	</target>
@@ -37,20 +37,22 @@
 
 	<target name="startSign" unless="skipSign">
 		<exec executable="sign" dir="${workingDir}/sign">
-		    <arg value="${signInputFolder}/sign.zip"/>
-			<arg value="nomail"/>
-			<arg value="${signOutputFolder}"/>
+			<arg value="${signInputFolder}/sign.zip" />
+			<arg value="nomail" />
+			<arg value="${signOutputFolder}" />
 		</exec>
 	</target>
 
 	<target name="testSign" depends="setup">
-		<property name="" value=""></property>
+		<available file="/home/data/httpd/download.eclipse.org/scout/updates" property="foundScout" />
+		<echo message="found scout ${foundScout}" />
+		<!--		<property name="" value=""></property>
 		<copy todir="${signInputFolder}">
 			<fileset dir="${templateDir}/sign" >
 				<include name="*.zip"/>
 			</fileset>
 		</copy>
-		<antcall target="signAndWaitResult"/>
+		<antcall target="signAndWaitResult"/> -->
 	</target>
-	
+
 </project>
