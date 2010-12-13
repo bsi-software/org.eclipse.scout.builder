@@ -40,7 +40,15 @@
 			<arg value="nomail"/>
 			<arg value="${signOutputFolder}"/>
 		</exec>
+	</target>
 
+	<target name="testSign" depends="setup">
+		<copy todir="${signOutputFolder}">
+			<fileset dir="${templateDir}/sign" >
+				<include name="*.zip"/>
+			</fileset>
+		</copy>
+		<antcall target="startSign"/>
 	</target>
 	
 </project>
