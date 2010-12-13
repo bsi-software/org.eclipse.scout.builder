@@ -17,10 +17,10 @@
 	<target name="signAndWaitResult">
 		<available file="/home/data/httpd/download.eclipse.org/scout/updates" property="foundScout" />
 		<echo message="found scout ${foundScout}"/>
-		<echo message="start signing..." />
+<!--		<echo message="start signing..." />
 		<antcall target="startSign"/>
 		<antcall target="checkSignedOutput" />
-		<echo message="done signing..." />
+		<echo message="done signing..." /> -->
 	</target>
 
 	<target name="checkSignedOutput" unless="stopSleep">
