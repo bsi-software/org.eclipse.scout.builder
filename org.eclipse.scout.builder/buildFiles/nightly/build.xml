@@ -70,9 +70,9 @@
 	</target>
 
 	<target name="internal.signScoutRtFeature" unless="skipSign">
-		<move file="${buildWorkspace}/N/org.eclipse.scout.rt.feature-N.zip" tofile="${signInputFolder}/sign.zip"/>
+		<move file="${buildWorkspace}/N/org.eclipse.scout.rt.feature-N.zip" tofile="${signInputFolder}/sign.zip" />
 		<ant antfile="sign.xml" target="signAndWaitResult" />
-		<move file="${signOutpuFolder}/sign.zip" tofile="${buildWorkspace}/N/org.eclipse.scout.rt.feature-N.zip"/>
+		<move file="${signOutputFolder}/sign.zip" tofile="${buildWorkspace}/N/org.eclipse.scout.rt.feature-N.zip" />
 	</target>
 
 
@@ -104,9 +104,9 @@
 	</target>
 
 	<target name="internal.signScoutSdkFeature" unless="skipSign">
-		<move file="${buildWorkspace}/N/org.eclipse.scout.sdk.feature-N.zip" tofile="${signInputFolder}/sign.zip"/>
+		<move file="${buildWorkspace}/N/org.eclipse.scout.sdk.feature-N.zip" tofile="${signInputFolder}/sign.zip" />
 		<ant antfile="sign.xml" target="signAndWaitResult" />
-		<move tofile="${buildWorkspace}/N/org.eclipse.scout.sdk.feature-N.zip" file="${signOutpuFolder}/sign.zip"/>
+		<move file="${signOutputFolder}/sign.zip" tofile="${buildWorkspace}/N/org.eclipse.scout.sdk.feature-N.zip" />
 	</target>
 
 	<target name="createP2Repository">
@@ -162,14 +162,14 @@
 		-->
 		<property name="tmpRepo" location="${nightlyRepository}/${nightlyRepositoryName}_tmp" />
 		<property name="defRepo" location="${nightlyRepository}/${nightlyRepositoryName}" />
-		<mkdir dir="${tmpRepo}"/>
-		
+		<mkdir dir="${tmpRepo}" />
+
 		<copy todir="${tmpRepo}">
 			<fileset dir="${buildBundle}/output/p2Repo">
-				<include name="**/**"/>
+				<include name="**/**" />
 			</fileset>
 		</copy>
-		
+
 		<delete dir="${defRepo}" />
 		<move file="${tmpRepo}" tofile="${defRepo}" />
 	</target>
