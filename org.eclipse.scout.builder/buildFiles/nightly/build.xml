@@ -70,18 +70,9 @@
 	</target>
 
 	<target name="internal.signScoutRtFeature" unless="skipSign">
-		<move todir="${signInputFolder}">
-			<fileset dir="${buildWorkspace}/N">
-				<include name="org.eclipse.scout.rt.feature-N.zip" />
-			</fileset>
-		</move>
+		<move file="${buildWorkspace}/N/org.eclipse.scout.rt.feature-N.zip" tofile="${signInputFolder}/sign.zip"/>
 		<ant antfile="sign.xml" target="signAndWaitResult" />
-		<move todir="${buildWorkspace}/N">
-			<fileset dir="${signOutputFolder}/N">
-				<include name="org.eclipse.scout.rt.feature-N.zip" />
-			</fileset>
-		</move>
-
+		<move file="${signOutpuFolder}/sign.zip" tofile="${buildWorkspace}/N/org.eclipse.scout.rt.feature-N.zip"/>
 	</target>
 
 
