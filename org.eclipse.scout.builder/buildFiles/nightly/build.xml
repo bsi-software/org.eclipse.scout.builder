@@ -113,18 +113,9 @@
 	</target>
 
 	<target name="internal.signScoutSdkFeature" unless="skipSign">
-		<move todir="${signInputFolder}">
-			<fileset dir="${buildWorkspace}/N">
-				<include name="org.eclipse.scout.sdk.feature-N.zip" />
-			</fileset>
-		</move>
+		<move file="${buildWorkspace}/N/org.eclipse.scout.sdk.feature-N.zip" tofile="${signInputFolder}/sign.zip"/>
 		<ant antfile="sign.xml" target="signAndWaitResult" />
-		<move todir="${buildWorkspace}/N">
-			<fileset dir="${signOutputFolder}/N">
-				<include name="org.eclipse.scout.sdk.feature-N.zip" />
-			</fileset>
-		</move>
-
+		<move tofile="${buildWorkspace}/N/org.eclipse.scout.sdk.feature-N.zip" file="${signOutpuFolder}/sign.zip"/>
 	</target>
 
 	<target name="createP2Repository">
