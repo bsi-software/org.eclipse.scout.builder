@@ -18,6 +18,8 @@
 	</target>
 
 	<target name="clean">
+		<echo message="delete - > ${buildBundle}/scoutBuild.log"></echo>
+		<delete file="${buildBundle}/scoutBuild.log"/>
 		<delete dir="${workingDir}"/>
 		<delete dir="${buildBundle}/output"/>
 		<delete dir="${buildBundle}/final"/>
