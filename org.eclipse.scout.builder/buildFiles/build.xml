@@ -1,0 +1,48 @@
+<!--
+   Copyright (c) 2010 BSI Business Systems Integration AG.
+   All rights reserved. This program and the accompanying materials
+   are made available under the terms of the Eclipse Public License v1.0
+   which accompanies this distribution, and is available at
+   http://www.eclipse.org/legal/epl-v10.html
+   
+   Contributors:
+       BSI Business Systems Integration AG - initial API and implementation
+ -->
+
+<project name="org.eclipse.scout.build" default="buildAll">
+	<property environment="env" />
+	<property file="build.properties" />
+
+	<target name="clean">
+		<delete dir="${workingDir}"></delete>
+		<delete dir="${buildBundle}/output"></delete>
+	</target>
+	
+	<target name="setupEnvironment" unless="BUILD_TIMESTAMP">
+		<tstamp>
+			<format property="BUILD_TIMESTAMP" pattern="yyyyMMdd" locale="en,UK" />
+		</tstamp>
+		<echo message="env.WORKSPACE '${env.WORKSPACE}'"/>
+		<echo message="workspace '${workspace}'"/>
+	</target>
+
+	<target name="buildAll" depends="setupEnvironment, build_3.6, build_3.7M3">
+	</target>
+
+	<target name="build_3.6" depends="setupEnvironment">
+		<ant antfile="3.6.1/build.xml" target="build" />
+	</target>
+
+	<target name="build_3.7M3" depends="setupEnvironment">
+		<ant antfile="3.7M3/build.xml" target="build" />
+	</target>
+
+	<target name="buildScoutRepository" depends="setupEnvironment">
+		<ant antfile="3.6.1/build.xml" target="p2FeatureBuild" />
+	</target>
+	
+	<target name="buildNightly">
+		<ant antfile="nightly/build.xml" target="build"/>
+	</target>
+
+</project>
