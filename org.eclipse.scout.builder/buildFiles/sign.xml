@@ -36,7 +36,7 @@
 
 
 	<target name="startSign" unless="skipSign">
-		<exec executable="sign" dir="${workingDir}/sign">
+		<exec executable="sign" dir="${workingDir}">
 		    <arg value="${signInputFolder}/sign.zip"/>
 			<arg value="nomail"/>
 			<arg value="${signOutputFolder}"/>
