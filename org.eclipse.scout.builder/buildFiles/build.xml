@@ -37,5 +37,10 @@
 		<ant antfile="nightly/build.xml" target="build"/>
 	</target>
 	
+	
+	<target name="publishTest">
+		<delete dir="/home/data/httpd/download.eclipse.org/scout/updates/3.5.6-nightly"/>
+		<mkdir dir="/home/data/httpd/download.eclipse.org/scout/updates/3.5.6-nightly"/>
+	</target>
 
 </project>
