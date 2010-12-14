@@ -11,7 +11,7 @@
 
 <project name="org.eclipse.scout.build.nightly" default="build">
 	<property environment="env" />
-	<property file="nightly/build.properties" />
+	<property file="3.5.5/build.properties" />
 
 	<target name="clean" depends="cleanSign">
 		<delete dir="${workingDir}" />

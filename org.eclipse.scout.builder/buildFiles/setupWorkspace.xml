@@ -14,7 +14,7 @@
 	 -->
 <project name="setupEclipse" default="setupBuildWorkspace">
 	<property environment="env" />
-	
+
 	<target name="setupBuildWorkspace">
 		<!-- mkdirs -->
 		<mkdir dir="${buildWorkspace}/plugins" />
@@ -39,18 +39,25 @@
 		<copy todir="${buildWorkspace}/features">
 			<fileset dir="${workspace}/scout.rt">
 				<include name="*scout.*feature*/**" />
-		    </fileset>
+			</fileset>
 			<fileset dir="${workspace}/scout.sdk">
 				<include name="*scout.*feature*/**" />
 			</fileset>
 		</copy>
-		<!-- source tamplate -->
-<!--		<copy todir="${buildWorkspace}/features/org.eclipse.scout.rt.feature.source" failonerror="false">
+		<!-- rt source tamplate -->
+		<copy todir="${buildWorkspace}/features/org.eclipse.scout.rt.feature.source" failonerror="false">
 			<fileset dir="${buildBundle}/templates/sourceTemplateFeature">
 				<include name="**" />
 			</fileset>
 		</copy>
-		-->
+		<replace file="${buildWorkspace}/features/org.eclipse.scout.rt.feature.source/feature.properties" token="%%featureName%%" value="Scout RT Source"/>
+		<!-- sdk source tamplate -->
+		<copy todir="${buildWorkspace}/features/org.eclipse.scout.sdk.feature.source" failonerror="false">
+			<fileset dir="${buildBundle}/templates/sourceTemplateFeature">
+				<include name="**" />
+			</fileset>
+		</copy>
+		<replace file="${buildWorkspace}/features/org.eclipse.scout.sdk.feature.source/feature.properties" token="%%featureName%%" value="Scout SDK RT Source"/>
 	</target>
-	
-	</project>
+
+</project>

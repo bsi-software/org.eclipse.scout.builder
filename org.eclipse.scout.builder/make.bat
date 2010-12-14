@@ -21,7 +21,7 @@ cd %WORKSPACE%
 :# standard values for Eclipse 3.5 Classic SDK + Delta Pack 3.5
 set buildOpts=-Declipse.running=true 
 set workspaceDir=-Dworkspace=%WORKSPACE%
-
+set nighltyRepoVar=-DnightlyRepository=E:\workspaces\eclipse\scoutPublic3.6\org.eclipse.scout.builder\final\nightlyP2Repo
 
 
 :# create a log file named according to this pattern: log.<this shell sctipt name, i.e. make>
@@ -30,11 +30,7 @@ set logfile=org.eclipse.scout.builder/scoutRtBuild.log
 PATH=%JAVA_HOME%\bin;%ANT_HOME%\bin;%PATH%
 
 
-:# call ant -f build.xml %buildOpts% %workspaceDir% %* 
-:# call ant -f releases/releaseBuild.xml %buildOpts% %workspaceDir%  %* build3_6  > %logfile%               %workspaceDir% 
-:# call ant -f org.eclipse.scout.builder/buildFiles/build.xml %buildOpts%  %* buildScoutRepository 
-call ant -f org.eclipse.scout.builder/buildFiles/build.xml %buildOpts% %workspaceDir% -DskipSign=true %* buildNightly 
+call ant -f org.eclipse.scout.builder/buildFiles/build.xml %buildOpts% %workspaceDir% %nighltyRepoVar% -DskipSign=true %* buildNightly %logfile%
 
 endlocal
-pause
 

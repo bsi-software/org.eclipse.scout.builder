@@ -29,12 +29,7 @@ set logfile=org.eclipse.scout.builder/scoutRtBuild.log
 
 PATH=%JAVA_HOME%\bin;%ANT_HOME%\bin;%PATH%
 
-
-:# call ant -f build.xml %buildOpts% %workspaceDir% %* 
-:# call ant -f releases/releaseBuild.xml %buildOpts% %workspaceDir%  %* build3_6  > %logfile%               %workspaceDir% 
-:# call ant -f org.eclipse.scout.builder/buildFiles/build.xml %buildOpts%  %* buildScoutRepository 
-call ant -f org.eclipse.scout.builder/buildFiles/build.xml %buildOpts% %workspaceDir% -DskipSign=true %nighltyRepoVar% %* publish 
+call ant -f org.eclipse.scout.builder/buildFiles/build.xml %buildOpts% %workspaceDir% %nighltyRepoVar% -DskipSign=true  %* build3.5.5 > %logfile% 
 
 endlocal
-pause
 
