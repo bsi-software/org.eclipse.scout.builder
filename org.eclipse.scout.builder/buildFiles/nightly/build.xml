@@ -189,9 +189,8 @@
 			</fileset>
 		</zip>
 		<ant antfile="sign.xml" target="signAndWaitResult" />
-		<delete dir="${buildBundle}/output/p2Repo"/>
-		<mkdir dir="${buildBundle}/output/p2Repo"/>
-		<unzip dest="${buildBundle}/output/p2Repo" src="${signOutputFolder}/sign.zip"/>
+		<mkdir dir="${buildBundle}/output/p2RepoSigned"/>
+		<unzip dest="${buildBundle}/output/p2RepoSigned" src="${signOutputFolder}/sign.zip"/>
 	</target>
 
 	<target name="publish" unless="skipPublish">
@@ -206,12 +205,21 @@
 		  + N-yyyyMMdd-1
 		  -artifact.jar
 		-->
+
 		<property name="tmpRepo" location="${nightlyRepository}/${nightlyRepositoryName}_tmp" />
 		<property name="defRepo" location="${nightlyRepository}/${nightlyRepositoryName}" />
+		<delete dir="${defRepo}_unsigned"/>
+		<mkdir dir="${defRepo}_unsigned"/>
+		<copy todir="${defRepo}_unsigned">
+			<fileset dir="${buildBundle}/output/p2Repo">
+				<include name="**/**" />
+			</fileset>
+		</copy>
+		
 		<mkdir dir="${tmpRepo}" />
 
 		<copy todir="${tmpRepo}">
-			<fileset dir="${buildBundle}/output/p2Repo">
+			<fileset dir="${buildBundle}/output/p2RepoSigned">
 				<include name="**/**" />
 			</fileset>
 		</copy>
