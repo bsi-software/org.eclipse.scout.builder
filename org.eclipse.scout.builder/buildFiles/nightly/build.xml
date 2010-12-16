@@ -192,8 +192,8 @@
 		<ant antfile="sign.xml" target="signAndWaitResult" />
 		<mkdir dir="${buildBundle}/output/p2RepoSigned"/>
 		<unzip dest="${buildBundle}/output/p2RepoSigned" src="${signOutputFolder}/sign.zip"/>
-		<delete dir="${buildBundle}/output/p2RepoSigned">
-			<fileset>
+		<delete>
+			<fileset dir="${buildBundle}/output/p2RepoSigned">
 				<include name="artifacts.jar"/>
 				<include name="contents.jar"/>
 			</fileset>
