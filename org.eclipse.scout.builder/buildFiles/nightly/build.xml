@@ -17,7 +17,7 @@
 		<delete dir="${workingDir}" />
 		<delete dir="${buildBundle}/output/features" />
 		<delete dir="${buildBundle}/output/p2Repo" />
-
+		<delete dir="${buildBundle}/output/p2RepoSigned"/>
 	</target>
 
 	<target name="cleanSign" unless="skipSign">
@@ -29,6 +29,7 @@
 		<mkdir dir="${workingDir}" />
 		<mkdir dir="${buildBundle}/output/features" />
 		<mkdir dir="${buildBundle}/output/p2Repo" />
+		<mkdir dir="${buildBundle}/output/p2RepoSigned"/>
 		<ant antfile="${buildBundle}/buildFiles/setupEclipse.xml" target="setupEclipse" />
 		<ant antfile="${buildBundle}/buildFiles/setupWorkspace.xml" target="setupBuildWorkspace" />
 	</target>
