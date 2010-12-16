@@ -242,11 +242,12 @@
 		<property name="defRepo" location="${nightlyRepository}/${nightlyRepositoryName}" />
 		<delete dir="${defRepo}_unsigned"/>
 		<mkdir dir="${defRepo}_unsigned"/>
-		<copy todir="${defRepo}_unsigned">
+<!--		<copy todir="${defRepo}_unsigned">
 			<fileset dir="${buildBundle}/output/p2Repo">
 				<include name="**/**" />
 			</fileset>
 		</copy>
+		-->
 		
 		<mkdir dir="${tmpRepo}" />
 
