@@ -17,7 +17,6 @@
 		<delete dir="${workingDir}" />
 		<delete dir="${buildBundle}/output/features" />
 		<delete dir="${buildBundle}/output/p2Repo" />
-		<delete dir="${buildBundle}/output/p2RepoSigned"/>
 	</target>
 
 	<target name="cleanSign" unless="skipSign">
@@ -29,7 +28,6 @@
 		<mkdir dir="${workingDir}" />
 		<mkdir dir="${buildBundle}/output/features" />
 		<mkdir dir="${buildBundle}/output/p2Repo" />
-		<mkdir dir="${buildBundle}/output/p2RepoSigned"/>
 		<ant antfile="${buildBundle}/buildFiles/setupEclipse.xml" target="setupEclipse" />
 		<ant antfile="${buildBundle}/buildFiles/setupWorkspace.xml" target="setupBuildWorkspace" />
 	</target>
@@ -40,7 +38,7 @@
 	</target>
 
 	<target name="build" depends="clean, setup, buildScoutRtFeature,  
-		buildScoutSdkFeature,  createP2Repository,signP2Repository, publish">
+		buildScoutSdkFeature,  createP2Repository, signP2Repository, publish">
 	</target>
 
 	<target name="buildScoutRtFeature">
@@ -66,22 +64,6 @@
 			</fileset>
 		</unzip>
 	</target>
-
-	<target name="signScoutRtFeature" depends="internal.signScoutRtFeature, cleanSign">
-		<mkdir dir="${buildBundle}/output/features" />
-		<unzip dest="${buildBundle}/output/features">
-			<fileset dir="${buildWorkspace}/N">
-				<include name="org.eclipse.scout.rt.feature-N.zip" />
-			</fileset>
-		</unzip>
-	</target>
-
-	<target name="internal.signScoutRtFeature" unless="skipSign">
-		<move file="${buildWorkspace}/N/org.eclipse.scout.rt.feature-N.zip" tofile="${signInputFolder}/sign.zip" />
-		<ant antfile="sign.xml" target="signAndWaitResult" />
-		<move file="${signOutputFolder}/sign.zip" tofile="${buildWorkspace}/N/org.eclipse.scout.rt.feature-N.zip" />
-	</target>
-
 
 	<target name="buildScoutSdkFeature">
 		<echo message="build feature" />
@@ -111,40 +93,7 @@
 
 
 
-	<target name="signScoutSdkFeature" depends="internal.signScoutSdkFeature, cleanSign">
 
-		<mkdir dir="${buildBundle}/output/features" />
-		<unzip dest="${buildBundle}/output/features">
-			<fileset dir="${buildWorkspace}/N">
-				<include name="org.eclipse.scout.sdk.feature-N.zip" />
-			</fileset>
-		</unzip>
-		<for param="file">
-			<path>
-				<fileset dir="${buildBundle}/output/features" includes="*/" />
-			</path>
-			<sequential>
-				<echo message="@@@ @{file}" />
-				<!--				<propertyregex override="yes" property="program" input="@{file}" regexp=".*/([^\.]*)\.cpp" replace="\1" />
-				<mkdir dir="${obj.dir}/${program}" />
-				<mkdir dir="${build.bin.dir}" />
-				<cc link="executable" objdir="${obj.dir}/${program}" outfile="${build.bin.dir}/${program}">
-					<compiler refid="compiler.options" />
-					<fileset file="@{file}" />
-					<linker refid="linker-libs" />
-				</cc>
-				-->
-			</sequential>
-		</for>
-	</target>
-
-	<target name="internal.signScoutSdkFeature" unless="skipSign">
-		<move file="${buildWorkspace}/N/org.eclipse.scout.sdk.feature-N.zip" tofile="${signInputFolder}/sign.zip" />
-		<ant antfile="sign.xml" target="signAndWaitResult" />
-		<move file="${signOutputFolder}/sign.zip" tofile="${buildWorkspace}/N/org.eclipse.scout.sdk.feature-N.zip" />
-	</target>
-	
-	
 
 	<target name="createP2Repository">
 		<mkdir dir="${buildWorkspace}/p2Repo" />
@@ -163,7 +112,7 @@
 			<arg line="-source ${buildWorkspace}/p2Repo" />
 			<!--			<arg line="-configs gtk.linux.x86"/> -->
 			<arg line="-compress" />
-			<arg line="-publishArtifacts" /> 
+			<arg line="-publishArtifacts" />
 			<classpath>
 				<pathelement location="${workingDir}/eclipse/plugins/org.eclipse.equinox.launcher_${equinoxLauncherPluginVersion}.jar" />
 			</classpath>
@@ -181,48 +130,49 @@
 			</classpath>
 		</java>
 	</target>
-	
+
 	<target name="signP2Repository" depends=" cleanSign" unless="skipSign">
 		<delete dir="${buildWorkspace}/p2Repo" />
 		<mkdir dir="${buildWorkspace}/p2Repo" />
 		<zip destfile="${signInputFolder}/sign.zip">
 			<fileset dir="${buildBundle}/output/p2Repo">
-				<include name="**/**"/>
+				<include name="**/**" />
 			</fileset>
 		</zip>
 		<ant antfile="sign.xml" target="signAndWaitResult" />
-		<mkdir dir="${buildBundle}/output/p2RepoSigned"/>
-		<unzip dest="${buildBundle}/output/p2RepoSigned" src="${signOutputFolder}/sign.zip"/>
+		<mkdir dir="${buildBundle}/output/p2Repo" />
+		<unzip dest="${buildBundle}/output/p2Repo" src="${signOutputFolder}/sign.zip" />
+		<!-- workaround to ensure correct checksums -->
 		<delete>
-			<fileset dir="${buildBundle}/output/p2RepoSigned">
-				<include name="artifacts.jar"/>
-				<include name="contents.jar"/>
+			<fileset dir="${buildBundle}/output/p2Repo">
+				<include name="artifacts.jar" />
+				<include name="contents.jar" />
 			</fileset>
 		</delete>
 		<java classname="org.eclipse.equinox.launcher.Main" fork="true" failonerror="true">
-					<arg line="-application org.eclipse.equinox.p2.publisher.FeaturesAndBundlesPublisher" />
-					<arg line="-metadataRepository file:/${buildBundle}/output/p2RepoSigned" />
-					<arg line="-artifactRepository file:/${buildBundle}/output/p2RepoSigned" />
-					<arg line="-source ${buildBundle}/output/p2RepoSigned" />
-					<!--			<arg line="-configs gtk.linux.x86"/> -->
-					<arg line="-compress" />
-					<arg line="-publishArtifacts" /> 
-					<classpath>
-						<pathelement location="${workingDir}/eclipse/plugins/org.eclipse.equinox.launcher_${equinoxLauncherPluginVersion}.jar" />
-					</classpath>
-				</java>
-				<echo message="categorize repository" />
-				<java classname="org.eclipse.equinox.launcher.Main" fork="true" failonerror="true">
-					<arg line="-application org.eclipse.equinox.p2.publisher.CategoryPublisher" />
-					<arg line="-metadataRepository file:/${buildBundle}/output/p2RepoSigned" />
-					<arg line="-source ${buildBundle}/output/p2RepoSigned" />
-					<arg line="-categoryDefinition file:${workspace}/scout.sdk/org.eclipse.scout.sdk.feature/scoutCategory.xml" />
-					<arg line="-compress" />
-					<arg line="-categoryQualifier" />
-					<classpath>
-						<pathelement location="${workingDir}/eclipse/plugins/org.eclipse.equinox.launcher_${equinoxLauncherPluginVersion}.jar" />
-					</classpath>
-				</java>
+			<arg line="-application org.eclipse.equinox.p2.publisher.FeaturesAndBundlesPublisher" />
+			<arg line="-metadataRepository file:/${buildBundle}/output/p2Repo" />
+			<arg line="-artifactRepository file:/${buildBundle}/output/p2Repo" />
+			<arg line="-source ${buildBundle}/output/p2Repo" />
+			<!--			<arg line="-configs gtk.linux.x86"/> -->
+			<arg line="-compress" />
+			<arg line="-publishArtifacts" />
+			<classpath>
+				<pathelement location="${workingDir}/eclipse/plugins/org.eclipse.equinox.launcher_${equinoxLauncherPluginVersion}.jar" />
+			</classpath>
+		</java>
+		<echo message="categorize repository" />
+		<java classname="org.eclipse.equinox.launcher.Main" fork="true" failonerror="true">
+			<arg line="-application org.eclipse.equinox.p2.publisher.CategoryPublisher" />
+			<arg line="-metadataRepository file:/${buildBundle}/output/p2Repo" />
+			<arg line="-source ${buildBundle}/output/p2Repo" />
+			<arg line="-categoryDefinition file:${workspace}/scout.sdk/org.eclipse.scout.sdk.feature/scoutCategory.xml" />
+			<arg line="-compress" />
+			<arg line="-categoryQualifier" />
+			<classpath>
+				<pathelement location="${workingDir}/eclipse/plugins/org.eclipse.equinox.launcher_${equinoxLauncherPluginVersion}.jar" />
+			</classpath>
+		</java>
 	</target>
 
 	<target name="publish" unless="skipPublish">
@@ -240,19 +190,11 @@
 
 		<property name="tmpRepo" location="${nightlyRepository}/${nightlyRepositoryName}_tmp" />
 		<property name="defRepo" location="${nightlyRepository}/${nightlyRepositoryName}" />
-		<delete dir="${defRepo}_unsigned"/>
-		<mkdir dir="${defRepo}_unsigned"/>
-<!--		<copy todir="${defRepo}_unsigned">
-			<fileset dir="${buildBundle}/output/p2Repo">
-				<include name="**/**" />
-			</fileset>
-		</copy>
-		-->
-		
+
 		<mkdir dir="${tmpRepo}" />
 
 		<copy todir="${tmpRepo}">
-			<fileset dir="${buildBundle}/output/p2RepoSigned">
+			<fileset dir="${buildBundle}/output/p2Repo">
 				<include name="**/**" />
 			</fileset>
 		</copy>
