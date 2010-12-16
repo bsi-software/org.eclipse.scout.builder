@@ -14,14 +14,14 @@ setlocal
 set JAVA_HOME=E:\jsdk\j2sdk1.6.0_10
 set ANT_HOME=E:\jsdk\apache-ant-1.7.1
 set ANT_OPTS=-Xmx512m
-set WORKSPACE=E:\workspaces\eclipse\scoutPublic3.6
+set WORKSPACE=E:\workspaces\scout.build\p2Workspace
 
 cd %WORKSPACE%
 
 :# standard values for Eclipse 3.5 Classic SDK + Delta Pack 3.5
 set buildOpts=-Declipse.running=true 
 :# set workspaceDir=-Dworkspace=%WORKSPACE%
-set nighltyRepoVar=-DnightlyRepository=E:\workspaces\eclipse\scoutPublic3.6\org.eclipse.scout.builder\final\nightlyP2Repo
+set nighltyRepoVar=-DnightlyRepository=E:\workspaces\scout.build\p2Workspace\org.eclipse.scout.builder\final\nightlyP2Repo
 :# productiv : nightlyRepository=/home/data/httpd/download.eclipse.org/scout/updates/3.5.6-nightly 
 
 
@@ -34,4 +34,6 @@ PATH=%JAVA_HOME%\bin;%ANT_HOME%\bin;%PATH%
 call ant -f org.eclipse.scout.builder/buildFiles/build.xml %buildOpts%  %nighltyRepoVar% -DskipSign=true %* buildNightly  > %logfile%
 
 endlocal
+pause
+
 

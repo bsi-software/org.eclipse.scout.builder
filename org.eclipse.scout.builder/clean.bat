@@ -14,7 +14,7 @@ setlocal
 set JAVA_HOME=E:\jsdk\j2sdk1.6.0_10
 set ANT_HOME=E:\jsdk\apache-ant-1.7.1
 set ANT_OPTS=-Xmx512m
-set WORKSPACE=E:\workspaces\eclipse\scoutPublic3.6
+set WORKSPACE=E:\workspaces\scout.build\p2Workspace
 
 cd %WORKSPACE%
 
