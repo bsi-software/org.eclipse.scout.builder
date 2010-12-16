@@ -142,6 +142,8 @@
 		<ant antfile="sign.xml" target="signAndWaitResult" />
 		<move file="${signOutputFolder}/sign.zip" tofile="${buildWorkspace}/N/org.eclipse.scout.sdk.feature-N.zip" />
 	</target>
+	
+	
 
 	<target name="createP2Repository">
 		<mkdir dir="${buildWorkspace}/p2Repo" />
@@ -160,13 +162,12 @@
 			<arg line="-source ${buildWorkspace}/p2Repo" />
 			<!--			<arg line="-configs gtk.linux.x86"/> -->
 			<arg line="-compress" />
-			<arg line="-publishArtifacts" />
+			<arg line="-publishArtifacts" /> 
 			<classpath>
 				<pathelement location="${workingDir}/eclipse/plugins/org.eclipse.equinox.launcher_${equinoxLauncherPluginVersion}.jar" />
 			</classpath>
 		</java>
 		<echo message="categorize repository" />
-
 		<java classname="org.eclipse.equinox.launcher.Main" fork="true" failonerror="true">
 			<arg line="-application org.eclipse.equinox.p2.publisher.CategoryPublisher" />
 			<arg line="-metadataRepository file:/${buildBundle}/output/p2Repo" />
@@ -191,6 +192,36 @@
 		<ant antfile="sign.xml" target="signAndWaitResult" />
 		<mkdir dir="${buildBundle}/output/p2RepoSigned"/>
 		<unzip dest="${buildBundle}/output/p2RepoSigned" src="${signOutputFolder}/sign.zip"/>
+		<delete dir="${buildBundle}/output/p2RepoSigned">
+			<fileset>
+				<include name="artifacts.jar"/>
+				<include name="contents.jar"/>
+			</fileset>
+		</delete>
+		<java classname="org.eclipse.equinox.launcher.Main" fork="true" failonerror="true">
+					<arg line="-application org.eclipse.equinox.p2.publisher.FeaturesAndBundlesPublisher" />
+					<arg line="-metadataRepository file:/${buildBundle}/output/p2RepoSigned" />
+					<arg line="-artifactRepository file:/${buildBundle}/output/p2RepoSigned" />
+					<arg line="-source ${buildBundle}/output/p2RepoSigned" />
+					<!--			<arg line="-configs gtk.linux.x86"/> -->
+					<arg line="-compress" />
+					<arg line="-publishArtifacts" /> 
+					<classpath>
+						<pathelement location="${workingDir}/eclipse/plugins/org.eclipse.equinox.launcher_${equinoxLauncherPluginVersion}.jar" />
+					</classpath>
+				</java>
+				<echo message="categorize repository" />
+				<java classname="org.eclipse.equinox.launcher.Main" fork="true" failonerror="true">
+					<arg line="-application org.eclipse.equinox.p2.publisher.CategoryPublisher" />
+					<arg line="-metadataRepository file:/${buildBundle}/output/p2RepoSigned" />
+					<arg line="-source ${buildBundle}/output/p2RepoSigned" />
+					<arg line="-categoryDefinition file:${workspace}/scout.sdk/org.eclipse.scout.sdk.feature/scoutCategory.xml" />
+					<arg line="-compress" />
+					<arg line="-categoryQualifier" />
+					<classpath>
+						<pathelement location="${workingDir}/eclipse/plugins/org.eclipse.equinox.launcher_${equinoxLauncherPluginVersion}.jar" />
+					</classpath>
+				</java>
 	</target>
 
 	<target name="publish" unless="skipPublish">
