@@ -44,19 +44,6 @@
 	<target name="buildScoutRtFeature">
 		<echo message="build feature ${env.JAVA_HOME}" />
 		<java classname="org.eclipse.equinox.launcher.Main" fork="true" failonerror="true">
-			
-<!--		
-jvm="${workingDir}/eclipse/jre/bin/java"
-	<bootclasspath>
-				<pathelement location="${env.JAVA_HOME}/jre/lib/resources.jar" />
-				<pathelement location="${env.JAVA_HOME}/jre/lib/rt.jar" />
-                <pathelement location="${env.JAVA_HOME}/jre/lib/sunrsasign.jar" />
-				<pathelement location="${env.JAVA_HOME}/jre/lib/jsse.jar" />
-				<pathelement location="${env.JAVA_HOME}/jre/lib/jce.jar" />
-				<pathelement location="${env.JAVA_HOME}/jre/lib/charsets.jar" />
-				<pathelement location="${env.JAVA_HOME}/jre/classes" />
-				<pathelement location="${templateDir}/jre/jre1.6/javax.jms_1.1.0.jar"/>
-			</bootclasspath> -->
 			<arg line="-application org.eclipse.ant.core.antRunner " />
 			<arg line="-buildfile ${workingDir}/eclipse/plugins/org.eclipse.pde.build_${pdeBuildPluginVersion}/scripts/build.xml" />
 			<arg line="-Dtimestamp=${timestamp}" />
@@ -90,6 +77,7 @@ jvm="${workingDir}/eclipse/jre/bin/java"
 			<arg line="-DtopLevelElementId=org.eclipse.scout.sdk.feature" />
 			<arg line="-Dbuilder=${buildBundle}/buildFiles/featureBuild" />
 			<arg line="-Dworkspace=${env.WORKSPACE}" />
+			<arg line="-Djavahome=${env.JAVA_HOME}" />
 			<arg line="-DIndividualSourceBundles=true" />
 			<classpath>
 				<pathelement location="${workingDir}/eclipse/plugins/org.eclipse.equinox.launcher_${equinoxLauncherPluginVersion}.jar" />
