@@ -36,13 +36,14 @@
 		</copy>
 		
 		<!-- jre -->
-		<mkdir dir="${workingDir}/eclipse/jre"/>
+<!--		<mkdir dir="${workingDir}/eclipse/jre"/>
 		<copy todir="${workingDir}/eclipse/jre">
 			<fileset dir="${env.JAVA_HOME}/jre" />
 		</copy>
 		<copy todir="${workingDir}/eclipse/jre/lib" failonerror="false">
 			<fileset dir="${templateDir}/jre" />
 		</copy>
+		-->
 	</target>
 
 	<target name="downloadEclipse" depends="checkDownloadEclipse" unless="skipDownloadEclipse">

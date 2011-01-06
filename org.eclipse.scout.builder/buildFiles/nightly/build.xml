@@ -43,9 +43,11 @@
 
 	<target name="buildScoutRtFeature">
 		<echo message="build feature ${env.JAVA_HOME}" />
-		<java jvm="${workingDir}/eclipse/jre/bin/java" classname="org.eclipse.equinox.launcher.Main" fork="true" failonerror="true">
+		<java classname="org.eclipse.equinox.launcher.Main" fork="true" failonerror="true">
 			
-<!--			<bootclasspath>
+<!--		
+jvm="${workingDir}/eclipse/jre/bin/java"
+	<bootclasspath>
 				<pathelement location="${env.JAVA_HOME}/jre/lib/resources.jar" />
 				<pathelement location="${env.JAVA_HOME}/jre/lib/rt.jar" />
                 <pathelement location="${env.JAVA_HOME}/jre/lib/sunrsasign.jar" />
@@ -63,6 +65,7 @@
 			<arg line="-DtopLevelElementId=org.eclipse.scout.rt.feature" />
 			<arg line="-Dbuilder=${buildBundle}/buildFiles/featureBuild" />
 			<arg line="-Dworkspace=${env.WORKSPACE}" />
+			<arg line="-Djavahome=${env.JAVA_HOME}" />
 			<arg line="-DIndividualSourceBundles=true" />
 			<classpath>
 				<pathelement location="${workingDir}/eclipse/plugins/org.eclipse.equinox.launcher_${equinoxLauncherPluginVersion}.jar" />
