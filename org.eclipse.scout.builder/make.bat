@@ -30,8 +30,8 @@ set logfile=org.eclipse.scout.builder/scoutBuild.log
 
 PATH=%JAVA_HOME%\bin;%ANT_HOME%\bin;%PATH%
 
-
-call ant -f org.eclipse.scout.builder/buildFiles/build.xml %buildOpts%  %nighltyRepoVar% -DskipSign=true %* buildNightly  > %logfile%
+call ant -f org.eclipse.scout.builder/buildFiles/build.xml %buildOpts%  %nighltyRepoVar% -DskipSign=true %* buildNightly 
+:# call ant -f org.eclipse.scout.builder/buildFiles/build.xml %buildOpts%  %nighltyRepoVar% -DskipSign=true %* buildNightly  > %logfile%
 
 endlocal
 pause

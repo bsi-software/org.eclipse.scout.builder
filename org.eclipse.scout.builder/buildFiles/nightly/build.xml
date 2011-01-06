@@ -42,8 +42,19 @@
 	</target>
 
 	<target name="buildScoutRtFeature">
-		<echo message="build feature" />
-		<java classname="org.eclipse.equinox.launcher.Main" fork="true" failonerror="true">
+		<echo message="build feature ${env.JAVA_HOME}" />
+		<java jvm="${workingDir}/eclipse/jre/bin/java" classname="org.eclipse.equinox.launcher.Main" fork="true" failonerror="true">
+			
+<!--			<bootclasspath>
+				<pathelement location="${env.JAVA_HOME}/jre/lib/resources.jar" />
+				<pathelement location="${env.JAVA_HOME}/jre/lib/rt.jar" />
+                <pathelement location="${env.JAVA_HOME}/jre/lib/sunrsasign.jar" />
+				<pathelement location="${env.JAVA_HOME}/jre/lib/jsse.jar" />
+				<pathelement location="${env.JAVA_HOME}/jre/lib/jce.jar" />
+				<pathelement location="${env.JAVA_HOME}/jre/lib/charsets.jar" />
+				<pathelement location="${env.JAVA_HOME}/jre/classes" />
+				<pathelement location="${templateDir}/jre/jre1.6/javax.jms_1.1.0.jar"/>
+			</bootclasspath> -->
 			<arg line="-application org.eclipse.ant.core.antRunner " />
 			<arg line="-buildfile ${workingDir}/eclipse/plugins/org.eclipse.pde.build_${pdeBuildPluginVersion}/scripts/build.xml" />
 			<arg line="-Dtimestamp=${timestamp}" />
