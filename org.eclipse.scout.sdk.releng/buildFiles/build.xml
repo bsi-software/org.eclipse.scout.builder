@@ -13,7 +13,7 @@
 	<property environment="env" />
 	<property file="nightly/build.properties" />
 
-	<target name="build" depends="clean">
+	<target name="build" depends="clean, setup">
 	</target>
 
 	<target name="clean">
@@ -21,6 +21,7 @@
 		<delete dir="${buildBundle}/output/features" />
 		<delete dir="${buildBundle}/output/p2Repo" />
 	</target>
+	
 	<target name="setup" >
 		<mkdir dir="${workingDir}" />
 		<mkdir dir="${buildBundle}/output/features" />
