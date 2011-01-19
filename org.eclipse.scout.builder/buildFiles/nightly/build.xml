@@ -13,6 +13,10 @@
 	<property environment="env" />
 	<property file="nightly/build.properties" />
 
+	<target name="build" depends="clean, setup, buildScoutRtFeature,  
+		buildScoutSdkFeature,  createP2Repository, signP2Repository, publish">
+	</target>
+	
 	<target name="clean" depends="cleanSign">
 		<delete dir="${workingDir}" />
 		<delete dir="${buildBundle}/output/features" />
@@ -37,9 +41,7 @@
 		<mkdir dir="${signOutputFolder}" />
 	</target>
 
-	<target name="build" depends="clean, setup, buildScoutRtFeature,  
-		buildScoutSdkFeature,  createP2Repository, signP2Repository, publish">
-	</target>
+
 
 	<target name="buildScoutRtFeature">
 		<echo message="build feature ${env.JAVA_HOME}" />
@@ -90,12 +92,6 @@
 			</fileset>
 		</unzip>
 	</target>
-
-
-
-
-
-
 
 	<target name="createP2Repository">
 		<mkdir dir="${buildWorkspace}/p2Repo" />
