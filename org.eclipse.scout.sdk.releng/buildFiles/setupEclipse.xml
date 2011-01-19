@@ -1,0 +1,68 @@
+<!-- Copyright (c) 2010 BSI Business Systems Integration AG. All rights reserved. 
+	This program and the accompanying materials are made available under the 
+	terms of the Eclipse Public License v1.0 which accompanies this distribution, 
+	and is available at http://www.eclipse.org/legal/epl-v10.html Contributors: 
+	BSI Business Systems Integration AG - initial API and implementation -->
+
+<!--
+	expecting properties:
+	- downloadDir
+		the directory to download the eclipse and delta pack to. The download only occures if the two files do not exist.
+	- templateDir 
+		the directory contains a dropins folder with some bundles or features.
+	- eclipseFileName 
+		the name of the eclipse file to download e.g. eclipse-SDK-3.7M3-win32.zip
+		
+	- eclipseDownloadUrl
+		the url to download the eclipse e.g. http://download.eclipse.org/eclipse/downloads/drops/S-3.7M3-201010281441/${eclipseFileName}
+	- eclipseDeltapackName
+		the eclipse delta pack file name e.g. eclipse-3.7M3-delta-pack.zip
+	- eclipseDeltapackUrl
+		the url to download the delta pack e.g. http://download.eclipse.org/eclipse/downloads/drops/S-3.7M3-201010281441/${eclipseDeltapackName}
+	
+	 -->
+<project name="setupEclipse" default="">
+	<property environment="env" />
+
+	<target name="setupEclipse" depends="downloadEclipse, downloadDeltapack">
+		<antcall target="downloadEclipse" />
+		<antcall target="downloadDeltapack" />
+		<!-- setup eclipse to the ${workingDir} -->
+		<!-- unzip eclipse and delta pack -->
+		<unzip dest="${workingDir}" overwrite="true" src="${downloadDir}/${eclipseFileName}" />
+		<unzip dest="${workingDir}" overwrite="true" src="${downloadDir}/${eclipseDeltapackName}" />
+		<copy todir="${workingDir}" failonerror="false">
+			<fileset dir="${templateDir}/dropins" />
+		</copy>
+		
+		<!-- jre -->
+<!--		<mkdir dir="${workingDir}/eclipse/jre"/>
+		<copy todir="${workingDir}/eclipse/jre">
+			<fileset dir="${env.JAVA_HOME}/jre" />
+		</copy>
+		<copy todir="${workingDir}/eclipse/jre/lib" failonerror="false">
+			<fileset dir="${templateDir}/jre" />
+		</copy>
+		-->
+	</target>
+
+	<target name="downloadEclipse" depends="checkDownloadEclipse" unless="skipDownloadEclipse">
+		<echo message="download eclipse from '${eclipseDownloadUrl}'." />
+		<mkdir dir="${downloadDir}" />
+		<get src="${eclipseDownloadUrl}" dest="${downloadDir}/${eclipseFileName}" />
+	</target>
+
+	<target name="checkDownloadEclipse">
+		<available file="${downloadDir}/${eclipseFileName}" property="skipDownloadEclipse" />
+	</target>
+
+	<target name="downloadDeltapack" depends="checkDownloadDeltapack" unless="skipDownloadDeltapack">
+		<echo message="download delta pack from '${eclipseDeltapackUrl}'." />
+		<get src="${eclipseDeltapackUrl}" dest="${downloadDir}/${eclipseDeltapackName}" />
+	</target>
+
+	<target name="checkDownloadDeltapack">
+		<available file="${downloadDir}/${eclipseDeltapackName}" property="skipDownloadDeltapack" />
+	</target>
+
+</project>

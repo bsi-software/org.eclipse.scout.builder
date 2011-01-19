@@ -1,0 +1,63 @@
+<!-- Copyright (c) 2010 BSI Business Systems Integration AG. All rights reserved. 
+	This program and the accompanying materials are made available under the 
+	terms of the Eclipse Public License v1.0 which accompanies this distribution, 
+	and is available at http://www.eclipse.org/legal/epl-v10.html Contributors: 
+	BSI Business Systems Integration AG - initial API and implementation -->
+
+<!--
+	expecting properties:
+		- buildWorkspace
+			the folder to create the building workspace
+		- workspace
+			the folder caining a teh SVN checkout of the tag.
+	
+	 -->
+<project name="setupEclipse" default="setupBuildWorkspace">
+	<property environment="env" />
+
+	<target name="setupBuildWorkspace">
+		<!-- mkdirs -->
+		<mkdir dir="${buildWorkspace}/plugins" />
+		<mkdir dir="${buildWorkspace}/features" />
+		<!-- copy plugins to build to the buildDirectory -->
+		<copy todir="${buildWorkspace}/plugins">
+			<fileset dir="${workspace}/scout.rt">
+				<include name="org.eclipse.scout.*/**" />
+				<include name="javax.*/**" />
+				<exclude name="org.eclipse.scout*build*/**" />
+				<exclude name="*testing*/**" />
+				<exclude name="*test*/**" />
+				<exclude name="*feature*/**" />
+			</fileset>
+			<fileset dir="${workspace}/scout.sdk">
+				<include name="org.eclipse.scout.*/**" />
+				<exclude name="*testing*/**" />
+				<exclude name="*test*/**" />
+				<exclude name="*feature*/**" />
+			</fileset>
+		</copy>
+		<copy todir="${buildWorkspace}/features">
+			<fileset dir="${workspace}/scout.rt">
+				<include name="*scout.*feature*/**" />
+			</fileset>
+			<fileset dir="${workspace}/scout.sdk">
+				<include name="*scout.*feature*/**" />
+			</fileset>
+		</copy>
+		<!-- rt source tamplate -->
+		<copy todir="${buildWorkspace}/features/org.eclipse.scout.rt.feature.source" failonerror="false">
+			<fileset dir="${buildBundle}/templates/sourceTemplateFeature">
+				<include name="**" />
+			</fileset>
+		</copy>
+		<replace file="${buildWorkspace}/features/org.eclipse.scout.rt.feature.source/feature.properties" token="%%featureName%%" value="Scout RT Source"/>
+		<!-- sdk source tamplate -->
+		<copy todir="${buildWorkspace}/features/org.eclipse.scout.sdk.feature.source" failonerror="false">
+			<fileset dir="${buildBundle}/templates/sourceTemplateFeature">
+				<include name="**" />
+			</fileset>
+		</copy>
+		<replace file="${buildWorkspace}/features/org.eclipse.scout.sdk.feature.source/feature.properties" token="%%featureName%%" value="Scout SDK RT Source"/>
+	</target>
+
+</project>
