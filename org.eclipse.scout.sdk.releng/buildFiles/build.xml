@@ -11,7 +11,7 @@
 
 <project name="org.eclipse.scout.build.nightly" default="build">
 	<property environment="env" />
-	<property file="nightly/build.properties" />
+	<property file="build.properties" />
 
 	<target name="build" depends="clean, setup">
 	</target>
