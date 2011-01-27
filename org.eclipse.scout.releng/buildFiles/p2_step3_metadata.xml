@@ -1,0 +1,72 @@
+<!--
+   Copyright (c) 2010 BSI Business Systems Integration AG.
+   All rights reserved. This program and the accompanying materials
+   are made available under the terms of the Eclipse Public License v1.0
+   which accompanies this distribution, and is available at
+   http://www.eclipse.org/legal/epl-v10.html
+   
+   Contributors:
+       BSI Business Systems Integration AG - initial API and implementation
+ -->
+<!--
+ Input
+  ${buildWorking}/step0 to have the subfolders /plugins /features with all bundle/feature sources in it.
+ 
+ Output
+  ${buildWorking}/step1 with two subfolders /plugins /features an all the built bundles and features 
+     packed in jar files if requested.
+     
+     $JAVA_HOME/bin/java \
+    	-Dorg.eclipse.update.jarprocessor.pack200=@jre \
+    	-cp "$ECLIPSE_LAUNCHER" org.eclipse.core.launcher.Main \
+    	-application org.eclipse.update.core.siteOptimizer \
+    	-jarProcessor -processAll -repack -outputDir .packed "$srcFile"  
+-->
+
+<project name="p2_step3.metadata" default="build">
+	<property file="build.properties" />
+
+
+	<target name="clean">
+		<delete dir="${buildDataDir}/p2_step3" />
+	</target>
+
+	<target name="build">
+		<available file="${buildDataDir}/p2_step3/output/metadata.created" property="skipP2_step3" />
+		<antcall target="createMetadata" />
+		<delete dir="${buildDataDir}/p2_step3/input" failonerror="false" />
+	</target>
+
+
+	<target name="createMetadata" unless="skipP2_step3">
+		<antcall target="clean" />
+		<property name="inputFolder" location="${buildDataDir}/p2_step3/input" />
+		<property name="outputFolder" location="${buildDataDir}/p2_step3/output" />
+		<mkdir dir="${inputFolder}" />
+		<copy todir="${inputFolder}">
+			<fileset dir="${buildDataDir}/p2_step2/output">
+				<include name="**/*" />
+				<exclude name="*.created" />
+			</fileset>
+		</copy>
+		<copy todir="${outputFolder}">
+			<fileset dir="${inputFolder}">
+				<include name="**/*" />
+			</fileset>
+		</copy>
+		<!-- create metadata-->
+		<java classname="org.eclipse.equinox.launcher.Main" fork="true" failonerror="true">
+			<arg line="-application org.eclipse.equinox.p2.publisher.FeaturesAndBundlesPublisher" />
+			<arg line="-metadataRepository file:/${outputFolder}" />
+			<arg line="-artifactRepository file:/${outputFolder}" />
+			<arg line="-source ${outputFolder}" />
+			<arg line="-compress" />
+			<arg line="-publishArtifacts" />
+			<classpath>
+				<pathelement location="${relengRootDir}/working/eclipse/plugins/org.eclipse.equinox.launcher_${equinoxLauncherPluginVersion}.jar" />
+			</classpath>
+		</java>
+		<touch file="${outputFolder}/metadata.created" />
+	</target>
+
+</project>

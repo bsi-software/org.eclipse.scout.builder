@@ -1,0 +1,74 @@
+<!--
+   Copyright (c) 2010 BSI Business Systems Integration AG.
+   All rights reserved. This program and the accompanying materials
+   are made available under the terms of the Eclipse Public License v1.0
+   which accompanies this distribution, and is available at
+   http://www.eclipse.org/legal/epl-v10.html
+   
+   Contributors:
+       BSI Business Systems Integration AG - initial API and implementation
+ -->
+<!--
+ Input
+  ${buildWorking}/step0 to have the subfolders /plugins /features with all bundle/feature sources in it.
+ 
+ Output
+  ${buildWorking}/step1 with two subfolders /plugins /features an all the built bundles and features 
+     packed in jar files if requested.
+     
+     $JAVA_HOME/bin/java \
+    	-Dorg.eclipse.update.jarprocessor.pack200=@jre \
+    	-cp "$ECLIPSE_LAUNCHER" org.eclipse.core.launcher.Main \
+    	-application org.eclipse.update.core.siteOptimizer \
+    	-jarProcessor -processAll -repack -outputDir .packed "$srcFile"  
+-->
+
+<project name="p2_step2.downlaodRepository" default="build">
+	<property file="build.properties" />
+
+	<target name="clean">
+		<delete dir="${buildDataDir}/p2_step2" />
+	</target>
+
+	<target name="build">
+		<available file="${buildDataDir}/p2_step2/output/setupRepository.created" property="skipP2_step2" />
+		<antcall target="setupRepository" />
+	</target>
+
+	<target name="setupRepository" unless="skipP2_step2">
+		<antcall target="clean" />
+		<mkdir dir="${buildDataDir}/p2_step2/output" />
+		<antcall target="localRepo" />
+		<antcall target="downlaodRepository" />
+		<touch file="${buildDataDir}/p2_step2/output/setupRepository.created" />
+		<delete dir="${buildDataDir}/p2_step2/input" failonerror="false" />
+	</target>
+
+	<target name="localRepo">
+		<property name="outputFolder" location="${buildDataDir}/p2_step2/output" />
+		<copy todir="${outputFolder}">
+			<fileset dir="${buildDataDir}/p2_step1/output/rtFeature">
+				<include name="**/*" />
+				<exclude name="*.created" />
+			</fileset>
+			<fileset dir="${buildDataDir}/p2_step1/output/sdkFeature">
+				<include name="**/*" />
+				<exclude name="*.created" />
+			</fileset>
+		</copy>
+	</target>
+
+
+	<target name="downlaodRepository" unless="skipDownloadRepository">
+		<!-- download -->
+		<copy todir="${outputFolder}">
+			<fileset dir="${scoutDownloadLocation}/${versionMajor}.${versionMinor}/update">
+				<include name="**/*" />
+				<exclude name="content.jar" />
+				<exclude name="artifact.jar" />
+			</fileset>
+		</copy>
+		<touch file="${outputFolder}/downlaodRepository.created" />
+	</target>
+
+</project>

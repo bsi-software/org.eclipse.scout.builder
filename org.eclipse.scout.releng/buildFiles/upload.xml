@@ -1,0 +1,66 @@
+<!--
+   Copyright (c) 2010 BSI Business Systems Integration AG.
+   All rights reserved. This program and the accompanying materials
+   are made available under the terms of the Eclipse Public License v1.0
+   which accompanies this distribution, and is available at
+   http://www.eclipse.org/legal/epl-v10.html
+   
+   Contributors:
+       BSI Business Systems Integration AG - initial API and implementation
+ -->
+<!--
+ Input
+  ${buildWorking}/step0 to have the subfolders /plugins /features with all bundle/feature sources in it.
+ 
+ Output
+  ${buildWorking}/step1 with two subfolders /plugins /features an all the built bundles and features 
+     packed in jar files if requested.
+     
+     $JAVA_HOME/bin/java \
+    	-Dorg.eclipse.update.jarprocessor.pack200=@jre \
+    	-cp "$ECLIPSE_LAUNCHER" org.eclipse.core.launcher.Main \
+    	-application org.eclipse.update.core.siteOptimizer \
+    	-jarProcessor -processAll -repack -outputDir .packed "$srcFile"  
+-->
+
+<project name="upload" default="build">
+	<property file="build.properties" />
+
+	<target name="clean">
+	</target>
+
+	<target name="build" unless="skipUpload">
+		<antcall target="uploadZip" />
+		<antcall target="uploadP2" />
+	</target>
+
+	<target name="uploadZip">
+		<property location="${scoutDownloadLocation}/${versionMajor}.${versionMajor}/zip" name="zipLocation"></property>
+		<mkdir dir="${zipLocation}" />
+		<copy todir="${zipLocation}">
+			<fileset dir="${buildDataDir}/zip_step2/output">
+				<include name="*.zip" />
+			</fileset>
+		</copy>
+	</target>
+
+	<target name="uploadP2">
+		<property location="${scoutDownloadLocation}/${versionMajor}.${versionMajor}/update" name="updateLocation"></property>
+		<mkdir dir="${updateLocation}" />
+		<delete dir="${updateLocation}/.backup" />
+		<mkdir dir="${updateLocation}/.backup" />
+		<move todir="${updateLocation}/.backup">
+			<fileset dir="${updateLocation}">
+				<include name="**/**" />
+				<exclude name=".backup/**" />
+			</fileset>
+		</move>
+		<copy todir="${updateLocation}">
+			<fileset dir="${buildDataDir}/p2_step4/output">
+				<include name="**/**"/>
+				<exclude name="*.created"/>
+			</fileset>
+		</copy>
+	</target>
+
+</project>

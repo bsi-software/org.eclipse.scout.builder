@@ -1,0 +1,95 @@
+<!--
+   Copyright (c) 2010 BSI Business Systems Integration AG.
+   All rights reserved. This program and the accompanying materials
+   are made available under the terms of the Eclipse Public License v1.0
+   which accompanies this distribution, and is available at
+   http://www.eclipse.org/legal/epl-v10.html
+   
+   Contributors:
+       BSI Business Systems Integration AG - initial API and implementation
+ -->
+
+<project name="org.eclipse.scout.build.nightly" default="build">
+	<property environment="env" />
+	<property file="build.properties" />
+
+	<tstamp>
+		<format property="buildTimestamp" pattern="yyyymmdd-hhmm" />
+		<format property="featureTimestamp" pattern="yyyymmddhhmm" />
+	</tstamp>
+
+
+	<target name="build" depends="clean">
+		<available file="${relengRootDir}/working/eclipse" property="skipInstallEclipse" />
+		<antcall target="setupEclipse" />
+		<antcall target="step1_buildFeatures" />
+		<antcall target="step2_achiveAll" />
+		<antcall target="step3_pack200Normalize" />
+		<antcall target="step4_sign" />
+		<antcall target="zip_step1" />
+		<antcall target="zip_step2" />
+		<antcall target="p2_step1" />
+		<antcall target="p2_step2" />
+		<antcall target="p2_step3" />
+		<antcall target="p2_step4" />
+		<antcall target="upload" />
+	</target>
+
+
+	<target name="clean" unless="skipClean">
+		<delete dir="${relengRootDir}/working" />
+	</target>
+
+
+
+	<target name="setupEclipse" unless="skipInstallEclipse">
+		<mkdir dir="${relengRootDir}/working" />
+		<ant antfile="${buildFileDir}/setupEclipse.xml" target="setupEclipse" />
+	</target>
+
+	<target name="step1_buildFeatures">
+		<ant antfile="${buildFileDir}/step1_buildFeatures.xml" target="build" />
+	</target>
+
+	<target name="step2_achiveAll">
+		<ant antfile="${buildFileDir}/step2_archiveAll.xml" target="build" />
+	</target>
+
+	<target name="step3_pack200Normalize">
+		<ant antfile="${buildFileDir}/step3_pack200Normalize.xml" target="build" />
+	</target>
+
+	<target name="step4_sign">
+		<ant antfile="${buildFileDir}/step4_sign.xml" target="build" />
+	</target>
+
+	<target name="zip_step1">
+		<ant antfile="${buildFileDir}/zip_step1_unpack.xml" target="build" />
+	</target>
+
+	<target name="zip_step2">
+		<ant antfile="${buildFileDir}/zip_step2_createzip.xml" target="build" />
+	</target>
+
+	<target name="p2_step1">
+		<ant antfile="${buildFileDir}/p2_step1_pack200.xml" target="build" />
+	</target>
+
+	<target name="p2_step2">
+		<ant antfile="${buildFileDir}/p2_step2_downloadRepository.xml" target="build" />
+	</target>
+
+	<target name="p2_step3">
+		<ant antfile="${buildFileDir}/p2_step3_metadata.xml" target="build" />
+	</target>
+	
+	<target name="p2_step4">
+		<ant antfile="${buildFileDir}/p2_step4_categorize.xml" target="build" />
+	</target>
+
+	<target name="upload" unless="skipUpload">
+		<ant antfile="${buildFileDir}/upload.xml" target="build" />
+	</target>
+
+
+</project>

@@ -1,0 +1,74 @@
+<!--
+   Copyright (c) 2010 BSI Business Systems Integration AG.
+   All rights reserved. This program and the accompanying materials
+   are made available under the terms of the Eclipse Public License v1.0
+   which accompanies this distribution, and is available at
+   http://www.eclipse.org/legal/epl-v10.html
+   
+   Contributors:
+       BSI Business Systems Integration AG - initial API and implementation
+ -->
+<!--
+ Input
+  ${buildWorking}/step0 to have the subfolders /plugins /features with all bundle/feature sources in it.
+ 
+ Output
+  ${buildWorking}/step1 with two subfolders /plugins /features an all the built bundles and features 
+     packed in jar files if requested.
+     
+     $JAVA_HOME/bin/java \
+    	-Dorg.eclipse.update.jarprocessor.pack200=@jre \
+    	-cp "$ECLIPSE_LAUNCHER" org.eclipse.core.launcher.Main \
+    	-application org.eclipse.update.core.siteOptimizer \
+    	-jarProcessor -processAll -repack -outputDir .packed "$srcFile"  
+-->
+
+<project name="p2_step1.pack200" default="build">
+	<property file="build.properties" />
+	<taskdef name="custom.removeUnpackSuffix" classname="org.eclipse.scout.releng.ant.archive.RemoveUnpackSuffix" />
+	<taskdef name="custom.pack" classname="org.eclipse.scout.releng.ant.pack200.Pack" />
+
+
+	<target name="clean">
+		<delete dir="${buildDataDir}/p2_step1" />
+	</target>
+
+	<target name="build">
+		<available file="${buildDataDir}/p2_step1/output/pack200.created" property="skipP2_step1" />
+		<antcall target="removeUnpackSuffix" />
+		<delete dir="${buildDataDir}/p2_step1/input" failonerror="false" />
+	</target>
+
+
+	<target name="removeUnpackSuffix" unless="skipP2_step1">
+		<antcall target="clean" />
+		<property name="inputFolder" location="${buildDataDir}/p2_step1/input" />
+		<property name="outputFolder" location="${buildDataDir}/p2_step1/output" />
+		<mkdir dir="${inputFolder}" />
+		<copy todir="${inputFolder}">
+			<fileset dir="${buildDataDir}/step4/output">
+				<include name="**/*" />
+				<exclude name="*.created" />
+			</fileset>
+		</copy>
+		<!-- unpack -->
+		<copy todir="${outputFolder}">
+			<fileset dir="${inputFolder}">
+				<include name="**/*" />
+			</fileset>
+		</copy>
+		<custom.removeUnpackSuffix>
+			<fileset dir="${outputFolder}">
+				<include name="**/*.jar" />
+			</fileset>
+		</custom.removeUnpackSuffix>
+		<custom.pack>
+			<fileset dir="${outputFolder}">
+				<include name="**/*.jar" />
+			</fileset>
+		</custom.pack>
+
+		<touch file="${outputFolder}/pack200.created" />
+	</target>
+
+</project>

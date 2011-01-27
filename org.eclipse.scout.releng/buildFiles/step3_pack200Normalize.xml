@@ -1,0 +1,68 @@
+<!--
+   Copyright (c) 2010 BSI Business Systems Integration AG.
+   All rights reserved. This program and the accompanying materials
+   are made available under the terms of the Eclipse Public License v1.0
+   which accompanies this distribution, and is available at
+   http://www.eclipse.org/legal/epl-v10.html
+   
+   Contributors:
+       BSI Business Systems Integration AG - initial API and implementation
+ -->
+<!--
+ Input
+  ${buildWorking}/step0 to have the subfolders /plugins /features with all bundle/feature sources in it.
+ 
+ Output
+  ${buildWorking}/step1 with two subfolders /plugins /features an all the built bundles and features 
+     packed in jar files if requested.
+     
+     $JAVA_HOME/bin/java \
+    	-Dorg.eclipse.update.jarprocessor.pack200=@jre \
+    	-cp "$ECLIPSE_LAUNCHER" org.eclipse.core.launcher.Main \
+    	-application org.eclipse.update.core.siteOptimizer \
+    	-jarProcessor -processAll -repack -outputDir .packed "$srcFile"  
+-->
+
+<project name="step3.pack200Normalize" default="build">
+	<property file="build.properties" />
+	<taskdef name="repack" classname="org.eclipse.scout.releng.ant.pack200.Repack" />
+
+	<target name="clean">
+		<delete dir="${buildDataDir}/step3" />
+	</target>
+
+	<target name="build">
+		<available file="${buildDataDir}/step3/output/pack200Repack.created" property="skipStep3" />
+		<antcall target="pack200Normalize" />
+		<delete dir="${buildDataDir}/step3/input" failonerror="false" />
+	</target>
+
+	<target name="pack200Normalize" unless="skipStep3">
+		<antcall target="clean" />
+		<property name="inputFolder" location="${buildDataDir}/step3/input" />
+		<property name="outputFolder" location="${buildDataDir}/step3/output" />
+		<mkdir dir="${inputFolder}" />
+		<copy todir="${inputFolder}">
+			<fileset dir="${buildDataDir}/step2/output">
+				<include name="**/*" />
+				<exclude name="*.created"/>
+			</fileset>
+		</copy>
+		<fileset id="jars2pack" dir="${inputFolder}">
+			<include name="**/*.jar" />
+		</fileset>
+
+		<!--
+    	<p200ant repack="true" >
+			<fileset refid="jars2pack" />
+		</p200ant>
+		-->
+		<repack outputDir="${outputFolder}">
+			<fileset refid="jars2pack" />
+		</repack>
+		<touch file="${outputFolder}/pack200Repack.created" />
+
+	</target>
+
+
+</project>
