@@ -37,6 +37,7 @@
 
 
 	<target name="clean" unless="skipClean">
+		<echo message="clean working dir" />
 		<delete dir="${relengRootDir}/working" />
 	</target>
 
