@@ -40,7 +40,7 @@
 	</target>
 
 
-	<target name="clean" unless="skipClean">
+	<target name="clean" unless="conditionSkipClean">
 		<echo message="clean working dir" />
 		<delete dir="${relengRootDir}/working" />
 	</target>
