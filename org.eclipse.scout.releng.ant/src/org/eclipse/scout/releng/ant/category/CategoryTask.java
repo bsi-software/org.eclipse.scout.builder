@@ -86,6 +86,11 @@ public class CategoryTask extends Task {
           addFeature(document, rootElement, feature);
         }
       }
+      Element categoryDef = document.createElement("category-def");
+      categoryDef.setAttribute("name", "Scout");
+      categoryDef.setAttribute("label", "Scout Application Development");
+      rootElement.appendChild(categoryDef);
+      
       // write document
       writeXmlFile(document);
     }
@@ -109,6 +114,7 @@ public class CategoryTask extends Task {
     fillFeatureIdVersion(feature, featureElement);
     site.appendChild(featureElement);
     // category
+
     Element categoryElement = doc.createElement("category");
     categoryElement.setAttribute("name", "Scout");
     featureElement.appendChild(categoryElement);
