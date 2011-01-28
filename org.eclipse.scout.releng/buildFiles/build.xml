@@ -92,7 +92,7 @@
 		<ant antfile="${buildFileDir}/p2_step4_categorize.xml" target="build" />
 	</target>
 
-	<target name="upload" unless="skipUpload">
+	<target name="upload">
 		<ant antfile="${buildFileDir}/upload.xml" target="build" />
 	</target>
 
