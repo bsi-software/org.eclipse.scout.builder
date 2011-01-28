@@ -31,6 +31,9 @@
 	</target>
 
 	<target name="build">
+		<condition property="conditionSkipDownloadRepository">
+			<istrue value="${skipDownloadRepository}"/>
+		</condition>
 		<available file="${buildDataDir}/p2_step2/output/setupRepository.created" property="skipP2_step2" />
 		<antcall target="setupRepository" />
 	</target>
@@ -59,7 +62,7 @@
 	</target>
 
 
-	<target name="downlaodRepository" unless="skipDownloadRepository">
+	<target name="downlaodRepository" unless="conditionSkipDownloadRepository">
 		<!-- download -->
 		<copy todir="${outputFolder}">
 			<fileset dir="${scoutDownloadLocation}/${versionMajor}.${versionMinor}/update">
@@ -68,7 +71,6 @@
 				<exclude name="artifact.jar" />
 			</fileset>
 		</copy>
-		<touch file="${outputFolder}/downlaodRepository.created" />
 	</target>
 
 </project>

@@ -29,11 +29,19 @@
 	<target name="clean">
 	</target>
 
-	<target name="build" unless="skipUpload">
-		<antcall target="uploadZip" />
-		<antcall target="uploadP2" />
+	<target name="build">
+		<condition property="conditionSkipUpload">
+			<istrue value="${skipUpload}"/>
+		</condition>
+		<antcall target="upload" />
 	</target>
 
+    <target name="upload" unless="conditionSkipUpload">
+		<antcall target="uploadZip" />
+		<antcall target="uploadP2" />
+    </target>
+
+	
 	<target name="uploadZip">
 		<property location="${scoutDownloadLocation}/${versionMajor}.${versionMajor}/zip" name="zipLocation"></property>
 		<mkdir dir="${zipLocation}" />
