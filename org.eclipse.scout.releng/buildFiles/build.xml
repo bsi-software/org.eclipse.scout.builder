@@ -28,6 +28,7 @@
 		<antcall target="setupEclipse" />
 		<antcall target="step1_buildFeatures" />
 		<antcall target="step2_achiveAll" />
+		<antcall target="step2a_markIncubation" />
 		<antcall target="step3_pack200Normalize" />
 		<antcall target="step4_sign" />
 		<antcall target="zip_step1" />
@@ -58,6 +59,10 @@
 
 	<target name="step2_achiveAll">
 		<ant antfile="${buildFileDir}/step2_archiveAll.xml" target="build" />
+	</target>
+	
+	<target name="step2a_markIncubation">
+		<ant antfile="${buildFileDir}/step2a_markIncubation.xml" target="build" />
 	</target>
 
 	<target name="step3_pack200Normalize">

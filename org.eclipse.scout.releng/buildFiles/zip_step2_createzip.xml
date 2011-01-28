@@ -52,7 +52,7 @@
 		</copy>
 		<mkdir dir="${outputFolder}" />
 		<!-- zip -->
-		<custom.createZip outputDir="${outputFolder}" zipName="scout" milestone="${versionMilestone}" version="${version}" timestamp="${buildTimestamp}">
+		<custom.createZip outputDir="${outputFolder}" zipName="scout" milestone="${versionMilestone}" version="${version}" timestamp="${buildTimestamp}" incubation="${incubation}">
 			<fileset dir="${inputFolder}/rtFeature">
 				<include name="**/**" />
 			</fileset>

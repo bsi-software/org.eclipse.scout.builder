@@ -1,0 +1,71 @@
+<!--
+   Copyright (c) 2010 BSI Business Systems Integration AG.
+   All rights reserved. This program and the accompanying materials
+   are made available under the terms of the Eclipse Public License v1.0
+   which accompanies this distribution, and is available at
+   http://www.eclipse.org/legal/epl-v10.html
+   
+   Contributors:
+       BSI Business Systems Integration AG - initial API and implementation
+ -->
+<!--
+ Input
+  ${buildWorking}/step0 to have the subfolders /plugins /features with all bundle/feature sources in it.
+ 
+ Output
+  ${buildWorking}/step1 with two subfolders /plugins /features an all the built bundles and features 
+     packed in jar files if requested. 
+-->
+
+<project name="step3.markIncubation" default="build">
+	<property file="build.properties" />
+	<taskdef name="custom.markIncubation" classname="org.eclipse.scout.releng.ant.incubation.MarkIncubation" />
+
+	<target name="clean">
+		<delete dir="${buildDataDir}/step2a" />
+	</target>
+
+	<target name="build">
+		<condition property="conditionIncubation">
+			<istrue value="${incubation}" />
+		</condition>
+		<available file="${buildDataDir}/step2a/output/incubationMarker.created" property="skipStep2a" />
+		<antcall target="markIncubation" />
+		<delete dir="${buildDataDir}/step2a/input" failonerror="false" />
+	</target>
+
+	<target name="skipTask" unless="conditionIncubation">
+		<antcall target="clean" />
+		<property name="outputFolder" location="${buildDataDir}/step2a/output" />
+		<mkdir dir="${outputFolder}" />
+		<copy todir="${outputFolder}">
+			<fileset dir="${buildDataDir}/step2/output">
+				<include name="**/*" />
+				<exclude name="*.created" />
+			</fileset>
+		</copy>
+		<touch file="${outputFolder}/incubationMarker.created" />
+	</target>
+
+	<target name="markIncubation" unless="skipStep2a">
+		<antcall target="clean" />
+		<property name="inputFolder" location="${buildDataDir}/step2a/input" />
+		<property name="outputFolder" location="${buildDataDir}/step2a/output" />
+
+		<mkdir dir="${outputFolder}" />
+		<copy todir="${outputFolder}">
+			<fileset dir="${buildDataDir}/step2/output">
+				<include name="**/*" />
+				<exclude name="*.created" />
+			</fileset>
+		</copy>
+		<custom.markIncubation>
+			<fileset dir="${buildDataDir}/step2a/output">
+				<include name="**/**.jar" />
+			</fileset>
+		</custom.markIncubation>
+		<touch file="${outputFolder}/incubationMarker.created" />
+	</target>
+
+
+</project>

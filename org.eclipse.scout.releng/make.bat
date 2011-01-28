@@ -32,9 +32,9 @@ PATH=%JAVA_HOME%\bin;%ANT_HOME%\bin;%PATH%
 
 set buildFlags=-DskipClean=true -DskipSign=true -DskipDownloadRepository=true -DskipUpload=true  
 
-call ant -f org.eclipse.scout.releng/buildFiles/build.xml  -lib org.eclipse.scout.releng/buildFiles/lib %buildOpts% %buildFlags% %nighltyRepoVar% %* build > %logfile% 
+call ant -f org.eclipse.scout.releng/buildFiles/build.xml  -lib org.eclipse.scout.releng/buildFiles/lib %buildOpts% %buildFlags% %nighltyRepoVar% %* build  
 :# call ant -f org.eclipse.scout.builder/buildFiles/build.xml -lib org.eclipse.scout.releng %buildOpts%  %nighltyRepoVar% -DskipSign=true %* buildNightly  > %logfile%
 
 endlocal
-
+pause
 

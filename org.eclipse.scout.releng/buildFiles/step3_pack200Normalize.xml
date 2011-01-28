@@ -43,7 +43,7 @@
 		<property name="outputFolder" location="${buildDataDir}/step3/output" />
 		<mkdir dir="${inputFolder}" />
 		<copy todir="${inputFolder}">
-			<fileset dir="${buildDataDir}/step2/output">
+			<fileset dir="${buildDataDir}/step2a/output">
 				<include name="**/*" />
 				<exclude name="*.created"/>
 			</fileset>

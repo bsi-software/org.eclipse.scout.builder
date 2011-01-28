@@ -29,7 +29,6 @@
 	
 
 	<target name="clean">
-
 		<delete dir="${buildDataDir}/step4" />
 	</target>
 
