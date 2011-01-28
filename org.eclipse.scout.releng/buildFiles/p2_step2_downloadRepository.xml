@@ -32,10 +32,10 @@
 
 	<target name="build">
 		<condition property="conditionSkipDownloadRepository">
-			<and>
+			<or>
 				<available file="${scoutDownloadLocation}/${versionMajor}.${versionMinor}/update" />
 				<istrue value="${skipDownloadRepository}" />
-			</and>
+			</or>
 		</condition>
 		<available file="${buildDataDir}/p2_step2/output/setupRepository.created" property="skipP2_step2" />
 		<antcall target="setupRepository" />
