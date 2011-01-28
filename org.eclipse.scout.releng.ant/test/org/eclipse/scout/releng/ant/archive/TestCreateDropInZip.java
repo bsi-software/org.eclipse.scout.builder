@@ -92,5 +92,42 @@ public class TestCreateDropInZip extends AbstractTestCase {
     }
     Assert.assertEquals(i, 20);
   }
+  
+  @Test
+  public void testTaskIncubation() throws Exception {
+    CreateDropInZip task = new CreateDropInZip();
+    task.setOutputDir(new File(m_workingDir + "/output"));
+    Project p = new Project();
+    task.setProject(p);
+    // filesets
+    FileSet set1 = new FileSet();
+    set1.setDir(new File(m_workingDir + "/input/sdkFeature"));
+    set1.createInclude().setName("**/**");
+    task.addFileset(set1);
+    FileSet set2 = new FileSet();
+    set2.setDir(new File(m_workingDir + "/input/rtFeature"));
+    set2.createInclude().setName("**/**");
+    task.addFileset(set2);
+    task.setZipName("blubber");
+    task.setMilestone("M4");
+    task.setTimestamp("201001211203");
+    task.setVersionMajor("3");
+    task.setVersionMinor("5");
+    task.setVersionMicro("0");
+    task.setIncubation(true);
+    task.execute();
+
+    File file = new File(m_workingDir + "/output/blubber-Incubation-3.5.0M4-201001211203.zip");
+    Assert.assertTrue(file.exists());
+    Assert.assertTrue(file.isFile());
+    ZipFile zipFile = new ZipFile(file);
+    int i = 0;
+    Enumeration<? extends ZipEntry> entries = zipFile.entries();
+    while (entries.hasMoreElements()) {
+      entries.nextElement();
+      i++;
+    }
+    Assert.assertEquals(i, 20);
+  }
 
 }

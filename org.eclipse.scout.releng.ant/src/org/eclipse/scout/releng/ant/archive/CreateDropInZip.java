@@ -43,6 +43,7 @@ public class CreateDropInZip extends Task {
   private String versionMicro;
   private String version;
   private String timestamp;
+  private boolean incubation;
 
   public CreateDropInZip() {
     filesets = new ArrayList<FileSet>();
@@ -168,6 +169,21 @@ public class CreateDropInZip extends Task {
     this.timestamp = timestamp;
   }
 
+  /**
+   * @param incubation
+   *          the incubation to set
+   */
+  public void setIncubation(boolean incubation) {
+    this.incubation = incubation;
+  }
+
+  /**
+   * @return the incubation
+   */
+  public boolean isIncubation() {
+    return incubation;
+  }
+
   @Override
   public void execute() throws BuildException {
     validate();
@@ -175,6 +191,9 @@ public class CreateDropInZip extends Task {
     try {
       // pattern name_
       String fileName = getZipName();
+      if (isIncubation()) {
+        fileName += "-Incubation";
+      }
       if (getVersion() != null) {
         fileName += "-" + getVersion();
       }

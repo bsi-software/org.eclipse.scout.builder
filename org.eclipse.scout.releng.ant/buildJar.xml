@@ -36,7 +36,7 @@
 
 	<target name="buildAll" depends="clean, compile, packJar, publish">
 		
-		<delete dir="${build.result.folder}/@dot" />
+		<delete dir="${build.result.folder}" />
 	</target>
 
 	<target name="compile">
