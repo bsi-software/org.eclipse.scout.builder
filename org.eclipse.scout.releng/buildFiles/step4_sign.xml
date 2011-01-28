@@ -34,13 +34,17 @@
 	</target>
 
 	<target name="build">
+		<condition property="conditionSkipSign">
+			<istrue value="${skipSign}"/>
+		</condition>
+		
 		<antcall target="skipSignTask" />
 		<available file="${buildDataDir}/step4/output/sign.created" property="skipStep4" />
 		<antcall target="sign" />
 		<delete dir="${buildDataDir}/step4/input" failonerror="false" />
 	</target>
 
-	<target name="skipSignTask" if="skipSign">
+	<target name="skipSignTask" if="conditionSkipSign">
 		<echo message="skip sign" />
 		<antcall target="clean" />
 		<property name="outputFolder" location="${buildDataDir}/step4/output" />

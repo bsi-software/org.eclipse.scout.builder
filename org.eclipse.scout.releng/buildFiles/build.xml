@@ -19,7 +19,11 @@
 	</tstamp>
 
 
-	<target name="build" depends="clean">
+	<target name="build">
+		<condition property="conditionSkipClean">
+			<istrue value="${skipClean}"/>
+		</condition>
+		<antcall target="clean"/>
 		<available file="${relengRootDir}/working/eclipse" property="skipInstallEclipse" />
 		<antcall target="setupEclipse" />
 		<antcall target="step1_buildFeatures" />
