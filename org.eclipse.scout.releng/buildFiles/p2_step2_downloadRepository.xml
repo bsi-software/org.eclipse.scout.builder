@@ -33,7 +33,9 @@
 	<target name="build">
 		<condition property="conditionSkipDownloadRepository">
 			<or>
-				<available file="${scoutDownloadLocation}/${versionMajor}.${versionMinor}/update" />
+				<not>
+					<available file="${scoutDownloadLocation}/${versionMajor}.${versionMinor}/update" />
+				</not>
 				<istrue value="${skipDownloadRepository}" />
 			</or>
 		</condition>
