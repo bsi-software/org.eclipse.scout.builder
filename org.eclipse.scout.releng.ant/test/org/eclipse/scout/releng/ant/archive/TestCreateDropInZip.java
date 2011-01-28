@@ -80,7 +80,7 @@ public class TestCreateDropInZip extends AbstractTestCase {
     task.setVersionMicro("0");
     task.execute();
 
-    File file = new File(m_workingDir + "/output/blubber-M4-3.5.0-201001211203.zip");
+    File file = new File(m_workingDir + "/output/blubber-3.5.0M4-201001211203.zip");
     Assert.assertTrue(file.exists());
     Assert.assertTrue(file.isFile());
     ZipFile zipFile = new ZipFile(file);

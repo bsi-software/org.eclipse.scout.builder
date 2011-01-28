@@ -175,9 +175,6 @@ public class CreateDropInZip extends Task {
     try {
       // pattern name_
       String fileName = getZipName();
-      if (getMilestone() != null) {
-        fileName += "-" + getMilestone();
-      }
       if (getVersion() != null) {
         fileName += "-" + getVersion();
       }
@@ -191,6 +188,9 @@ public class CreateDropInZip extends Task {
             }
           }
         }
+      }
+      if (getMilestone() != null) {
+        fileName += "" + getMilestone();
       }
       if (getTimestamp() != null) {
         fileName += "-" + getTimestamp();
