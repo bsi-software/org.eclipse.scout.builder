@@ -31,10 +31,10 @@ set logfile=org.eclipse.scout.releng/scoutBuild.log
 PATH=%JAVA_HOME%\bin;%ANT_HOME%\bin;%PATH%
 
 
-call ant -f org.eclipse.scout.releng/buildFiles/build.xml  -lib org.eclipse.scout.releng %buildOpts%  %nighltyRepoVar% %* clean 
+call ant -f org.eclipse.scout.releng/buildFiles/build.xml  -lib org.eclipse.scout.releng %buildOpts%  %nighltyRepoVar% %* clean
+ 
 :# call ant -f org.eclipse.scout.builder/buildFiles/build.xml -lib org.eclipse.scout.releng %buildOpts%  %nighltyRepoVar% -DskipSign=true %* buildNightly  > %logfile%
 
 endlocal
-pause
 
 
