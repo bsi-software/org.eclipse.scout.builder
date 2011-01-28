@@ -43,7 +43,7 @@
 
 	
 	<target name="uploadZip">
-		<property location="${scoutDownloadLocation}/${versionMajor}.${versionMajor}/zip" name="zipLocation"></property>
+		<property location="${scoutDownloadLocation}/${versionMajor}.${versionMinor}/zip" name="zipLocation"></property>
 		<mkdir dir="${zipLocation}" />
 		<copy todir="${zipLocation}">
 			<fileset dir="${buildDataDir}/zip_step2/output">
@@ -53,7 +53,7 @@
 	</target>
 
 	<target name="uploadP2">
-		<property location="${scoutDownloadLocation}/${versionMajor}.${versionMajor}/update" name="updateLocation"></property>
+		<property location="${scoutDownloadLocation}/${versionMajor}.${versionMinor}/update" name="updateLocation"></property>
 		<mkdir dir="${updateLocation}" />
 		<delete dir="${updateLocation}/.backup" />
 		<mkdir dir="${updateLocation}/.backup" />
