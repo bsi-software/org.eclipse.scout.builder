@@ -64,13 +64,16 @@
 	</target>
 
 	<target name="uploadP2">
+		<!-- ensure update exists -->
 		<mkdir dir="${scoutRepositoryLocation}/update" />
 		
+		<!-- ensure temp dir exists and is empty -->
 		<delete dir="${scoutRepositoryLocation}/update_temp" />
 		<mkdir dir="${scoutRepositoryLocation}/update_temp" />
 
-		<delete dir="${tempUpdateLocation}/.updateBackup" />
-		<mkdir dir="${tempUpdateLocation}/.updateBackup" />
+		<!-- ensure backup dir exists and is empty -->
+		<delete dir="${scoutRepositoryLocation}/.updateBackup" />
+		<mkdir dir="${scoutRepositoryLocation}/.updateBackup" />
 
 		<copy todir="${scoutRepositoryLocation}/.updateBackup">
 			<fileset dir="${scoutRepositoryLocation}/update">
@@ -84,9 +87,21 @@
 				<exclude name="*.created" />
 			</fileset>
 		</copy>
-		<move src="${scoutRepositoryLocation}/update" dest="${scoutRepositoryLocation}/.updateBackup" />
+		
+		<move todir="${scoutRepositoryLocation}/.updateBackup" >
+			<fileset dir="${scoutRepositoryLocation}/update">
+				<include name="**/**" />
+			</fileset>
+		</move>
+		
 		<delete dir="${scoutRepositoryLocation}/update" />
-		<move src="${scoutRepositoryLocation}/update_temp" dest="${scoutRepositoryLocation}/update" />
+		<mkdir dir="${scoutRepositoryLocation}/update"/>
+		<move todir="${scoutRepositoryLocation}/update" >
+			<fileset dir="${scoutRepositoryLocation}/update_temp">
+				<include name="**/**" />
+			</fileset>
+		</move>
+		<delete dir="${scoutRepositoryLocation}/update_temp" />
 	</target>
 
 </project>

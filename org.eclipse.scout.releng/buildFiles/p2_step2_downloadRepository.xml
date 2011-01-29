@@ -97,12 +97,13 @@
 
 
 	<target name="downlaodRepository" unless="conditionSkipDownloadRepository">
+		<echo message="downloadRepository doit"></echo>
 		<!-- download -->
-		<copy todir="${outputFolder}">
+		<copy todir="${buildDataDir}/p2_step2/output">
 			<fileset dir="${scoutRepositoryLocation}">
 				<include name="**/**" />
 				<exclude name="content.jar" />
-				<exclude name="artifact.jar" />
+				<exclude name="artifacts.jar" />
 			</fileset>
 		</copy>
 	</target>
