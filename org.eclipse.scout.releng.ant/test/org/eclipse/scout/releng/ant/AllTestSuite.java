@@ -13,7 +13,9 @@ package org.eclipse.scout.releng.ant;
 import org.eclipse.scout.releng.ant.archive.ArchiveSuite;
 import org.eclipse.scout.releng.ant.category.TestCategoryTask;
 import org.eclipse.scout.releng.ant.incubation.TestIncubation;
+import org.eclipse.scout.releng.ant.p2.TestTrunkateRepository;
 import org.eclipse.scout.releng.ant.pack200.Pack200Suite;
+import org.eclipse.scout.releng.ant.undo.TestCreateUndoScript;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
@@ -25,7 +27,7 @@ import org.junit.runners.Suite;
  */
 @RunWith(Suite.class)
 @Suite.SuiteClasses({ArchiveSuite.class,
-    Pack200Suite.class, TestCategoryTask.class, TestIncubation.class})
+    Pack200Suite.class, TestCategoryTask.class, TestIncubation.class, TestCreateUndoScript.class, TestTrunkateRepository.class})
 public class AllTestSuite {
 
 }
