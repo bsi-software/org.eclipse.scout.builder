@@ -21,7 +21,7 @@ import org.junit.runners.Suite;
  */
 @RunWith(Suite.class)
 @Suite.SuiteClasses( { TestCreateArchive.class,
-  TestCreateDropInZip.class, TestExtractArchive.class, TestRemoveUnpackSuffix.class})
+  TestCreateDropInZip.class, TestExtractArchive.class, TestRemoveUnpackSuffix.class, TestRemoveOldZipFiles.class})
 public class ArchiveSuite {
 
 }

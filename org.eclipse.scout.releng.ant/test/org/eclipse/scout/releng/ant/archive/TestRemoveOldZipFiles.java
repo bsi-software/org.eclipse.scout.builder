@@ -8,9 +8,11 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.releng.ant.p2;
+package org.eclipse.scout.releng.ant.archive;
 
 import java.io.File;
+
+import junit.framework.Assert;
 
 import org.apache.tools.ant.Project;
 import org.eclipse.scout.releng.ant.AbstractTestCase;
@@ -26,12 +28,12 @@ import org.junit.Test;
  * @since 1.1.0 (27.01.2011)
  */
 
-public class TestTrunkateRepository extends AbstractTestCase {
+public class TestRemoveOldZipFiles extends AbstractTestCase {
 
   private String m_workingDir;
 
-  public TestTrunkateRepository() {
-    m_workingDir = getTestDataDir() + "/p2";
+  public TestRemoveOldZipFiles() {
+    m_workingDir = getTestDataDir() + "/archive/removeOldZipFiles";
   }
 
   @Before
@@ -56,12 +58,19 @@ public class TestTrunkateRepository extends AbstractTestCase {
 
   @Test
   public void testTask() {
-    TrunkateRepository task = new TrunkateRepository();
+    File outputDir = new File(m_workingDir + "/output");
+    RemoveOldZipFiles task = new RemoveOldZipFiles();
     Project project2 = new Project();
     task.setProject(project2);
-    task.setKeep(1);
-    task.setRepositoryLocation(new File(m_workingDir + "/output"));
+    task.setKeep(3);
+    task.setDir(outputDir);
     task.execute();
+    
+    Assert.assertTrue(outputDir.listFiles().length ==3);
+    Assert.assertFalse(new File(outputDir.getAbsolutePath()+"/N-scout-3.5.0M4-20110120-0901-Incubation.zip").exists());
+    Assert.assertTrue(new File(outputDir.getAbsolutePath()+"/N-scout-3.5.0M4-20110121-0901-Incubation.zip").exists());
+    Assert.assertTrue(new File(outputDir.getAbsolutePath()+"/N-scout-3.5.0M4-20110129-0901.zip").exists());
+    Assert.assertTrue(new File(outputDir.getAbsolutePath()+"/N-scout-3.5.0M4-20110130-0901-Incubation.zip").exists());
     
   }
 
