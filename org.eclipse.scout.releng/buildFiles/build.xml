@@ -21,12 +21,8 @@
 
 	<target name="build">
 		<!-- full version -->
-		<condition property="incubationValue" value="-Incubation">
-			<istrue value="${incubation}"/>
-		</condition>
-		<property name="incubationValue" value="" />
 		
-		<condition property="major" value="-${versionMajor}">
+		<condition property="major" value="${versionMajor}">
 			<isset property="versionMajor"/>
 		</condition>
 		<property name="major" value="" />
@@ -47,7 +43,6 @@
 		</condition>
 		<property name="micro" value="" />
 		
-		<property name="zipVersion" value="${incubationValue}${major}${minor}${micro}" />
 		<property name="scoutVersion" value="${major}${minor}${micro}" />
 		
 		<condition property="conditionSkipClean">

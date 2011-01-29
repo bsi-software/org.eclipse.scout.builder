@@ -51,7 +51,12 @@
 		</copy>
 		<mkdir dir="${outputFolder}" />
 
-		<zip destfile="${outputFolder}/scout${zipVersion}${versionMilestone}-${buildTimestamp}.zip">
+		<condition property="incubationValue" value="-Incubation">
+			<istrue value="${incubation}"/>
+		</condition>
+		<property name="incubationValue" value="" />
+		
+		<zip destfile="${outputFolder}/scout-${scoutVersion}${versionMilestone}-${buildTimestamp}${incubationValue}.zip">
 			<fileset dir="${inputFolder}/rtFeature">
 				<include name="**/**" />
 			</fileset>

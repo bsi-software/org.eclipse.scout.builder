@@ -27,16 +27,33 @@
 	<property file="build.properties" />
 
 	<taskdef name="custom.createUndoScript" classname="org.eclipse.scout.releng.ant.undo.CreateUndoScript" />
+	<taskdef name="custom.trunkateReposiory" classname="org.eclipse.scout.releng.ant.p2.TrunkateRepository" />
+
 
 	<target name="clean">
 		<delete dir="${buildDataDir}/p2_step2" />
 	</target>
 
 	<target name="build">
+
+		<condition property="nightly">
+			<equals arg1="N" arg2="${buildType}" />
+		</condition>
+
+		<condition property="scoutRepositoryLocation" value="${scoutDownloadLocation}/nightly/update">
+			<equals arg1="N" arg2="${buildType}" />
+		</condition>
+		<condition property="scoutRepositoryLocation" value="${scoutDownloadLocation}/${versionMajor}.${versionMinor}/update">
+			<or>
+				<equals arg1="R" arg2="${buildType}" />
+				<equals arg1="S" arg2="${buildType}" />
+			</or>
+		</condition>
+
 		<condition property="conditionSkipDownloadRepository">
 			<or>
 				<not>
-					<available file="${scoutDownloadLocation}/${versionMajor}.${versionMinor}/update" />
+					<available file="${scoutRepositoryLocation}" />
 				</not>
 				<istrue value="${skipDownloadRepository}" />
 			</or>
@@ -82,12 +99,15 @@
 	<target name="downlaodRepository" unless="conditionSkipDownloadRepository">
 		<!-- download -->
 		<copy todir="${outputFolder}">
-			<fileset dir="${scoutDownloadLocation}/${versionMajor}.${versionMinor}/update">
-				<include name="**/*" />
+			<fileset dir="${scoutRepositoryLocation}">
+				<include name="**/**" />
 				<exclude name="content.jar" />
 				<exclude name="artifact.jar" />
 			</fileset>
 		</copy>
 	</target>
 
+	<target name="trunkateRepository" if="nightly">
+		<custom.trunkateReposiory repositoryLocation="${scoutRepositoryLocation}" keep="3" />
+	</target>
 </project>
