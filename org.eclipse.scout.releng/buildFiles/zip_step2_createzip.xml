@@ -25,7 +25,6 @@
 
 <project name="zip_step2.createzip" default="build">
 	<property file="build.properties" />
-	<taskdef name="custom.createZip" classname="org.eclipse.scout.releng.ant.archive.CreateDropInZip" />
 
 
 	<target name="clean">
@@ -51,16 +50,15 @@
 			</fileset>
 		</copy>
 		<mkdir dir="${outputFolder}" />
-		<!-- zip -->
-		<custom.createZip outputDir="${outputFolder}" zipName="scout" milestone="${versionMilestone}" version="${version}" timestamp="${buildTimestamp}" incubation="${incubation}">
+
+		<zip destfile="${outputFolder}/scout${zipVersion}${versionMilestone}-${buildTimestamp}.zip">
 			<fileset dir="${inputFolder}/rtFeature">
 				<include name="**/**" />
 			</fileset>
 			<fileset dir="${inputFolder}/sdkFeature">
 				<include name="**/**" />
 			</fileset>
-
-		</custom.createZip>
+		</zip>
 
 		<touch file="${outputFolder}/zip.created" />
 	</target>

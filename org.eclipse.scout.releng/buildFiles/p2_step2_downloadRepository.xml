@@ -26,6 +26,8 @@
 <project name="p2_step2.downlaodRepository" default="build">
 	<property file="build.properties" />
 
+	<taskdef name="custom.createUndoScript" classname="org.eclipse.scout.releng.ant.undo.CreateUndoScript" />
+
 	<target name="clean">
 		<delete dir="${buildDataDir}/p2_step2" />
 	</target>
@@ -47,6 +49,7 @@
 		<antcall target="clean" />
 		<mkdir dir="${buildDataDir}/p2_step2/output" />
 		<antcall target="localRepo" />
+		<antcall target="createUndoScript" />
 		<antcall target="downlaodRepository" />
 		<touch file="${buildDataDir}/p2_step2/output/setupRepository.created" />
 		<delete dir="${buildDataDir}/p2_step2/input" failonerror="false" />
@@ -64,6 +67,15 @@
 				<exclude name="*.created" />
 			</fileset>
 		</copy>
+	</target>
+
+	<target name="createUndoScript">
+		<custom.createUndoScript undoScript="${buildDataDir}/p2_step2/output/undo-${scoutVersion}${versionMilestone}-${buildTimestamp}.sh">
+			<dirset dir="${buildDataDir}/p2_step2/output">
+				<include name="plugins" />
+				<include name="features" />
+			</dirset>
+		</custom.createUndoScript>
 	</target>
 
 

@@ -20,6 +20,36 @@
 
 
 	<target name="build">
+		<!-- full version -->
+		<condition property="incubationValue" value="-Incubation">
+			<istrue value="${incubation}"/>
+		</condition>
+		<property name="incubationValue" value="" />
+		
+		<condition property="major" value="-${versionMajor}">
+			<isset property="versionMajor"/>
+		</condition>
+		<property name="major" value="" />
+		
+		<condition property="minor" value=".${versionMinor}">
+			<and>
+				<isset property="versionMajor"/>
+				<isset property="versionMinor"/>
+			</and>
+		</condition>
+		<property name="minor" value="" />
+		
+		<condition property="micro" value=".${versionMicro}">
+			<and>
+				<isset property="versionMinor"/>
+				<isset property="versionMicro"/>
+			</and>
+		</condition>
+		<property name="micro" value="" />
+		
+		<property name="zipVersion" value="${incubationValue}${major}${minor}${micro}" />
+		<property name="scoutVersion" value="${major}${minor}${micro}" />
+		
 		<condition property="conditionSkipClean">
 			<istrue value="${skipClean}"/>
 		</condition>

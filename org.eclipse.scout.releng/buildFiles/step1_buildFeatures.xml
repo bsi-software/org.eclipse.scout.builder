@@ -26,8 +26,6 @@
 	</target>
 
 	<target name="build">
-		<echo message="timestamp = ${timestamp}">
-		</echo>
 		<available file="${buildDataDir}/step1/output/features.created" property="skipCreateFeatures" />
 		<antcall target="createFeatures" />
 	</target>
@@ -55,14 +53,15 @@
 			<arg line="-DrelengRootDir=${relengRootDir}" />
 			<arg line="-Djavahome=${env.JAVA_HOME}" />
 			<arg line="-DIndividualSourceBundles=true" />
+			<arg line="-DbuildType=${buildType}"/>
 			<classpath>
 				<pathelement location="${relengRootDir}/working/eclipse/plugins/org.eclipse.equinox.launcher_${equinoxLauncherPluginVersion}.jar" />
 			</classpath>
 		</java>
 		<mkdir dir="${buildDataDir}/step1/output" />
 		<unzip dest="${buildDataDir}/step1/output">
-			<fileset dir="${buildDataDir}/step1/input/N">
-				<include name="org.eclipse.scout.rt.feature-N.zip" />
+			<fileset dir="${buildDataDir}/step1/input/${buildType}">
+				<include name="org.eclipse.scout.rt.feature-${buildType}.zip" />
 			</fileset>
 		</unzip>
 	</target>
@@ -81,14 +80,15 @@
 			<arg line="-DrelengRootDir=${relengRootDir}" />
 			<arg line="-Djavahome=${env.JAVA_HOME}" />
 			<arg line="-DIndividualSourceBundles=true" />
+			<arg line="-DbuildType=${buildType}"/>
 			<classpath>
 				<pathelement location="${relengRootDir}/working/eclipse/plugins/org.eclipse.equinox.launcher_${equinoxLauncherPluginVersion}.jar" />
 			</classpath>
 		</java>
 		<mkdir dir="${buildDataDir}/step1/output" />
 		<unzip dest="${buildDataDir}/step1/output">
-			<fileset dir="${buildDataDir}/step1/input/N">
-				<include name="org.eclipse.scout.sdk.feature-N.zip" />
+			<fileset dir="${buildDataDir}/step1/input/${buildType}">
+				<include name="org.eclipse.scout.sdk.feature-${buildType}.zip" />
 			</fileset>
 		</unzip>
 	</target>
