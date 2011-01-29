@@ -26,7 +26,7 @@
 <project name="upload" default="build">
 	<property file="build.properties" />
 	<taskdef name="custom.removeOldZips" classname="org.eclipse.scout.releng.ant.archive.RemoveOldZipFiles" />
-	
+
 	<target name="clean">
 	</target>
 
@@ -64,26 +64,27 @@
 	</target>
 
 	<target name="uploadP2">
-		<mkdir dir="${scoutRepositoryLocation}/update"/>
-		<mkdir dir="${scoutRepositoryLocation}/update_temp"/>
+		<mkdir dir="${scoutRepositoryLocation}/update" />
+		<mkdir dir="${scoutRepositoryLocation}/update_temp" />
 
 		<delete dir="${tempUpdateLocation}/.updateBackup" />
 		<mkdir dir="${tempUpdateLocation}/.updateBackup" />
-			
+
 		<copy todir="${scoutRepositoryLocation}/.updateBackup">
 			<fileset dir="${scoutRepositoryLocation}/update">
 				<include name="**/**" />
 			</fileset>
 		</copy>
-		
+
 		<copy todir="${scoutRepositoryLocation}/update_temp">
 			<fileset dir="${buildDataDir}/p2_step4/output">
 				<include name="**/**" />
 				<exclude name="*.created" />
 			</fileset>
 		</copy>
-		<rename dest="${scoutRepositoryLocation}/.updateBackup" src="${scoutRepositoryLocation}/update"/>
-		<rename dest="${scoutRepositoryLocation}/update" src="${scoutRepositoryLocation}/update_temp"/>
+		<move src="${scoutRepositoryLocation}/update" dest="${scoutRepositoryLocation}/.updateBackup" />
+		<delete dir="${scoutRepositoryLocation}/update" />
+		<move src="${scoutRepositoryLocation}/update_temp" dest="${scoutRepositoryLocation}/update" />
 	</target>
 
 </project>
