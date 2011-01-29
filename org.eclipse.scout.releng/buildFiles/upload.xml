@@ -65,6 +65,8 @@
 
 	<target name="uploadP2">
 		<mkdir dir="${scoutRepositoryLocation}/update" />
+		
+		<delete dir="${scoutRepositoryLocation}/update_temp" />
 		<mkdir dir="${scoutRepositoryLocation}/update_temp" />
 
 		<delete dir="${tempUpdateLocation}/.updateBackup" />
