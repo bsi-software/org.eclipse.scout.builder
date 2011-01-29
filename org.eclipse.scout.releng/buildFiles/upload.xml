@@ -25,7 +25,8 @@
 
 <project name="upload" default="build">
 	<property file="build.properties" />
-
+	<taskdef name="custom.removeOldZips" classname="org.eclipse.scout.releng.ant.archive.RemoveOldZipFiles" />
+	
 	<target name="clean">
 	</target>
 
@@ -59,6 +60,7 @@
 				<include name="*.zip" />
 			</fileset>
 		</copy>
+		<custom.removeOldZips dir="${zipLocation}" keep="3" />
 	</target>
 
 	<target name="uploadP2">
