@@ -56,7 +56,7 @@
 		</condition>
 		<property name="incubationValue" value="" />
 		
-		<zip destfile="${outputFolder}/scout-${scoutVersion}${versionMilestone}-${buildTimestamp}${incubationValue}.zip">
+		<zip destfile="${outputFolder}/${buildType}-scout-${scoutVersion}${versionMilestone}-${buildTimestamp}${incubationValue}.zip">
 			<fileset dir="${inputFolder}/rtFeature">
 				<include name="**/**" />
 			</fileset>
