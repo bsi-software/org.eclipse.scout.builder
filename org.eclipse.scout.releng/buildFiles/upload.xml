@@ -101,6 +101,11 @@
 				<include name="**/**" />
 			</fileset>
 		</move>
+		<chmod perm="755" failonerror="false" verbose="true">
+			<fileset dir="${scoutRepositoryLocation}/update">
+				<include name="*.sh"/>
+			</fileset>
+		</chmod>
 		<delete dir="${scoutRepositoryLocation}/update_temp" />
 	</target>
 
