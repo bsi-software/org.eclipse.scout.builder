@@ -104,7 +104,7 @@
 		</move>
 		<chmod perm="755" failonerror="false" verbose="true">
 			<fileset dir="${uploadFolder}">
-				<include name="*.sh" />
+				<include name="*${buildTimestamp}.sh" />
 			</fileset>
 		</chmod>
 		<delete dir="${scoutRepositoryLocation}/update_temp" />
