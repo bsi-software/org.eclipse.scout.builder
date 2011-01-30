@@ -57,7 +57,12 @@
 
 
 	<target name="uploadZip">
-		<property name="zipLocation" location="${scoutRepositoryLocation}/zip" />
+		<condition property="uploadFolder" value="${scoutRepositoryLocation}/zip_test">
+			<istrue value="${testBuild}" />
+		</condition>
+		<property name="uploadFolder" value="${scoutRepositoryLocation}/zip" />
+		
+		<property name="zipLocation" location="${uploadFolder}" />
 		<mkdir dir="${zipLocation}" />
 		<copy todir="${zipLocation}">
 			<fileset dir="${buildDataDir}/zip_step2/output">
@@ -68,13 +73,13 @@
 	</target>
 
 	<target name="uploadP2">
-		<condition property="updateFolder" value="${scoutRepositoryLocation}/update.test">
+		<condition property="uploadFolder" value="${scoutRepositoryLocation}/update_test">
 			<istrue value="${testBuild}" />
 		</condition>
-		<property name="updateFolder" value="${scoutRepositoryLocation}/update" />
+		<property name="uploadFolder" value="${scoutRepositoryLocation}/update" />
 
 		<!-- ensure update exists -->
-		<mkdir dir="${updateFolder}" />
+		<mkdir dir="${uploadFolder}" />
 
 		<!-- ensure temp dir exists and is empty -->
 		<delete dir="${scoutRepositoryLocation}/update_temp" />
@@ -90,15 +95,15 @@
 		</copy>
 
 
-		<delete dir="${updateFolder}" />
-		<mkdir dir="${updateFolder}" />
-		<move todir="${updateFolder}">
+		<delete dir="${uploadFolder}" />
+		<mkdir dir="${uploadFolder}" />
+		<move todir="${uploadFolder}">
 			<fileset dir="${scoutRepositoryLocation}/update_temp">
 				<include name="**/**" />
 			</fileset>
 		</move>
 		<chmod perm="755" failonerror="false" verbose="true">
-			<fileset dir="${updateFolder}">
+			<fileset dir="${uploadFolder}">
 				<include name="*.sh" />
 			</fileset>
 		</chmod>
