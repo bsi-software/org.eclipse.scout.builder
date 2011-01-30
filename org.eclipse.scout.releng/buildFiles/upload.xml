@@ -110,7 +110,7 @@
 		<delete dir="${scoutRepositoryLocation}/update_temp" />
 	</target>
 
-	<target name="p2.createBackup" if="conditionTestBuild">
+	<target name="p2.createBackup" unless="conditionTestBuild">
 		<!-- ensure backup dir exists and is empty -->
 		<delete dir="${scoutRepositoryLocation}/.updateBackup" />
 		<mkdir dir="${scoutRepositoryLocation}/.updateBackup" />
