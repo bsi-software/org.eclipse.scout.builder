@@ -43,6 +43,10 @@
 		<condition property="conditionSkipUpload">
 			<istrue value="${skipUpload}" />
 		</condition>
+		<condition property="conditionTestBuild">
+			<istrue value="${testBuild}" />
+		</condition>
+		
 		<antcall target="upload" />
 	</target>
 
@@ -53,7 +57,12 @@
 
 
 	<target name="uploadZip">
-		<property name="zipLocation" location="${scoutRepositoryLocation}/zip" />
+		<condition property="uploadFolder" value="${scoutRepositoryLocation}/zip_test">
+			<istrue value="${testBuild}" />
+		</condition>
+		<property name="uploadFolder" value="${scoutRepositoryLocation}/zip" />
+		
+		<property name="zipLocation" location="${uploadFolder}" />
 		<mkdir dir="${zipLocation}" />
 		<copy todir="${zipLocation}">
 			<fileset dir="${buildDataDir}/zip_step2/output">
@@ -64,13 +73,44 @@
 	</target>
 
 	<target name="uploadP2">
+		<condition property="uploadFolder" value="${scoutRepositoryLocation}/update_test">
+			<istrue value="${testBuild}" />
+		</condition>
+		<property name="uploadFolder" value="${scoutRepositoryLocation}/update" />
+
 		<!-- ensure update exists -->
-		<mkdir dir="${scoutRepositoryLocation}/update" />
-		
+		<mkdir dir="${uploadFolder}" />
+
 		<!-- ensure temp dir exists and is empty -->
 		<delete dir="${scoutRepositoryLocation}/update_temp" />
 		<mkdir dir="${scoutRepositoryLocation}/update_temp" />
 
+		<antcall target="p2.createBackup" />
+
+		<copy todir="${scoutRepositoryLocation}/update_temp">
+			<fileset dir="${buildDataDir}/p2_step4/output">
+				<include name="**/**" />
+				<exclude name="*.created" />
+			</fileset>
+		</copy>
+
+
+		<delete dir="${uploadFolder}" />
+		<mkdir dir="${uploadFolder}" />
+		<move todir="${uploadFolder}">
+			<fileset dir="${scoutRepositoryLocation}/update_temp">
+				<include name="**/**" />
+			</fileset>
+		</move>
+		<chmod perm="755" failonerror="false" verbose="true">
+			<fileset dir="${uploadFolder}">
+				<include name="*${buildTimestamp}.sh" />
+			</fileset>
+		</chmod>
+		<delete dir="${scoutRepositoryLocation}/update_temp" />
+	</target>
+
+	<target name="p2.createBackup" unless="conditionTestBuild">
 		<!-- ensure backup dir exists and is empty -->
 		<delete dir="${scoutRepositoryLocation}/.updateBackup" />
 		<mkdir dir="${scoutRepositoryLocation}/.updateBackup" />
@@ -80,28 +120,5 @@
 				<include name="**/**" />
 			</fileset>
 		</copy>
-
-		<copy todir="${scoutRepositoryLocation}/update_temp">
-			<fileset dir="${buildDataDir}/p2_step4/output">
-				<include name="**/**" />
-				<exclude name="*.created" />
-			</fileset>
-		</copy>
-		
-		<move todir="${scoutRepositoryLocation}/.updateBackup" >
-			<fileset dir="${scoutRepositoryLocation}/update">
-				<include name="**/**" />
-			</fileset>
-		</move>
-		
-		<delete dir="${scoutRepositoryLocation}/update" />
-		<mkdir dir="${scoutRepositoryLocation}/update"/>
-		<move todir="${scoutRepositoryLocation}/update" >
-			<fileset dir="${scoutRepositoryLocation}/update_temp">
-				<include name="**/**" />
-			</fileset>
-		</move>
-		<delete dir="${scoutRepositoryLocation}/update_temp" />
 	</target>
-
 </project>
