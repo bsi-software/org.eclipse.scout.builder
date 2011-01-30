@@ -93,7 +93,7 @@
 				<include name="features" />
 			</dirset>
 		</custom.createUndoScript>
-		<chmod perm="775" file="${buildDataDir}/p2_step2/output/undo-${scoutVersion}${versionMilestone}-${buildTimestamp}.sh" failonerror="false" />
+		<chmod perm="775" file="${buildDataDir}/p2_step2/output/undo-${scoutVersion}${versionMilestone}-${buildTimestamp}.sh" failonerror="false" verbose="true" />
 	</target>
 
 
