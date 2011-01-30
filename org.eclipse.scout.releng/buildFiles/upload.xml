@@ -43,6 +43,10 @@
 		<condition property="conditionSkipUpload">
 			<istrue value="${skipUpload}" />
 		</condition>
+		<condition property="conditionTestBuild">
+			<istrue value="${testBuild}" />
+		</condition>
+		
 		<antcall target="upload" />
 	</target>
 
@@ -64,13 +68,44 @@
 	</target>
 
 	<target name="uploadP2">
+		<condition property="updateFolder" value="${scoutRepositoryLocation}/update.test">
+			<istrue value="${testBuild}" />
+		</condition>
+		<property name="updateFolder" value="${scoutRepositoryLocation}/update" />
+
 		<!-- ensure update exists -->
-		<mkdir dir="${scoutRepositoryLocation}/update" />
-		
+		<mkdir dir="${updateFolder}" />
+
 		<!-- ensure temp dir exists and is empty -->
 		<delete dir="${scoutRepositoryLocation}/update_temp" />
 		<mkdir dir="${scoutRepositoryLocation}/update_temp" />
 
+		<antcall target="p2.createBackup" />
+
+		<copy todir="${scoutRepositoryLocation}/update_temp">
+			<fileset dir="${buildDataDir}/p2_step4/output">
+				<include name="**/**" />
+				<exclude name="*.created" />
+			</fileset>
+		</copy>
+
+
+		<delete dir="${updateFolder}" />
+		<mkdir dir="${updateFolder}" />
+		<move todir="${updateFolder}">
+			<fileset dir="${scoutRepositoryLocation}/update_temp">
+				<include name="**/**" />
+			</fileset>
+		</move>
+		<chmod perm="755" failonerror="false" verbose="true">
+			<fileset dir="${updateFolder}">
+				<include name="*.sh" />
+			</fileset>
+		</chmod>
+		<delete dir="${scoutRepositoryLocation}/update_temp" />
+	</target>
+
+	<target name="p2.createBackup" if="conditionTestBuild">
 		<!-- ensure backup dir exists and is empty -->
 		<delete dir="${scoutRepositoryLocation}/.updateBackup" />
 		<mkdir dir="${scoutRepositoryLocation}/.updateBackup" />
@@ -80,33 +115,5 @@
 				<include name="**/**" />
 			</fileset>
 		</copy>
-
-		<copy todir="${scoutRepositoryLocation}/update_temp">
-			<fileset dir="${buildDataDir}/p2_step4/output">
-				<include name="**/**" />
-				<exclude name="*.created" />
-			</fileset>
-		</copy>
-		
-		<move todir="${scoutRepositoryLocation}/.updateBackup" >
-			<fileset dir="${scoutRepositoryLocation}/update">
-				<include name="**/**" />
-			</fileset>
-		</move>
-		
-		<delete dir="${scoutRepositoryLocation}/update" />
-		<mkdir dir="${scoutRepositoryLocation}/update"/>
-		<move todir="${scoutRepositoryLocation}/update" >
-			<fileset dir="${scoutRepositoryLocation}/update_temp">
-				<include name="**/**" />
-			</fileset>
-		</move>
-		<chmod perm="755" failonerror="false" verbose="true">
-			<fileset dir="${scoutRepositoryLocation}/update">
-				<include name="*.sh"/>
-			</fileset>
-		</chmod>
-		<delete dir="${scoutRepositoryLocation}/update_temp" />
 	</target>
-
 </project>
