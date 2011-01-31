@@ -26,6 +26,7 @@
 <project name="upload" default="build">
 	<property file="build.properties" />
 	<taskdef name="custom.removeOldZips" classname="org.eclipse.scout.releng.ant.archive.RemoveOldZipFiles" />
+	<taskdef name="custom.createRepositoryOverview" classname="org.eclipse.scout.releng.ant.CreateRepositoryOverview" />
 
 	<target name="clean">
 	</target>
@@ -46,7 +47,7 @@
 		<condition property="conditionTestBuild">
 			<istrue value="${testBuild}" />
 		</condition>
-		
+
 		<antcall target="upload" />
 	</target>
 
@@ -61,7 +62,7 @@
 			<istrue value="${testBuild}" />
 		</condition>
 		<property name="uploadFolder" value="${scoutRepositoryLocation}/zip" />
-		
+
 		<property name="zipLocation" location="${uploadFolder}" />
 		<mkdir dir="${zipLocation}" />
 		<copy todir="${zipLocation}">
@@ -102,12 +103,18 @@
 				<include name="**/**" />
 			</fileset>
 		</move>
+		<chown owner="ahoegger">
+			<fileset dir="${uploadFolder}">
+				<include name="*${buildTimestamp}.sh" />
+			</fileset>
+		</chown>
 		<chmod perm="755" failonerror="false" verbose="true">
 			<fileset dir="${uploadFolder}">
 				<include name="*${buildTimestamp}.sh" />
 			</fileset>
 		</chmod>
 		<delete dir="${scoutRepositoryLocation}/update_temp" />
+		<antcall target="createRepositoryOverview" />
 	</target>
 
 	<target name="p2.createBackup" unless="conditionTestBuild">
@@ -121,4 +128,11 @@
 			</fileset>
 		</copy>
 	</target>
+
+	<target name="createRepositoryOverview" unless="conditionTestBuild">
+		<delete file="${scoutDownloadLocation}/overview/repositoryOverview.xml" />
+		<custom.createRepositoryOverview rootUrl="http://download.eclipse.org/scout" repositoryDir="${scoutDownloadLocation}" overviewFile="${scoutDownloadLocation}/overview/repositoryOverview.xml">
+		</custom.createRepositoryOverview>
+	</target>
+
 </project>

@@ -14,8 +14,8 @@
 	<property file="build.properties" />
 
 	<tstamp>
-		<format property="buildTimestamp" pattern="yyyymmdd-hhmm" />
-		<format property="featureTimestamp" pattern="yyyymmddhhmm" />
+		<format property="buildTimestamp" pattern="yyyyMMdd-hhmm" />
+		<format property="featureTimestamp" pattern="yyyyMMddhhmm" />
 	</tstamp>
 
 
