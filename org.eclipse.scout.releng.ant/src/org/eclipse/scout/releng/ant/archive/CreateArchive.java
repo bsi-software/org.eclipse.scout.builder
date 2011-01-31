@@ -22,7 +22,7 @@ import java.util.jar.JarOutputStream;
 
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Task;
-import org.eclipse.scout.releng.ant.FileUtility;
+import org.eclipse.scout.releng.ant.util.FileUtility;
 
 /**
  * <h4>CreateArchive</h4>

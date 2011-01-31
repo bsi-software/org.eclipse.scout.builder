@@ -20,7 +20,7 @@ import junit.framework.Assert;
 import org.apache.tools.ant.Project;
 import org.apache.tools.ant.types.FileSet;
 import org.eclipse.scout.releng.ant.AbstractTestCase;
-import org.eclipse.scout.releng.ant.FileUtility;
+import org.eclipse.scout.releng.ant.util.FileUtility;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;

@@ -27,7 +27,8 @@ import org.junit.runners.Suite;
  */
 @RunWith(Suite.class)
 @Suite.SuiteClasses({ArchiveSuite.class,
-    Pack200Suite.class, TestCategoryTask.class, TestIncubation.class, TestCreateUndoScript.class, TestTrunkateRepository.class})
+    Pack200Suite.class, TestCategoryTask.class, TestIncubation.class, TestCreateUndoScript.class, TestTrunkateRepository.class,
+    TestCreateRepositoryOverview.class, DropInZipFilterTest.class})
 public class AllTestSuite {
 
 }

@@ -21,7 +21,7 @@ import org.apache.tools.ant.DirectoryScanner;
 import org.apache.tools.ant.Project;
 import org.apache.tools.ant.Task;
 import org.apache.tools.ant.types.FileSet;
-import org.eclipse.scout.releng.ant.FileUtility;
+import org.eclipse.scout.releng.ant.util.FileUtility;
 
 /**
  * <h4>CreateArchive</h4>

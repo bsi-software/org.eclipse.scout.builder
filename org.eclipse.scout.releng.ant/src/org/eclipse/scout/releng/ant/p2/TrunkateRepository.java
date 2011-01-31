@@ -21,7 +21,7 @@ import java.util.regex.Pattern;
 
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Task;
-import org.eclipse.scout.releng.ant.FileUtility;
+import org.eclipse.scout.releng.ant.util.FileUtility;
 
 /**
  * <h4>TrunkateRepository</h4>

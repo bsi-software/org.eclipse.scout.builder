@@ -11,14 +11,12 @@
 package org.eclipse.scout.releng.ant.archive;
 
 import java.io.File;
-import java.io.FilenameFilter;
-import java.util.TreeMap;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Task;
-import org.eclipse.scout.releng.ant.FileUtility;
+import org.eclipse.scout.releng.ant.util.DropInZip;
+import org.eclipse.scout.releng.ant.util.DropInZipFilter;
+import org.eclipse.scout.releng.ant.util.FileUtility;
 
 /**
  * <h4>TrunkateRepository</h4>
@@ -60,19 +58,21 @@ public class RemoveOldZipFiles extends Task {
   public void setKeep(int keep) {
     this.keep = keep;
   }
+
   @Override
   public void execute() throws BuildException {
     validate();
-    P_ZipFileFilter filter = new P_ZipFileFilter();
+    DropInZipFilter filter = new DropInZipFilter();
     getDir().list(filter);
     if (filter.size() > keep) {
-      File[] toRemove = filter.getOrderedZipFiles();
+      DropInZip[] toRemove = filter.getOrderedZipFiles();
       for (int i = keep; i < toRemove.length; i++) {
-        FileUtility.deleteFile(toRemove[i]);
+        if (toRemove[i].getZipFile().exists()) {
+          FileUtility.deleteFile(toRemove[i].getZipFile());
+        }
       }
     }
   }
-
 
   private void validate() throws BuildException {
     if (getDir() == null) {
@@ -80,37 +80,4 @@ public class RemoveOldZipFiles extends Task {
     }
   }
 
-  private class P_ZipFileFilter implements FilenameFilter {
-    private TreeMap<String, File> orderedZipFiles;
-    Pattern versionPattern = Pattern.compile("([0-9]{8}\\-[0-9]{4})(-Incubation)?\\.zip$");
-
-    public P_ZipFileFilter() {
-      this.orderedZipFiles = new TreeMap<String, File>();
-    }
-
-    @Override
-    public boolean accept(File dir, String name) {
-      Matcher matcher = versionPattern.matcher(name);
-      if (matcher.find()) {
-        orderedZipFiles.put(matcher.group(1), new File(dir.getAbsolutePath() + File.separator + name));
-      }
-      return false;
-    }
-
-    public int size() {
-      return orderedZipFiles.size();
-    }
-
-    /**
-     * @return the orderedScripts
-     */
-    public File[] getOrderedZipFiles() {
-      int i = orderedZipFiles.size();
-      File[] files = new File[i];
-      for (File f : orderedZipFiles.values()) {
-        files[--i] = f;
-      }
-      return files;
-    }
-  }
 }

@@ -16,7 +16,7 @@ import java.util.Arrays;
 
 import org.apache.tools.ant.Project;
 import org.eclipse.scout.releng.ant.AbstractTestCase;
-import org.eclipse.scout.releng.ant.FileUtility;
+import org.eclipse.scout.releng.ant.util.FileUtility;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;

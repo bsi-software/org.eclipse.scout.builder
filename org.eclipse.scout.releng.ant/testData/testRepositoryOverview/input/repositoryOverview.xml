@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<repository name="Scout">
+  <release url="http://dowload.eclipse.org/scout/nightly/update/" version="nightly">
+    <zip date="20110130-1256" url="http://dowload.eclipse.org/scout/nightly/zip/N-scout-3.7.0M5-20110130-1256-Incubation.zip"/>
+  </release>
+  <release url="http://dowload.eclipse.org/scout/3.7/update/" version="3.7">
+    <zip date="20111020-0313" url="http://dowload.eclipse.org/scout/3.7/zip/S-scout-3.7.1-20111020-0313.zip"/>
+    <zip date="20110512-1520" url="http://dowload.eclipse.org/scout/3.7/zip/R-scout-3.7.0-20110512-1520-Incubation.zip"/>
+    <zip date="20110131-1230" url="http://dowload.eclipse.org/scout/3.7/zip/S-scout-3.7.0M5-20110131-1230-Incubation.zip"/>
+    <zip date="20110130-1256" url="http://dowload.eclipse.org/scout/3.7/zip/N-scout-3.7.0M5-20110130-1256-Incubation.zip"/>
+  </release>
+  <release version="3.6">
+    <zip date="20111020-0313" url="http://dowload.eclipse.org/scout/3.6/zip/S-scout-3.6.1-20111020-0313.zip"/>
+    <zip date="20110512-1520" url="http://dowload.eclipse.org/scout/3.6/zip/R-scout-3.6.0-20110512-1520-Incubation.zip"/>
+    <zip date="20110131-1230" url="http://dowload.eclipse.org/scout/3.6/zip/S-scout-3.6.0M5-20110131-1230-Incubation.zip"/>
+    <zip date="20110130-1256" url="http://dowload.eclipse.org/scout/3.6/zip/N-scout-3.6.0M5-20110130-1256-Incubation.zip"/>
+  </release>
+</repository>
