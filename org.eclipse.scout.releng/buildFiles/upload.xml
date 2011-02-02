@@ -29,13 +29,17 @@
 	<taskdef name="custom.createRepositoryOverview" classname="org.eclipse.scout.releng.ant.CreateRepositoryOverview" />
 
 	<target name="clean">
+		<delete dir="${buildDataDir}/upload" />
 	</target>
 
 	<target name="build">
-		<condition property="scoutRepositoryLocation" value="${scoutDownloadLocation}/nightly">
+		<condition property="conditionIsNightly">
 			<equals arg1="N" arg2="${buildType}" />
 		</condition>
-		<condition property="scoutRepositoryLocation" value="${scoutDownloadLocation}/${versionMajor}.${versionMinor}">
+		<condition property="repository" value="nightly">
+			<equals arg1="N" arg2="${buildType}" />
+		</condition>
+		<condition property="repository" value="${versionMajor}.${versionMinor}">
 			<or>
 				<equals arg1="R" arg2="${buildType}" />
 				<equals arg1="S" arg2="${buildType}" />
@@ -52,19 +56,26 @@
 	</target>
 
 	<target name="upload" unless="conditionSkipUpload">
-		<antcall target="uploadZip" />
-		<antcall target="uploadP2" />
+		<antcall target="clean" />
+		<mkdir dir="${buildDataDir}/upload/input" />
+		<antcall target="prepare.zip" />
+		<antcall target="prepare.p2" />
+		<antcall target="createEclipseVersionFile" />
+		<antcall target="createRepositoryOverview" />
+		<antcall target="packUploadZip" />
+		<antcall target="testUpload" />
+		<antcall target="finalUpload" />
 	</target>
 
-
-	<target name="uploadZip">
-		<condition property="uploadFolder" value="${scoutRepositoryLocation}/zip_test">
-			<istrue value="${testBuild}" />
-		</condition>
-		<property name="uploadFolder" value="${scoutRepositoryLocation}/zip" />
-
-		<property name="zipLocation" location="${uploadFolder}" />
-		<mkdir dir="${zipLocation}" />
+	<target name="prepare.zip">
+		<!-- download zip -->
+		<property name="zipLocation" location="${buildDataDir}/upload/input/${repository}/zip" />
+		<mkdir dir="${zipLocation}"/>
+		<copy todir="${zipLocation}" failonerror="false">
+			<fileset dir="${scoutDownloadLocation}/${repository}/zip">
+				<include name="*.zip" />
+			</fileset>
+		</copy>
 		<copy todir="${zipLocation}">
 			<fileset dir="${buildDataDir}/zip_step2/output">
 				<include name="*.zip" />
@@ -73,66 +84,65 @@
 		<custom.removeOldZips dir="${zipLocation}" keep="3" />
 	</target>
 
-	<target name="uploadP2">
-		<condition property="uploadFolder" value="${scoutRepositoryLocation}/update_test">
-			<istrue value="${testBuild}" />
-		</condition>
-		<property name="uploadFolder" value="${scoutRepositoryLocation}/update" />
+	<target name="removeOldZips" if="conditionIsNightly">
+		<custom.removeOldZips dir="${zipLocation}" keep="4" />
+	</target>
 
-		<!-- ensure update exists -->
-		<mkdir dir="${uploadFolder}" />
-
-		<!-- ensure temp dir exists and is empty -->
-		<delete dir="${scoutRepositoryLocation}/update_temp" />
-		<mkdir dir="${scoutRepositoryLocation}/update_temp" />
-
-		<antcall target="p2.createBackup" />
-
-		<copy todir="${scoutRepositoryLocation}/update_temp">
+	<target name="prepare.p2">
+		<property name="p2Location" location="${buildDataDir}/upload/input/${repository}/update" />
+		<copy todir="${p2Location}">
 			<fileset dir="${buildDataDir}/p2_step4/output">
 				<include name="**/**" />
 				<exclude name="*.created" />
 			</fileset>
 		</copy>
 
-
-		<delete dir="${uploadFolder}" />
-		<mkdir dir="${uploadFolder}" />
-		<move todir="${uploadFolder}">
-			<fileset dir="${scoutRepositoryLocation}/update_temp">
-				<include name="**/**" />
-			</fileset>
-		</move>
-		<chown owner="ahoegger">
-			<fileset dir="${uploadFolder}">
-				<include name="*${buildTimestamp}.sh" />
-			</fileset>
-		</chown>
-		<chmod perm="755" failonerror="false" verbose="true">
-			<fileset dir="${uploadFolder}">
-				<include name="*${buildTimestamp}.sh" />
-			</fileset>
-		</chmod>
-		<delete dir="${scoutRepositoryLocation}/update_temp" />
-		<antcall target="createRepositoryOverview" />
 	</target>
 
-	<target name="p2.createBackup" unless="conditionTestBuild">
-		<!-- ensure backup dir exists and is empty -->
-		<delete dir="${scoutRepositoryLocation}/.updateBackup" />
-		<mkdir dir="${scoutRepositoryLocation}/.updateBackup" />
-
-		<copy todir="${scoutRepositoryLocation}/.updateBackup">
-			<fileset dir="${scoutRepositoryLocation}/update">
-				<include name="**/**" />
-			</fileset>
-		</copy>
+	<target name="createEclipseVersionFile">
+		<touch file="${buildDataDir}/upload/input/${repository}/eclipseVersion.txt">
+		</touch>
+		<echo file="${buildDataDir}/upload/input/${repository}/eclipseVersion.txt" message="${eclipseVersion}" />
 	</target>
 
 	<target name="createRepositoryOverview" unless="conditionTestBuild">
 		<delete file="${scoutDownloadLocation}/overview/repositoryOverview.xml" />
-		<custom.createRepositoryOverview rootUrl="http://download.eclipse.org/scout" repositoryDir="${scoutDownloadLocation}" overviewFile="${scoutDownloadLocation}/overview/repositoryOverview.xml">
-		</custom.createRepositoryOverview>
+		<custom.createRepositoryOverview rootUrl="http://download.eclipse.org/scout" uploadDir="${buildDataDir}/upload/input" repositoryDir="${scoutDownloadLocation}" overviewFile="${buildDataDir}/upload/input//repositoryOverview.xml" />
 	</target>
+
+
+	<target name="packUploadZip">
+		<mkdir dir="${buildDataDir}/upload/output"/>
+		<zip destfile="${buildDataDir}/upload/output/stage_${featureTimestamp}.zip">
+			<fileset dir="${buildDataDir}/upload/input">
+				<include name="**/**"/>
+			</fileset>
+		</zip>
+	</target>
+
+	<target name="testUpload" if="conditionTestBuild">
+		<delete >
+			<fileset dir="${scoutDownloadLocation}/testBuild">
+				<include name="testBuild/**"/>
+			</fileset>
+		</delete>
+		<unzip dest="${scoutDownloadLocation}/testBuild">
+			<fileset dir="${buildDataDir}/upload/output">
+				<include name="stage_${featureTimestamp}.zip"/>
+			</fileset>
+		</unzip>
+	</target>
+
+	<target name="finalUpload" unless="conditionTestBuild">
+		<checksum algorithm="MD5" file="${buildDataDir}/upload/output/stage_${featureTimestamp}.zip" property="md5checksum" />
+		<echo file="${buildDataDir}/upload/output/pending" append="false" message="${md5checksum}  stage_${featureTimestamp}.zip" />
+		<copy todir="${scoutDownloadLocation}/stagingArea">
+			<fileset dir="${buildDataDir}/upload/output">
+				<include name="stage_${featureTimestamp}.zip"/>
+			</fileset>
+		</copy>
+		<copy file="${buildDataDir}/upload/output/pending" tofile="${scoutDownloadLocation}/stagingArea/doStage" />
+	</target>
+
 
 </project>
