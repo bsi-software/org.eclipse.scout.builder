@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.releng.ant;
+package org.eclipse.scout.releng.ant.util;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;

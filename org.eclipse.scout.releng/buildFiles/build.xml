@@ -14,41 +14,49 @@
 	<property file="build.properties" />
 
 	<tstamp>
-		<format property="buildTimestamp" pattern="yyyymmdd-hhmm" />
-		<format property="featureTimestamp" pattern="yyyymmddhhmm" />
+		<format property="buildTimestamp" pattern="yyyyMMdd-hhmm" />
+		<format property="featureTimestamp" pattern="yyyyMMddhhmm" />
 	</tstamp>
 
+	<!-- condition properties -->
+	<condition property="major" value="${versionMajor}">
+		<isset property="versionMajor" />
+	</condition>
+	<property name="major" value="" />
+
+	<condition property="minor" value=".${versionMinor}">
+		<and>
+			<isset property="versionMajor" />
+			<isset property="versionMinor" />
+		</and>
+	</condition>
+	<property name="minor" value="" />
+
+	<condition property="micro" value=".${versionMicro}">
+		<and>
+			<isset property="versionMinor" />
+			<isset property="versionMicro" />
+		</and>
+	</condition>
+	<property name="micro" value="" />
+
+	<property name="scoutVersion" value="${major}${minor}${micro}" />
+
+	<condition property="conditionSkipClean">
+		<istrue value="${skipClean}" />
+	</condition>
+
+	<condition property="conditionCheckStaged">
+		<and>
+			<available file="${scoutDownloadLocation}/stagingArea/pending" />
+			<isfalse value="${skipUpload}" />
+			<isfalse value="${testBuild}" />
+		</and>
+	</condition>
 
 	<target name="build">
-		<!-- full version -->
-		
-		<condition property="major" value="${versionMajor}">
-			<isset property="versionMajor"/>
-		</condition>
-		<property name="major" value="" />
-		
-		<condition property="minor" value=".${versionMinor}">
-			<and>
-				<isset property="versionMajor"/>
-				<isset property="versionMinor"/>
-			</and>
-		</condition>
-		<property name="minor" value="" />
-		
-		<condition property="micro" value=".${versionMicro}">
-			<and>
-				<isset property="versionMinor"/>
-				<isset property="versionMicro"/>
-			</and>
-		</condition>
-		<property name="micro" value="" />
-		
-		<property name="scoutVersion" value="${major}${minor}${micro}" />
-		
-		<condition property="conditionSkipClean">
-			<istrue value="${skipClean}"/>
-		</condition>
-		<antcall target="clean"/>
+		<antcall target="precheck" />
+		<antcall target="clean" />
 		<available file="${relengRootDir}/working/eclipse" property="skipInstallEclipse" />
 		<antcall target="setupEclipse" />
 		<antcall target="step1_buildFeatures" />
@@ -72,6 +80,13 @@
 	</target>
 
 
+	<target name="precheck" depends="checkStaged">
+
+	</target>
+
+	<target name="checkStaged" if="conditionCheckStaged">
+		<fail message="already staged. Ensure the staged build is applied to the repository!" />
+	</target>
 
 	<target name="setupEclipse" unless="skipInstallEclipse">
 		<mkdir dir="${relengRootDir}/working" />
@@ -85,7 +100,7 @@
 	<target name="step2_achiveAll">
 		<ant antfile="${buildFileDir}/step2_archiveAll.xml" target="build" />
 	</target>
-	
+
 	<target name="step2a_markIncubation">
 		<ant antfile="${buildFileDir}/step2a_markIncubation.xml" target="build" />
 	</target>
@@ -117,7 +132,7 @@
 	<target name="p2_step3">
 		<ant antfile="${buildFileDir}/p2_step3_metadata.xml" target="build" />
 	</target>
-	
+
 	<target name="p2_step4">
 		<ant antfile="${buildFileDir}/p2_step4_categorize.xml" target="build" />
 	</target>
