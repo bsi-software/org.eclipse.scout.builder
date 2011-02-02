@@ -1,6 +1,6 @@
-workingDir=/home/aho/eclipseUpload
+workingDir=/home/data/users/ahoegger/downloads/scout
 stagingArea=$workingDir/stagingArea
-repositoriesDir=$workingDir/repository
+repositoriesDir=$workingDir
 stageTriggerFileName=doStage
 
 
@@ -9,45 +9,45 @@ processZipFile()
 {
   backupDir=$(pwd)
   zipFile=$backupDir"/"${1%?}
-  echo	"zip file name '$zipFile'"
   sigOk=$2
   if [ $sigOk == OK ]; then
-    echo "process zip file $zipFile"
+    echo $(date)" publish $zipFile"
     mkdir $stagingArea/working
-    unzip $zipFile -d $stagingArea/working
+    unzip $zipFile -d $stagingArea/working >$workingDir/NUL 
     cd $stagingArea/working
     for d in {[0-9\.]*,nightly}
     do
       if [ -d "$d" ]; then
+        if  [ -d  $repositoriesDir/$d""_new ]; then
+           rm -rf $repositoriesDir/$d""_new
+        fi
+        mv $stagingArea/working/$d $repositoriesDir/$d""_new
         # backup original
         if [ -d $repositoriesDir/$d ]; then
-          echo "backup repository $d"
           if [ -d $repositoriesDir/$d""_backup ]; then
             rm -rf $repositoriesDir/$d""_backup
           fi
-          mkdir $repositoriesDir/$d""_backup
-          mv -f $repositoriesDir/$d $repositoriesDir/$d""_backup
+          mv $repositoriesDir/$d $repositoriesDir/$d""_backup
         fi
+        mv $repositoriesDir/$d""_new $repositoriesDir/$d
       fi
     done
-    cp -rf $stagingArea/working/* $repositoriesDir/
+    cp -f $stagingArea/working/* $repositoriesDir/
+    rm -rf $stagingArea/working
     cd $backupDir
+  else
+    echo "md5 not valid for $zipFile!"
   fi
 }
 
-echo "start"
 if [ -f $stagingArea/$stageTriggerFileName ]; then
   backupDir=$(pwd)
   cd $stagingArea
   mv $stagingArea/$stageTriggerFileName $stagingArea/processing
   processZipFile $(md5sum -c $stagingArea/processing)
-#  for f in $stagingArea/stage_[0-9]*\.zip
-#  do
-#    processStageZip $f
-#  done
-#  rm $stagingArea/processing
   mv $stagingArea/processing $stagingArea/$stageTriggerFileName 
   cd $backupDir
+  rm $workingDir/NUL
 fi
 
 #echo $stagingArea/stage.zip
