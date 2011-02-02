@@ -106,7 +106,6 @@
 	</target>
 
 	<target name="createRepositoryOverview" unless="conditionTestBuild">
-		<delete file="${scoutDownloadLocation}/overview/repositoryOverview.xml" />
 		<custom.createRepositoryOverview rootUrl="http://download.eclipse.org/scout" uploadDir="${buildDataDir}/upload/input" repositoryDir="${scoutDownloadLocation}" overviewFile="${buildDataDir}/upload/input//repositoryOverview.xml" />
 	</target>
 
