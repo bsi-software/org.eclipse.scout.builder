@@ -13,6 +13,7 @@ package org.eclipse.scout.releng.ant;
 import java.io.File;
 import java.io.FileInputStream;
 import java.util.Arrays;
+import java.util.TreeMap;
 import java.util.TreeSet;
 
 import junit.framework.Assert;
@@ -23,22 +24,22 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-/** <h4> CreateRepositoryOverviewTest </h4>
- *
+/**
+ * <h4>CreateRepositoryOverviewTest</h4>
+ * 
  * @author aho
  * @since 1.1.0 (31.01.2011)
- *
  */
 public class TestCreateRepositoryOverview extends AbstractTestCase {
 
   private String m_workingDir;
 
-  public TestCreateRepositoryOverview(){
+  public TestCreateRepositoryOverview() {
     m_workingDir = getTestDataDir() + "/testRepositoryOverview";
   }
 
   @Before
-  public void setUp() throws Exception{
+  public void setUp() throws Exception {
     removeOutputDir();
   }
 
@@ -53,9 +54,24 @@ public class TestCreateRepositoryOverview extends AbstractTestCase {
       FileUtility.deleteFile(outputDir);
     }
   }
-  
+
   @Test
-  public void testReverseComparator(){
+  public void treeMapTest() {
+    TreeMap<String, String> map = new TreeMap<String, String>(new ReverseStringComparator());
+    String version351 = "3.5_1";
+    map.put("3.5", version351);
+    String version36 = "3.6";
+    map.put("3.6", version36);
+    String version352 = "3.5_2";
+    map.put("3.5", version352);
+    Assert.assertTrue(map.size() == 2);
+    String[] arr = map.values().toArray(new String[map.size()]);
+    Assert.assertEquals(arr[0], "3.6");
+    Assert.assertEquals(arr[1], "3.5_2");
+  }
+
+  @Test
+  public void testReverseComparator() {
     TreeSet<String> set = new TreeSet<String>(new ReverseStringComparator());
     set.add("3.5");
     set.add(null);
@@ -67,21 +83,21 @@ public class TestCreateRepositoryOverview extends AbstractTestCase {
     Assert.assertEquals(arr[2], "3.5");
     Assert.assertEquals(arr[3], null);
   }
-  
+
   @Test
-  public void testRepositoryOverview() throws Exception{
+  public void testRepositoryOverview() throws Exception {
     File inputDir = new File(m_workingDir + "/input");
     File outputDir = new File(m_workingDir + "/output");
-    File overviewFile = new File(outputDir.getAbsolutePath()+"/repositoryOverview.xml");
+    File overviewFile = new File(outputDir.getAbsolutePath() + "/repositoryOverview.xml");
     CreateRepositoryOverview task = new CreateRepositoryOverview();
     task.setRootUrl("http://dowload.eclipse.org/scout");
     task.setOverviewFile(overviewFile);
     task.setRepositoryDir(inputDir);
     task.execute();
-    
+
     Assert.assertTrue(overviewFile.exists());
     byte[] contentNew = FileUtility.getContent(new FileInputStream(overviewFile));
-    byte[] contentRef = FileUtility.getContent(m_workingDir+"/input/repositoryOverview.xml");
+    byte[] contentRef = FileUtility.getContent(m_workingDir + "/input/repositoryOverview.xml");
     Assert.assertTrue(Arrays.equals(contentNew, contentRef));
   }
 }

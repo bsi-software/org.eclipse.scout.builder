@@ -10,13 +10,18 @@
  ******************************************************************************/
 package org.eclipse.scout.releng.ant;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.FilenameFilter;
+import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URI;
 import java.text.SimpleDateFormat;
 import java.util.TreeMap;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -27,6 +32,7 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
 import org.apache.tools.ant.BuildException;
+import org.apache.tools.ant.Project;
 import org.apache.tools.ant.Task;
 import org.eclipse.scout.releng.ant.util.DropInZip;
 import org.eclipse.scout.releng.ant.util.DropInZipFilter;
@@ -43,16 +49,19 @@ import org.w3c.dom.Element;
 public class CreateRepositoryOverview extends Task {
 
   private String rootUrl;
+  private File uploadDir;
   private File repositoryDir;
   private File overviewFile;
 
-  private SimpleDateFormat dateFormat ;
-  
-  public CreateRepositoryOverview(){
+  private SimpleDateFormat dateFormat;
+
+  public CreateRepositoryOverview() {
     dateFormat = new SimpleDateFormat("yyyyMMdd-HHmm");
   }
+
   /**
-   * @param rootUrl the rootUrl to set
+   * @param rootUrl
+   *          the rootUrl to set
    */
   public void setRootUrl(String rootUrl) {
     this.rootUrl = rootUrl.replaceAll("/$", "");
@@ -63,6 +72,21 @@ public class CreateRepositoryOverview extends Task {
    */
   public String getRootUrl() {
     return rootUrl;
+  }
+
+  /**
+   * @param uploadDir
+   *          the uploadDir to set
+   */
+  public void setUploadDir(File uploadDir) {
+    this.uploadDir = uploadDir;
+  }
+
+  /**
+   * @return the uploadDir
+   */
+  public File getUploadDir() {
+    return uploadDir;
   }
 
   /**
@@ -116,57 +140,85 @@ public class CreateRepositoryOverview extends Task {
 
   private void findReleases(Document doc, Element repository) {
     // nightly
-    File nightlyDir = new File(getRepositoryDir().getAbsolutePath()+File.separator+"nightly");
-    if(nightlyDir.exists()){
-      addRelease(nightlyDir, doc, repository);
-    }
+//    File nightlyDir = new File(getRepositoryDir().getAbsolutePath() + File.separator + "nightly");
+//    if (nightlyDir.exists()) {
+//      addRelease(nightlyDir, doc, repository);
+//    }
     P_ReleaseFilter releseFilter = new P_ReleaseFilter();
-    getRepositoryDir().list(releseFilter);
-    for (File releaseDir : releseFilter.getReleses()) {
+    if (getRepositoryDir() != null) {
+      getRepositoryDir().list(releseFilter);
+    }
+    if (getUploadDir() != null) {
+      getUploadDir().list(releseFilter);
+    }
+    for (ReleaseFile releaseDir : releseFilter.getReleses()) {
       addRelease(releaseDir, doc, repository);
     }
   }
-  
-  private void addRelease(File releaseDir, Document doc,Element repository){
+
+  private void addRelease(ReleaseFile releaseDir, Document doc, Element repository) {
     Element releaseElement = doc.createElement("release");
-    File updateDir = new File(releaseDir.getAbsolutePath()+File.separator+"update");
-    if(updateDir.exists()){
-      URI uri = getRepositoryDir().getAbsoluteFile().toURI().relativize(updateDir.getAbsoluteFile().toURI());
-      releaseElement.setAttribute("url", rootUrl+"/"+uri.toString());
-      releaseElement.setAttribute("version", releaseDir.getName());
+
+    File updateDir = new File(releaseDir.getFile().getAbsolutePath() + File.separator + "update");
+    if (updateDir.exists()) {
+      URI uri = releaseDir.getFolder().relativize(updateDir.getAbsoluteFile().toURI());
+      releaseElement.setAttribute("url", rootUrl + "/" + uri.toString());
+      releaseElement.setAttribute("version", releaseDir.getFile().getName());
     }
-    File zipDir = new File(releaseDir.getAbsolutePath()+File.separator+"zip");
-    if(zipDir.exists()){
-      findZips(zipDir, doc, releaseElement);
-    }
-    
-    if(releaseElement.hasChildNodes() || releaseElement.hasAttributes()){
+    findZips(releaseDir, doc, releaseElement);
+//    File zipDir = new File(releaseDir.getFile().getAbsolutePath() + File.separator + "zip");
+//    if (zipDir.exists()) {
+//      findZips(zipDir, doc, releaseElement);
+//    }
+
+    if (releaseElement.hasChildNodes() || releaseElement.hasAttributes()) {
+      try {
+        File eclipseVersionFile = new File(releaseDir.getFile().getAbsolutePath() + File.separator + "eclipseVersion.txt");
+        if (eclipseVersionFile.exists()) {
+          BufferedReader reader = new BufferedReader(new FileReader(eclipseVersionFile));
+          String line = reader.readLine();
+          if (line != null) {
+            Matcher m = Pattern.compile("^\\s*\\[\\s*([0-9]{1,2}\\.[0-9]{1,2})\\s*\\,\\s*([0-9]{1,2}\\.[0-9]{1,2})\\s*\\]\\s*$").matcher(line);
+            if (m.matches()) {
+              releaseElement.setAttribute("eclipseMinVersion", m.group(1));
+              releaseElement.setAttribute("eclipseMaxVersion", m.group(2));
+            }
+          }
+        }
+      }
+      catch (IOException e) {
+        log("could not parse eclipse min max version!", e, Project.MSG_WARN);
+      }
       repository.appendChild(releaseElement);
     }
-  
+
   }
 
-  private void findZips(File zipFileDir, Document doc, Element releaseElement) {
+  private void findZips(ReleaseFile releseFile, Document doc, Element releaseElement) {
+    File zipDir = new File(releseFile.getFile().getAbsolutePath()+File.separator+"zip");
+    if(zipDir.exists() && zipDir.isDirectory()){
+    
     String attVersion = releaseElement.getAttribute("version");
     DropInZipFilter filter = new DropInZipFilter();
-    zipFileDir.list(filter);
-    for(DropInZip zip : filter.getOrderedZipFiles()){
-      if(attVersion == null || attVersion.length()==0){
-        attVersion = zip.getVersionMajor()+"."+zip.getVersionMinor();
+    zipDir.list(filter);
+    for (DropInZip zip : filter.getOrderedZipFiles()) {
+      if (attVersion == null || attVersion.length() == 0) {
+        attVersion = zip.getVersionMajor() + "." + zip.getVersionMinor();
         releaseElement.setAttribute("version", attVersion);
       }
       Element zipElement = doc.createElement("zip");
       zipElement.setAttribute("date", dateFormat.format(zip.getBuildDate()));
-      URI uri = getRepositoryDir().getAbsoluteFile().toURI().relativize(zip.getZipFile().getAbsoluteFile().toURI());
-      zipElement.setAttribute("url", rootUrl+"/"+uri.toString());
+      URI uri = releseFile.getFolder().relativize(zip.getZipFile().getAbsoluteFile().toURI());
+      zipElement.setAttribute("url", rootUrl + "/" + uri.toString());
       releaseElement.appendChild(zipElement);
     }
+    }
   }
-  
+
   private void writeXmlFile(Document document) throws Exception {
     OutputStream fos = null;
     try {
-      if(!getOverviewFile().exists()){
+      if (!getOverviewFile().exists()) {
         getOverviewFile().getParentFile().mkdirs();
       }
       fos = new FileOutputStream(getOverviewFile());
@@ -182,23 +234,23 @@ public class CreateRepositoryOverview extends Task {
       fos.close();
     }
   }
-  
+
   private void validate() throws BuildException {
-    if (getRepositoryDir() == null) {
-      throw new BuildException("parameter repositoryDir (Folder) must be specified.");
+    if (getRepositoryDir() == null && getUploadDir() == null) {
+      throw new BuildException("parameter repositoryDir (Folder) or uploadDir (Folder) must be specified.");
     }
-    if(getRootUrl() == null){
+    if (getRootUrl() == null) {
       throw new BuildException("parameter rootUrl (URL) must be specified.");
     }
   }
 
   private class P_ReleaseFilter implements FilenameFilter {
-    TreeMap<String, File> releses = new TreeMap<String, File>(new ReverseStringComparator());
+    TreeMap<String, ReleaseFile> releses = new TreeMap<String, ReleaseFile>(new ReverseStringComparator());
 
     @Override
     public boolean accept(File dir, String name) {
-      if (name.matches("[0-9]{1,2}\\.[0-9]{1,2}")) {
-        releses.put(name, new File(dir.getAbsoluteFile() + File.separator + name));
+      if (name.matches("([0-9]{1,2}\\.[0-9]{1,2}|nightly)")) {
+        releses.put("z"+name, new ReleaseFile(new File(dir.getAbsoluteFile() + File.separator + name),dir.toURI()));
       }
       return false;
     }
@@ -206,12 +258,32 @@ public class CreateRepositoryOverview extends Task {
     /**
      * @return the releses
      */
-    public File[] getReleses() {
-      return releses.values().toArray(new File[releses.size()]);
+    public ReleaseFile[] getReleses() {
+      return releses.values().toArray(new ReleaseFile[releses.size()]);
     }
   }
 
   
-
+  private class ReleaseFile{
+    private File file;
+    private URI folder;
+    
+    public ReleaseFile(File file, URI folder){
+     this.file = file;
+     this.folder = folder;
+    }
+    
+    /**
+     * @return the file
+     */
+    public File getFile() {
+      return file;
+    }
+    /**
+     * @return the folder
+     */
+    public URI getFolder() {
+      return folder;
+    }
+  }
 }
-
