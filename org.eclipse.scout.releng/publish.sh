@@ -1,4 +1,4 @@
-workingDir=/home/data/users/ahoegger/downloads/scout
+workingDir=/home/data/httpd/download.eclipse.org/scout
 stagingArea=$workingDir/stagingArea
 repositoriesDir=$workingDir
 stageTriggerFileName=doStage
