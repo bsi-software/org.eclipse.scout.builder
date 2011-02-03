@@ -13,7 +13,7 @@ processZipFile()
   if [ $sigOk == OK ]; then
     echo $(date)" publish $zipFile"
     mkdir $stagingArea/working
-    unzip $zipFile -d $stagingArea/working >$workingDir/NUL 
+    unzip $zipFile -d $stagingArea/working >$stagingArea/NUL 
     cd $stagingArea/working
     for d in {[0-9\.]*,nightly}
     do
@@ -45,9 +45,8 @@ if [ -f $stagingArea/$stageTriggerFileName ]; then
   cd $stagingArea
   mv $stagingArea/$stageTriggerFileName $stagingArea/processing
   processZipFile $(md5sum -c $stagingArea/processing)
-  mv $stagingArea/processing $stagingArea/$stageTriggerFileName 
+  rm -rf $stagingArea/* 
   cd $backupDir
-  rm $workingDir/NUL
 fi
 
 #echo $stagingArea/stage.zip
