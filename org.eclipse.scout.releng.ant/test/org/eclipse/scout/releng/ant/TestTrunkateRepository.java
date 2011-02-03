@@ -46,7 +46,7 @@ public class TestTrunkateRepository extends AbstractTestCase {
 
   @After
   public void cleanUp() {
-//    removeOutputDir();
+    removeOutputDir();
   }
 
   private void removeOutputDir() {
