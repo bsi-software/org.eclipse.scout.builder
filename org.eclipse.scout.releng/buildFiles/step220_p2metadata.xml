@@ -23,29 +23,28 @@
     	-jarProcessor -processAll -repack -outputDir .packed "$srcFile"  
 -->
 
-<project name="p2_step4.categorize" default="build">
+<project name="step220.p2metadata" default="build">
 	<property file="build.properties" />
-	<taskdef name="custom.categoryXml" classname="org.eclipse.scout.releng.ant.category.CategoryTask" />
+
 
 	<target name="clean">
-		<delete dir="${buildDataDir}/p2_step4" />
+		<delete dir="${buildDataDir}/step220" />
 	</target>
 
 	<target name="build">
-		<available file="${buildDataDir}/p2_step4/output/category.created" property="skipP2_step4" />
-		<antcall target="categorize" />
-		<delete dir="${buildDataDir}/p2_step4/input" failonerror="false" />
-		
+		<available file="${buildDataDir}/step220/output/metadata.created" property="skipStep220" />
+		<antcall target="createMetadata" />
+		<delete dir="${buildDataDir}/step220/input" failonerror="false" />
 	</target>
 
 
-	<target name="categorize" unless="skipP2_step4">
+	<target name="createMetadata" unless="skipStep220">
 		<antcall target="clean" />
-		<property name="inputFolder" location="${buildDataDir}/p2_step4/input" />
-		<property name="outputFolder" location="${buildDataDir}/p2_step4/output" />
+		<property name="inputFolder" location="${buildDataDir}/step220/input" />
+		<property name="outputFolder" location="${buildDataDir}/step220/output" />
 		<mkdir dir="${inputFolder}" />
 		<copy todir="${inputFolder}">
-			<fileset dir="${buildDataDir}/p2_step3/output">
+			<fileset dir="${buildDataDir}/step210/output">
 				<include name="**/*" />
 				<exclude name="*.created" />
 			</fileset>
@@ -55,22 +54,19 @@
 				<include name="**/*" />
 			</fileset>
 		</copy>
-		<!-- create category file -->
-		<custom.categoryXml categoryFile="${outputFolder}/scout.categories" featuresFolder="${outputFolder}/features" />
+		<!-- create metadata-->
 		<java classname="org.eclipse.equinox.launcher.Main" fork="true" failonerror="true">
-			<arg line="-application org.eclipse.equinox.p2.publisher.CategoryPublisher" />
+			<arg line="-application org.eclipse.equinox.p2.publisher.FeaturesAndBundlesPublisher" />
 			<arg line="-metadataRepository file:/${outputFolder}" />
+			<arg line="-artifactRepository file:/${outputFolder}" />
 			<arg line="-source ${outputFolder}" />
-			<arg line="-categoryDefinition file:${outputFolder}/scout.categories" />
 			<arg line="-compress" />
-			<arg line="-categoryQualifier" />
+			<arg line="-publishArtifacts" />
 			<classpath>
 				<pathelement location="${relengRootDir}/working/eclipse/plugins/org.eclipse.equinox.launcher_${equinoxLauncherPluginVersion}.jar" />
 			</classpath>
 		</java>
-
-		<delete file="${outputFolder}/scout.categories" />
-		<touch file="${outputFolder}/category.created" />
+		<touch file="${outputFolder}/metadata.created" />
 	</target>
 
 </project>

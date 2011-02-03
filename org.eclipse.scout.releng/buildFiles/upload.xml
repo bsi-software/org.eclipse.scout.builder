@@ -25,7 +25,6 @@
 
 <project name="upload" default="build">
 	<property file="build.properties" />
-	<taskdef name="custom.removeOldZips" classname="org.eclipse.scout.releng.ant.archive.RemoveOldZipFiles" />
 	<taskdef name="custom.createRepositoryOverview" classname="org.eclipse.scout.releng.ant.CreateRepositoryOverview" />
 
 	<target name="clean">
@@ -72,26 +71,22 @@
 		<property name="zipLocation" location="${buildDataDir}/upload/input/${repository}/zip" />
 		<mkdir dir="${zipLocation}"/>
 		<copy todir="${zipLocation}" failonerror="false">
-			<fileset dir="${scoutDownloadLocation}/${repository}/zip">
+			<fileset dir="${buildDataDir}/step010/output/zip">
 				<include name="*.zip" />
 			</fileset>
 		</copy>
 		<copy todir="${zipLocation}">
-			<fileset dir="${buildDataDir}/zip_step2/output">
+			<fileset dir="${buildDataDir}/step110/output">
 				<include name="*.zip" />
 			</fileset>
 		</copy>
-		<custom.removeOldZips dir="${zipLocation}" keep="3" />
 	</target>
 
-	<target name="removeOldZips" if="conditionIsNightly">
-		<custom.removeOldZips dir="${zipLocation}" keep="4" />
-	</target>
 
 	<target name="prepare.p2">
 		<property name="p2Location" location="${buildDataDir}/upload/input/${repository}/update" />
 		<copy todir="${p2Location}">
-			<fileset dir="${buildDataDir}/p2_step4/output">
+			<fileset dir="${buildDataDir}/step230/output">
 				<include name="**/**" />
 				<exclude name="*.created" />
 			</fileset>

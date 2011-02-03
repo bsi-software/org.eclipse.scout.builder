@@ -48,7 +48,7 @@
 
 	<condition property="conditionCheckStaged">
 		<and>
-			<available file="${scoutDownloadLocation}/stagingArea/pending" />
+			<available file="${scoutDownloadLocation}/stagingArea/doStage" />
 			<isfalse value="${skipUpload}" />
 			<isfalse value="${testBuild}" />
 		</and>
@@ -59,18 +59,23 @@
 		<antcall target="clean" />
 		<available file="${relengRootDir}/working/eclipse" property="skipInstallEclipse" />
 		<antcall target="setupEclipse" />
-		<antcall target="step1_buildFeatures" />
-		<antcall target="step2_achiveAll" />
-		<antcall target="step2a_markIncubation" />
-		<antcall target="step3_pack200Normalize" />
-		<antcall target="step4_sign" />
-		<antcall target="zip_step1" />
-		<antcall target="zip_step2" />
-		<antcall target="p2_step1" />
-		<antcall target="p2_step2" />
-		<antcall target="p2_step3" />
-		<antcall target="p2_step4" />
-		<antcall target="upload" />
+		
+		<ant antfile="${buildFileDir}/step010_downloadRepository.xml" target="build" />
+		<ant antfile="${buildFileDir}/step020_buildFeatures.xml" target="build" />
+		
+		<ant antfile="${buildFileDir}/step030_archiveAll.xml" target="build" />
+		<ant antfile="${buildFileDir}/step040_markIncubation.xml" target="build" />
+		<ant antfile="${buildFileDir}/step050_pack200Normalize.xml" target="build" />
+		<ant antfile="${buildFileDir}/step060_sign.xml" target="build" />
+		<ant antfile="${buildFileDir}/step100_zipUnpack.xml" target="build" />
+		<ant antfile="${buildFileDir}/step110_zipCreate.xml" target="build" />
+		<ant antfile="${buildFileDir}/step200_p2Pack200.xml" target="build" />
+		<ant antfile="${buildFileDir}/step210_p2mergeRepository.xml" target="build" />
+        <ant antfile="${buildFileDir}/step220_p2metadata.xml" target="build" />
+		<ant antfile="${buildFileDir}/step230_p2categorize.xml" target="build" />
+		<ant antfile="${buildFileDir}/upload.xml" target="build" />
+		
+		
 	</target>
 
 
@@ -91,54 +96,6 @@
 	<target name="setupEclipse" unless="skipInstallEclipse">
 		<mkdir dir="${relengRootDir}/working" />
 		<ant antfile="${buildFileDir}/setupEclipse.xml" target="setupEclipse" />
-	</target>
-
-	<target name="step1_buildFeatures">
-		<ant antfile="${buildFileDir}/step1_buildFeatures.xml" target="build" />
-	</target>
-
-	<target name="step2_achiveAll">
-		<ant antfile="${buildFileDir}/step2_archiveAll.xml" target="build" />
-	</target>
-
-	<target name="step2a_markIncubation">
-		<ant antfile="${buildFileDir}/step2a_markIncubation.xml" target="build" />
-	</target>
-
-	<target name="step3_pack200Normalize">
-		<ant antfile="${buildFileDir}/step3_pack200Normalize.xml" target="build" />
-	</target>
-
-	<target name="step4_sign">
-		<ant antfile="${buildFileDir}/step4_sign.xml" target="build" />
-	</target>
-
-	<target name="zip_step1">
-		<ant antfile="${buildFileDir}/zip_step1_unpack.xml" target="build" />
-	</target>
-
-	<target name="zip_step2">
-		<ant antfile="${buildFileDir}/zip_step2_createzip.xml" target="build" />
-	</target>
-
-	<target name="p2_step1">
-		<ant antfile="${buildFileDir}/p2_step1_pack200.xml" target="build" />
-	</target>
-
-	<target name="p2_step2">
-		<ant antfile="${buildFileDir}/p2_step2_downloadRepository.xml" target="build" />
-	</target>
-
-	<target name="p2_step3">
-		<ant antfile="${buildFileDir}/p2_step3_metadata.xml" target="build" />
-	</target>
-
-	<target name="p2_step4">
-		<ant antfile="${buildFileDir}/p2_step4_categorize.xml" target="build" />
-	</target>
-
-	<target name="upload">
-		<ant antfile="${buildFileDir}/upload.xml" target="build" />
 	</target>
 
 
