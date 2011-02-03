@@ -8,13 +8,13 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.releng.ant.p2;
+package org.eclipse.scout.releng.ant;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
 import java.io.FilenameFilter;
-import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -22,6 +22,7 @@ import java.util.regex.Pattern;
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Task;
 import org.eclipse.scout.releng.ant.util.FileUtility;
+import org.eclipse.scout.releng.ant.util.ReverseStringComparator;
 
 /**
  * <h4>TrunkateRepository</h4>
@@ -70,41 +71,16 @@ public class TrunkateRepository extends Task {
     P_ShellScriptFilter filter = new P_ShellScriptFilter();
     getRepositoryLocation().list(filter);
     if (filter.size() > keep) {
-      File[] toRemove = filter.getOrderedScripts();
-      for (int i = keep; i < toRemove.length; i++) {
-        try {
-          remove(toRemove[i]);
+      int i =0;
+      for(List<File> files : filter.getOrderedScripts()){
+        if(i >= keep){
+          for(File f : files){
+            FileUtility.deleteFile(f);
+          }
         }
-        catch (IOException e) {
-          throw new BuildException("coud not trunkate repository to size '" + getKeep() + "'.", e);
-        }
+        i++;
       }
-    }
-  }
 
-  /**
-   * @param file
-   */
-  private void remove(File file) throws IOException {
-    String workingDir = file.getParent();
-    BufferedReader reader = null;
-    try {
-      reader = new BufferedReader(new FileReader(file));
-      Pattern p = Pattern.compile("^rm\\s*\\-rf\\s*(.*)$");
-      String line = reader.readLine();
-      while(line != null){
-        Matcher m = p.matcher(line);
-        if(m.matches()){
-          FileUtility.deleteFile(new File(workingDir+File.separator+m.group(1)));
-        }
-        line = reader.readLine();
-      }
-      FileUtility.deleteFile(file);
-    }
-    finally {
-      if (reader != null) {
-        reader.close();
-      }
     }
   }
 
@@ -115,20 +91,42 @@ public class TrunkateRepository extends Task {
   }
 
   private class P_ShellScriptFilter implements FilenameFilter {
-    private TreeMap<String, File> orderedScripts;
-    Pattern versionPattern = Pattern.compile("([0-9]{8}\\-[0-9]{4})\\.sh$");
+    private TreeMap<String, List<File>> orderedScripts;
+    Pattern zipPattern = Pattern.compile("^[A-Z]\\-scout\\-([0-9]{1,2})\\.([0-9]{1,2})\\.(([0-9]{1,2}))?([^\\-]*)?\\-([0-9]{8})\\-([0-9]{4})(-Incubation)?\\.zip$");
+    Pattern versionPattern = Pattern.compile("^.*([0-9]{12})\\.jar(\\.pack\\.gz)?$");
 
     public P_ShellScriptFilter() {
-      this.orderedScripts = new TreeMap<String, File>();
+      this.orderedScripts = new TreeMap<String, List<File>>(new ReverseStringComparator());
     }
 
     @Override
     public boolean accept(File dir, String name) {
-      Matcher matcher = versionPattern.matcher(name);
-      if (matcher.find()) {
-        orderedScripts.put(matcher.group(1), new File(dir.getAbsolutePath() + File.separator + name));
+
+      File file = new File(dir.getAbsolutePath()+File.separator+name);
+      if(file.exists() && file.isDirectory()){
+        file.list(P_ShellScriptFilter.this);
+      }else{
+        Matcher zipMatcher = zipPattern.matcher(name);
+        if(zipMatcher.matches()){
+          String timeStamp = zipMatcher.group(6)+zipMatcher.group(7);
+          addFile(timeStamp, file);
+        }else{
+          Matcher jarMatcher = versionPattern.matcher(name);
+          if(jarMatcher.matches()){
+            addFile(jarMatcher.group(1), file);
+          }
+        }
       }
       return false;
+    }
+    
+    private void addFile(String timeStamp, File file){
+      List<File> fileList = orderedScripts.get(timeStamp);
+      if(fileList == null){
+        fileList = new ArrayList<File>();
+        orderedScripts.put(timeStamp, fileList);
+      }
+      fileList.add(file);
     }
 
     public int size() {
@@ -138,13 +136,8 @@ public class TrunkateRepository extends Task {
     /**
      * @return the orderedScripts
      */
-    public File[] getOrderedScripts() {
-      int i = orderedScripts.size();
-      File[] files = new File[i];
-      for(File f : orderedScripts.values()){
-        files[--i] = f;
-      }
-      return files;
+    public Collection<List<File>> getOrderedScripts() {
+      return orderedScripts.values(); 
     }
   }
 }

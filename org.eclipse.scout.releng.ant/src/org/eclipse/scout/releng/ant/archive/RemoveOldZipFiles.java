@@ -19,7 +19,7 @@ import org.eclipse.scout.releng.ant.util.DropInZipFilter;
 import org.eclipse.scout.releng.ant.util.FileUtility;
 
 /**
- * <h4>TrunkateRepository</h4>
+ * <h4>RemoveOldZipFiles</h4>
  * 
  * @author aho
  * @since 1.1.0 (29.01.2011)
