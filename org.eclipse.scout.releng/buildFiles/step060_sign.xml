@@ -9,18 +9,13 @@
        BSI Business Systems Integration AG - initial API and implementation
  -->
 <!--
- Input
-  ${buildWorking}/step0 to have the subfolders /plugins /features with all bundle/feature sources in it.
- 
- Output
-  ${buildWorking}/step1 with two subfolders /plugins /features an all the built bundles and features 
-     packed in jar files if requested.
-     
-     $JAVA_HOME/bin/java \
-    	-Dorg.eclipse.update.jarprocessor.pack200=@jre \
-    	-cp "$ECLIPSE_LAUNCHER" org.eclipse.core.launcher.Main \
-    	-application org.eclipse.update.core.siteOptimizer \
-    	-jarProcessor -processAll -repack -outputDir .packed "$srcFile"  
+	All jar files getting signed with the Eclipse certificate. The input will be zipped and moved to the 
+	${signInputFolder}. Then the sign process (external process) is getting started. Since the sign process is async
+	a wait loop waits to receive the signd zip in the ${signOutputFolder}.  
+	
+	Set ${skipSign} property to true to skip this step.
+	
+	The output folder (${buildDataDir}/step060/output) is used by step100 and step200. 
 -->
 
 <project name="step060.sign" default="build">

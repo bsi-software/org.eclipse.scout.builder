@@ -9,12 +9,10 @@
        BSI Business Systems Integration AG - initial API and implementation
  -->
 <!--
- Input
-  ${buildWorking}/step0 to have the subfolders /plugins /features with all bundle/feature sources in it.
- 
- Output
-  ${buildWorking}/step1 with two subfolders /plugins /features an all the built bundles and features 
-     packed in jar files if requested. 
+   If the property ${incubation} is true all bundle names and feature names will be extended by (Incubation).
+   If the property ${incubation} is false the input will be copied to the output folder.
+   
+   The output folder (${buildDataDir}/step040/output) is used by step050. 
 -->
 
 <project name="step040.markIncubation" default="build">

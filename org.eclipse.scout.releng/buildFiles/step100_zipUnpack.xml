@@ -9,18 +9,11 @@
        BSI Business Systems Integration AG - initial API and implementation
  -->
 <!--
- Input
-  ${buildWorking}/step0 to have the subfolders /plugins /features with all bundle/feature sources in it.
- 
- Output
-  ${buildWorking}/step1 with two subfolders /plugins /features an all the built bundles and features 
-     packed in jar files if requested.
-     
-     $JAVA_HOME/bin/java \
-    	-Dorg.eclipse.update.jarprocessor.pack200=@jre \
-    	-cp "$ECLIPSE_LAUNCHER" org.eclipse.core.launcher.Main \
-    	-application org.eclipse.update.core.siteOptimizer \
-    	-jarProcessor -processAll -repack -outputDir .packed "$srcFile"  
+	All jars temporarly packed by step030 will be unpacked here. As a marker for jars to unpack
+	a _unpack is expected. 
+    E.g. folder org.eclipse.scout.rt.feature_3.7.0.201102030528_unpack.jar -> org.eclipse.scout.rt.feature_3.7.0.201102030528 
+	
+	The output folder (${buildDataDir}/step100/output) is used by step110. 
 -->
 
 <project name="step100.zipUnpack" default="build">

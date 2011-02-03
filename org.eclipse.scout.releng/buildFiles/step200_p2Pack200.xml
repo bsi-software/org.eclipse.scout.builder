@@ -9,18 +9,10 @@
        BSI Business Systems Integration AG - initial API and implementation
  -->
 <!--
- Input
-  ${buildWorking}/step0 to have the subfolders /plugins /features with all bundle/feature sources in it.
- 
- Output
-  ${buildWorking}/step1 with two subfolders /plugins /features an all the built bundles and features 
-     packed in jar files if requested.
-     
-     $JAVA_HOME/bin/java \
-    	-Dorg.eclipse.update.jarprocessor.pack200=@jre \
-    	-cp "$ECLIPSE_LAUNCHER" org.eclipse.core.launcher.Main \
-    	-application org.eclipse.update.core.siteOptimizer \
-    	-jarProcessor -processAll -repack -outputDir .packed "$srcFile"  
+	All jar files will be archived to pack200 files.
+	E.g. org.eclipse.scout.rt.feature_3.7.0.201102030528.jar  -> org.eclipse.scout.rt.feature_3.7.0.201102030528.jar.pack.gz
+	
+	The output folder (${buildDataDir}/step200/output) is used by step210. 
 -->
 
 <project name="step200.p2Pack200" default="build">

@@ -9,12 +9,11 @@
        BSI Business Systems Integration AG - initial API and implementation
  -->
 <!--
- Input
-  ${buildWorking}/step0 to have the subfolders /plugins /features with all bundle/feature sources in it.
- 
- Output
-  ${buildWorking}/step1 with two subfolders /plugins /features an all the built bundles and features 
-     packed in jar files if requested. 
+   Ensures all bundles and features are packed in jar files.
+   E.g. folder org.eclipse.scout.rt.feature_3.7.0.201102030528  -> org.eclipse.scout.rt.feature_3.7.0.201102030528_unpack.jar
+   To mark the packed files the _unpack marker is used.
+   
+   The output (${buildDataDir}/step030/output) is used by step040.
 -->
 
 <project name="step030.archiveAll" default="build">

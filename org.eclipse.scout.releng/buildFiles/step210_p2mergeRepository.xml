@@ -9,18 +9,11 @@
        BSI Business Systems Integration AG - initial API and implementation
  -->
 <!--
- Input
-  ${buildWorking}/step0 to have the subfolders /plugins /features with all bundle/feature sources in it.
- 
- Output
-  ${buildWorking}/step1 with two subfolders /plugins /features an all the built bundles and features 
-     packed in jar files if requested.
-     
-     $JAVA_HOME/bin/java \
-    	-Dorg.eclipse.update.jarprocessor.pack200=@jre \
-    	-cp "$ECLIPSE_LAUNCHER" org.eclipse.core.launcher.Main \
-    	-application org.eclipse.update.core.siteOptimizer \
-    	-jarProcessor -processAll -repack -outputDir .packed "$srcFile"  
+	The new created repository (taken from step200 output folder) and the existing repository
+	(taken from step010 output folder) will be merged to one. 
+	${buildDataDir}/step210/output conatins the two folders pugins and features.
+	
+	The output folder (${buildDataDir}/step200/output) is used by step220.   
 -->
 
 <project name="step210.p2mergeRepository" default="build">

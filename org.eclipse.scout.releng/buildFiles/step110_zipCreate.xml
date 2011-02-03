@@ -9,18 +9,10 @@
        BSI Business Systems Integration AG - initial API and implementation
  -->
 <!--
- Input
-  ${buildWorking}/step0 to have the subfolders /plugins /features with all bundle/feature sources in it.
- 
- Output
-  ${buildWorking}/step1 with two subfolders /plugins /features an all the built bundles and features 
-     packed in jar files if requested.
-     
-     $JAVA_HOME/bin/java \
-    	-Dorg.eclipse.update.jarprocessor.pack200=@jre \
-    	-cp "$ECLIPSE_LAUNCHER" org.eclipse.core.launcher.Main \
-    	-application org.eclipse.update.core.siteOptimizer \
-    	-jarProcessor -processAll -repack -outputDir .packed "$srcFile"  
+	A drop in zip will be created (${outputFolder}/${buildType}-scout-${scoutVersion}${versionMilestone}-${buildTimestamp}${incubationValue}.zip):
+	Root folders of the zip are plugins and features.
+
+	The output folder (${buildDataDir}/step110/output) is used by upload. 
 -->
 
 <project name="step110.zipCreate" default="build">

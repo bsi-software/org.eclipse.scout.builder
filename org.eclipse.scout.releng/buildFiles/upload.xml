@@ -9,18 +9,11 @@
        BSI Business Systems Integration AG - initial API and implementation
  -->
 <!--
- Input
-  ${buildWorking}/step0 to have the subfolders /plugins /features with all bundle/feature sources in it.
- 
- Output
-  ${buildWorking}/step1 with two subfolders /plugins /features an all the built bundles and features 
-     packed in jar files if requested.
-     
-     $JAVA_HOME/bin/java \
-    	-Dorg.eclipse.update.jarprocessor.pack200=@jre \
-    	-cp "$ECLIPSE_LAUNCHER" org.eclipse.core.launcher.Main \
-    	-application org.eclipse.update.core.siteOptimizer \
-    	-jarProcessor -processAll -repack -outputDir .packed "$srcFile"  
+	Uploads the packed updated repository to the stagingArea. Beside a doStage
+	file containing the MD5 hash of the uploaded zip will be created to trigger the 
+	publish job.
+	
+	Set ${skipUpload} property to true to skip this step.
 -->
 
 <project name="upload" default="build">
@@ -69,7 +62,7 @@
 	<target name="prepare.zip">
 		<!-- download zip -->
 		<property name="zipLocation" location="${buildDataDir}/upload/input/${repository}/zip" />
-		<mkdir dir="${zipLocation}"/>
+		<mkdir dir="${zipLocation}" />
 		<copy todir="${zipLocation}" failonerror="false">
 			<fileset dir="${buildDataDir}/step010/output/zip">
 				<include name="*.zip" />
@@ -106,23 +99,23 @@
 
 
 	<target name="packUploadZip">
-		<mkdir dir="${buildDataDir}/upload/output"/>
+		<mkdir dir="${buildDataDir}/upload/output" />
 		<zip destfile="${buildDataDir}/upload/output/stage_${featureTimestamp}.zip">
 			<fileset dir="${buildDataDir}/upload/input">
-				<include name="**/**"/>
+				<include name="**/**" />
 			</fileset>
 		</zip>
 	</target>
 
 	<target name="testUpload" if="conditionTestBuild">
-		<delete >
+		<delete>
 			<fileset dir="${scoutDownloadLocation}/testBuild">
-				<include name="testBuild/**"/>
+				<include name="testBuild/**" />
 			</fileset>
 		</delete>
 		<unzip dest="${scoutDownloadLocation}/testBuild">
 			<fileset dir="${buildDataDir}/upload/output">
-				<include name="stage_${featureTimestamp}.zip"/>
+				<include name="stage_${featureTimestamp}.zip" />
 			</fileset>
 		</unzip>
 	</target>
@@ -132,7 +125,7 @@
 		<echo file="${buildDataDir}/upload/output/pending" append="false" message="${md5checksum}  stage_${featureTimestamp}.zip" />
 		<copy todir="${scoutDownloadLocation}/stagingArea">
 			<fileset dir="${buildDataDir}/upload/output">
-				<include name="stage_${featureTimestamp}.zip"/>
+				<include name="stage_${featureTimestamp}.zip" />
 			</fileset>
 		</copy>
 		<copy file="${buildDataDir}/upload/output/pending" tofile="${scoutDownloadLocation}/stagingArea/doStage" />
