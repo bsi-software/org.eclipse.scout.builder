@@ -13,7 +13,10 @@ processZipFile()
   if [ $sigOk == OK ]; then
     echo $(date)" publish $zipFile"
     mkdir $stagingArea/working
-    unzip $zipFile -d $stagingArea/working >$stagingArea/NUL 
+    unzip $zipFile -d $stagingArea/working >$stagingArea/NUL
+    chgrp -R technology.scout $stagingArea/working
+    chmod -R g+w $stagingArea/working
+     
     cd $stagingArea/working
     for d in {[0-9\.]*,nightly}
     do
