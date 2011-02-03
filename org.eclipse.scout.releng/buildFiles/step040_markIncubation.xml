@@ -17,29 +17,29 @@
      packed in jar files if requested. 
 -->
 
-<project name="step3.markIncubation" default="build">
+<project name="step040.markIncubation" default="build">
 	<property file="build.properties" />
 	<taskdef name="custom.markIncubation" classname="org.eclipse.scout.releng.ant.incubation.MarkIncubation" />
 
 	<target name="clean">
-		<delete dir="${buildDataDir}/step2a" />
+		<delete dir="${buildDataDir}/step040" />
 	</target>
 
 	<target name="build">
 		<condition property="conditionIncubation">
 			<istrue value="${incubation}" />
 		</condition>
-		<available file="${buildDataDir}/step2a/output/incubationMarker.created" property="skipStep2a" />
+		<available file="${buildDataDir}/step040/output/incubationMarker.created" property="skipStep040" />
 		<antcall target="markIncubation" />
-		<delete dir="${buildDataDir}/step2a/input" failonerror="false" />
+		<delete dir="${buildDataDir}/step040/input" failonerror="false" />
 	</target>
 
 	<target name="skipTask" unless="conditionIncubation">
 		<antcall target="clean" />
-		<property name="outputFolder" location="${buildDataDir}/step2a/output" />
+		<property name="outputFolder" location="${buildDataDir}/step040/output" />
 		<mkdir dir="${outputFolder}" />
 		<copy todir="${outputFolder}">
-			<fileset dir="${buildDataDir}/step2/output">
+			<fileset dir="${buildDataDir}/step030/output">
 				<include name="**/*" />
 				<exclude name="*.created" />
 			</fileset>
@@ -47,20 +47,20 @@
 		<touch file="${outputFolder}/incubationMarker.created" />
 	</target>
 
-	<target name="markIncubation" unless="skipStep2a">
+	<target name="markIncubation" unless="skipStep040">
 		<antcall target="clean" />
-		<property name="inputFolder" location="${buildDataDir}/step2a/input" />
-		<property name="outputFolder" location="${buildDataDir}/step2a/output" />
+		<property name="inputFolder" location="${buildDataDir}/step040/input" />
+		<property name="outputFolder" location="${buildDataDir}/step040/output" />
 
 		<mkdir dir="${outputFolder}" />
 		<copy todir="${outputFolder}">
-			<fileset dir="${buildDataDir}/step2/output">
+			<fileset dir="${buildDataDir}/step030/output">
 				<include name="**/*" />
 				<exclude name="*.created" />
 			</fileset>
 		</copy>
 		<custom.markIncubation>
-			<fileset dir="${buildDataDir}/step2a/output">
+			<fileset dir="${buildDataDir}/step040/output">
 				<include name="**/**.jar" />
 			</fileset>
 		</custom.markIncubation>

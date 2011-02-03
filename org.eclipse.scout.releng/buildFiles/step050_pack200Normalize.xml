@@ -23,52 +23,46 @@
     	-jarProcessor -processAll -repack -outputDir .packed "$srcFile"  
 -->
 
-<project name="p2_step1.pack200" default="build">
+<project name="step050.pack200Normalize" default="build">
 	<property file="build.properties" />
-	<taskdef name="custom.removeUnpackSuffix" classname="org.eclipse.scout.releng.ant.archive.RemoveUnpackSuffix" />
-	<taskdef name="custom.pack" classname="org.eclipse.scout.releng.ant.pack200.Pack" />
-
+	<taskdef name="repack" classname="org.eclipse.scout.releng.ant.pack200.Repack" />
 
 	<target name="clean">
-		<delete dir="${buildDataDir}/p2_step1" />
+		<delete dir="${buildDataDir}/step050" />
 	</target>
 
 	<target name="build">
-		<available file="${buildDataDir}/p2_step1/output/pack200.created" property="skipP2_step1" />
-		<antcall target="removeUnpackSuffix" />
-		<delete dir="${buildDataDir}/p2_step1/input" failonerror="false" />
+		<available file="${buildDataDir}/step050/output/pack200Repack.created" property="skipStep050" />
+		<antcall target="pack200Normalize" />
+		<delete dir="${buildDataDir}/step050/input" failonerror="false" />
 	</target>
 
-
-	<target name="removeUnpackSuffix" unless="skipP2_step1">
+	<target name="pack200Normalize" unless="skipStep050">
 		<antcall target="clean" />
-		<property name="inputFolder" location="${buildDataDir}/p2_step1/input" />
-		<property name="outputFolder" location="${buildDataDir}/p2_step1/output" />
+		<property name="inputFolder" location="${buildDataDir}/step050/input" />
+		<property name="outputFolder" location="${buildDataDir}/step050/output" />
 		<mkdir dir="${inputFolder}" />
 		<copy todir="${inputFolder}">
-			<fileset dir="${buildDataDir}/step4/output">
+			<fileset dir="${buildDataDir}/step040/output">
 				<include name="**/*" />
-				<exclude name="*.created" />
+				<exclude name="*.created"/>
 			</fileset>
 		</copy>
-		<!-- unpack -->
-		<copy todir="${outputFolder}">
-			<fileset dir="${inputFolder}">
-				<include name="**/*" />
-			</fileset>
-		</copy>
-		<custom.removeUnpackSuffix>
-			<fileset dir="${outputFolder}">
-				<include name="**/*.jar" />
-			</fileset>
-		</custom.removeUnpackSuffix>
-		<custom.pack>
-			<fileset dir="${outputFolder}">
-				<include name="**/*.jar" />
-			</fileset>
-		</custom.pack>
+		<fileset id="jars2pack" dir="${inputFolder}">
+			<include name="**/*.jar" />
+		</fileset>
 
-		<touch file="${outputFolder}/pack200.created" />
+		<!--
+    	<p200ant repack="true" >
+			<fileset refid="jars2pack" />
+		</p200ant>
+		-->
+		<repack outputDir="${outputFolder}">
+			<fileset refid="jars2pack" />
+		</repack>
+		<touch file="${outputFolder}/pack200Repack.created" />
+
 	</target>
+
 
 </project>

@@ -23,45 +23,39 @@
     	-jarProcessor -processAll -repack -outputDir .packed "$srcFile"  
 -->
 
-<project name="step3.pack200Normalize" default="build">
+<project name="step210.p2mergeRepository" default="build">
 	<property file="build.properties" />
-	<taskdef name="repack" classname="org.eclipse.scout.releng.ant.pack200.Repack" />
+
+
 
 	<target name="clean">
-		<delete dir="${buildDataDir}/step3" />
+		<delete dir="${buildDataDir}/step210" />
 	</target>
 
 	<target name="build">
-		<available file="${buildDataDir}/step3/output/pack200Repack.created" property="skipStep3" />
-		<antcall target="pack200Normalize" />
-		<delete dir="${buildDataDir}/step3/input" failonerror="false" />
+		<available file="${buildDataDir}/step210/output/setupRepository.created" property="skipStep210" />
+		<antcall target="setupRepository" />
 	</target>
 
-	<target name="pack200Normalize" unless="skipStep3">
+	<target name="setupRepository" unless="skipStep210">
 		<antcall target="clean" />
-		<property name="inputFolder" location="${buildDataDir}/step3/input" />
-		<property name="outputFolder" location="${buildDataDir}/step3/output" />
-		<mkdir dir="${inputFolder}" />
-		<copy todir="${inputFolder}">
-			<fileset dir="${buildDataDir}/step2a/output">
+
+		<mkdir dir="${buildDataDir}/step210/output" />
+		<copy todir="${buildDataDir}/step210/output">
+			<fileset dir="${buildDataDir}/step200/output/rtFeature">
 				<include name="**/*" />
-				<exclude name="*.created"/>
+				<exclude name="*.created" />
+			</fileset>
+			<fileset dir="${buildDataDir}/step200/output/sdkFeature">
+				<include name="**/*" />
+				<exclude name="*.created" />
+			</fileset>
+			<fileset dir="${buildDataDir}/step010/output/update">
+				<include name="plugins/*" />
+				<include name="features/*" />
 			</fileset>
 		</copy>
-		<fileset id="jars2pack" dir="${inputFolder}">
-			<include name="**/*.jar" />
-		</fileset>
-
-		<!--
-    	<p200ant repack="true" >
-			<fileset refid="jars2pack" />
-		</p200ant>
-		-->
-		<repack outputDir="${outputFolder}">
-			<fileset refid="jars2pack" />
-		</repack>
-		<touch file="${outputFolder}/pack200Repack.created" />
-
+		<touch file="${buildDataDir}/step210/output/setupRepository.created" />
 	</target>
 
 

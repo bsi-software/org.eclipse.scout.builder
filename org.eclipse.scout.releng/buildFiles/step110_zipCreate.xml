@@ -23,39 +23,55 @@
     	-jarProcessor -processAll -repack -outputDir .packed "$srcFile"  
 -->
 
-<project name="zip_step1.unpack" default="build">
+<project name="step110.zipCreate" default="build">
 	<property file="build.properties" />
-	<taskdef name="custom.extract" classname="org.eclipse.scout.releng.ant.archive.ExtractArchive" />
-	
+
 
 	<target name="clean">
-		<delete dir="${buildDataDir}/zip_step1" />
+		<delete dir="${buildDataDir}/step110" />
 	</target>
 
 	<target name="build">
-		<available file="${buildDataDir}/zip_step1/output/unpack.created" property="skipZip_step1" />
-		<antcall target="unpack" />
-		<delete dir="${buildDataDir}/zip_step1/input" failonerror="false" />
+		<available file="${buildDataDir}/step110/output/zip.created" property="skipStep110" />
+		<antcall target="createZip" />
+		<delete dir="${buildDataDir}/step110/input" failonerror="false" />
 	</target>
 
 
-	<target name="unpack" unless="skipZip_step1">
+	<target name="createZip" unless="skipStep110">
 		<antcall target="clean" />
-		<property name="inputFolder" location="${buildDataDir}/zip_step1/input" />
-		<property name="outputFolder" location="${buildDataDir}/zip_step1/output" />
+		<property name="inputFolder" location="${buildDataDir}/step110/input" />
+		<property name="outputFolder" location="${buildDataDir}/step110/output" />
 		<mkdir dir="${inputFolder}" />
 		<copy todir="${inputFolder}">
-			<fileset dir="${buildDataDir}/step4/output">
+			<fileset dir="${buildDataDir}/step100/output">
 				<include name="**/*" />
 				<exclude name="*.created" />
 			</fileset>
 		</copy>
-		<!-- unpack -->
-		<custom.extract inputDir="${inputFolder}/rtFeature/features" outputDir="${outputFolder}/rtFeature/features"/>
-		<custom.extract inputDir="${inputFolder}/rtFeature/plugins" outputDir="${outputFolder}/rtFeature/plugins"/>
-		<custom.extract inputDir="${inputFolder}/sdkFeature/features" outputDir="${outputFolder}/sdkFeature/features"/>
-		<custom.extract inputDir="${inputFolder}/sdkFeature/plugins" outputDir="${outputFolder}/sdkFeature/plugins"/>
-		<touch file="${outputFolder}/unpack.created" />
+		<mkdir dir="${outputFolder}" />
+
+		<condition property="incubationValue" value="-Incubation">
+			<istrue value="${incubation}" />
+		</condition>
+		<property name="incubationValue" value="" />
+
+		<zip destfile="${outputFolder}/${buildType}-scout-${scoutVersion}${versionMilestone}-${buildTimestamp}${incubationValue}.zip">
+			<fileset dir="${inputFolder}/rtFeature">
+				<include name="**/**" />
+			</fileset>
+			<fileset dir="${inputFolder}/sdkFeature">
+				<include name="**/**" />
+			</fileset>
+			<fileset dir="${templateDir}/dropins/eclipse">
+				<include name="**/**" />
+			</fileset>
+
+		</zip>
+
+		<touch file="${outputFolder}/zip.created" />
 	</target>
+
+
 
 </project>
