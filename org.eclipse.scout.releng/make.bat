@@ -12,6 +12,9 @@
 @echo off
 setlocal
 set JAVA_HOME=E:\jsdk\j2sdk1.6.0_10
+:# used for pack200
+set JAVA_HOME_1-5=E:\jsdk\j2sdk1.5.0_12
+
 set ANT_HOME=E:\jsdk\apache-ant-1.7.1
 set ANT_OPTS=-Xmx512m
 set WORKSPACE=E:\workspaces\scout.build\p2Workspace
@@ -30,7 +33,7 @@ set logfile=org.eclipse.scout.releng/scoutBuild.log
 
 PATH=%JAVA_HOME%\bin;%ANT_HOME%\bin;%PATH%
 
-set buildFlags=-DskipClean=false -DskipSign=true -DskipDownloadRepository=false -DskipUpload=false -DbuildType=N -DscoutDownloadLocation=D:/Temp/max24h/eclipseBuild/download -DtestBuild=false
+set buildFlags=-DskipClean=false -DskipSign=true -DskipDownloadRepository=false -DskipUpload=false -DbuildType=N -DscoutDownloadLocation=D:/Temp/max24h/eclipseBuild/download -DtestBuild=true
 
 call ant -f org.eclipse.scout.releng/buildFiles/build.xml  -lib org.eclipse.scout.releng/buildFiles/lib %buildOpts% %buildFlags% %nighltyRepoVar% %* build  
 :# call ant -f org.eclipse.scout.builder/buildFiles/build.xml -lib org.eclipse.scout.releng %buildOpts%  %nighltyRepoVar% -DskipSign=true %* buildNightly  > %logfile%
