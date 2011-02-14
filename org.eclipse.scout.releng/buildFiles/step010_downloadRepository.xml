@@ -83,7 +83,7 @@
 	</target>
 
 	<target name="trunkateRepository" if="conditionNightly">
-		<custom.trunkateReposiory repositoryLocation="${scoutRepositoryLocation}" keep="${nightlyKeepVersions}" />
+		<custom.trunkateReposiory repositoryLocation="${buildDataDir}/step010/output" keep="${nightlyKeepVersions}" />
 	</target>
 			
 </project>
