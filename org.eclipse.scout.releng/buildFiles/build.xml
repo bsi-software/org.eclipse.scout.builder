@@ -144,13 +144,6 @@
 	</target>
 
 	<target name="setupEclipse" unless="skipInstallEclipse">
-		<echo message="${eclipseFileName}" />
-				<echo message="${eclipseDownloadUrl}" />
-				<echo message="${eclipseDeltapackName}" />
-				<echo message="${eclipseDeltapackUrl}" />
-				<echo message="${pdeBuildPluginVersion}" />
-				<echo message="${equinoxLauncherPluginVersion}" />
-		
 		<mkdir dir="${relengRootDir}/working" />
 		<ant antfile="${buildFileDir}/setupEclipse.xml" target="setupEclipse" />
 	</target>
