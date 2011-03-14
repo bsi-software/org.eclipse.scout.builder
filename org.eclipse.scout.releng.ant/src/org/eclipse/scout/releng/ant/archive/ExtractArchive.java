@@ -19,6 +19,7 @@ import java.util.jar.JarInputStream;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Task;
@@ -135,9 +136,9 @@ public class ExtractArchive extends Task {
     if (!dest.exists()) {
       dest.mkdirs();
     }
-    JarInputStream jin = null;
+    ZipInputStream jin = null;
     try {
-      jin = new JarInputStream(new FileInputStream(jarFile));
+      jin = new ZipInputStream(new FileInputStream(jarFile));
       byte[] buffer = new byte[1024];
 
       ZipEntry entry = jin.getNextEntry();
