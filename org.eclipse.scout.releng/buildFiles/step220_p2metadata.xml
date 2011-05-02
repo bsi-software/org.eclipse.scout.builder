@@ -53,6 +53,10 @@
 			<arg line="-source ${outputFolder}" />
 			<arg line="-compress" />
 			<arg line="-publishArtifacts" />
+			<arg value="-artifactRepositoryName"/>
+			<arg value="Eclipse Scout Site"/>
+			<arg value="-metadataRepositoryName"/>
+			<arg value="Eclipse Scout Site"/>
 			<classpath>
 				<pathelement location="${relengRootDir}/working/eclipse/plugins/org.eclipse.equinox.launcher_${equinoxLauncherPluginVersion}.jar" />
 			</classpath>

@@ -126,7 +126,7 @@
 		<ant antfile="${buildFileDir}/step220_p2metadata.xml" target="build" />
 		<ant antfile="${buildFileDir}/step230_p2categorize.xml" target="build" />
 		<ant antfile="${buildFileDir}/upload.xml" target="build" />
-		<antcall target="clean"/>
+<!--		<antcall target="clean"/> -->
 	</target>
 
 

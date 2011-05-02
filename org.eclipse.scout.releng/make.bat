@@ -25,7 +25,7 @@ cd %WORKSPACE%
 set buildOpts=-Declipse.running=true 
 :# set workspaceDir=-Dworkspace=%WORKSPACE%
 set nighltyRepoVar=-DnightlyRepository=E:\workspaces\scout.build\p2Workspace\org.eclipse.scout.releng\final\nightlyP2Repo
-:# productiv : nightlyRepository=/home/data/httpd/download.eclipse.org/scout/updates/3.5.6-nightly 
+:# productive : nightlyRepository=/home/data/httpd/download.eclipse.org/scout/updates/3.5.6-nightly 
 
 
 :# create a log file named according to this pattern: log.<this shell sctipt name, i.e. make>
@@ -33,7 +33,7 @@ set logfile=org.eclipse.scout.releng/scoutBuild.log
 
 PATH=%JAVA_HOME%\bin;%ANT_HOME%\bin;%PATH%
 
-set buildFlags=-DskipClean=false -DskipSign=true -DskipDownloadRepository=false -DskipUpload=false -DbuildType=N -DscoutDownloadLocation=D:/Temp/max24h/eclipseBuild/download -DtestBuild=true
+set buildFlags=-DskipClean=false -DskipSign=true -DskipDownloadRepository=false -DskipUpload=false -DbuildType=S -DscoutDownloadLocation=D:/Temp/max24h/eclipseBuild/download -DtestBuild=true
 
 call ant -f org.eclipse.scout.releng/buildFiles/build.xml  -lib org.eclipse.scout.releng/buildFiles/lib %buildOpts% %buildFlags% %nighltyRepoVar% %* build  
 :# call ant -f org.eclipse.scout.builder/buildFiles/build.xml -lib org.eclipse.scout.releng %buildOpts%  %nighltyRepoVar% -DskipSign=true %* buildNightly  > %logfile%
