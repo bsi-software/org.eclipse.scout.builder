@@ -1,0 +1,145 @@
+<!--
+   Copyright (c) 2010 BSI Business Systems Integration AG.
+   All rights reserved. This program and the accompanying materials
+   are made available under the terms of the Eclipse Public License v1.0
+   which accompanies this distribution, and is available at
+   http://www.eclipse.org/legal/epl-v10.html
+   
+   Contributors:
+       BSI Business Systems Integration AG - initial API and implementation
+ -->
+<!--
+   Features org.eclipse.scout.rt.feature and org.eclipse.scout.sdk.feature are build including source bundles 
+   and also creates the source featrues.
+   The output in  ${buildDataDir}/step020/output folder are two directory rtFeature and sdkFeature.
+   
+   The output folder is read by step030.
+-->
+
+<project name="step020.buildFeatures" default="build">
+	<property file="build.properties" />
+
+	<target name="clean">
+		<delete dir="${buildDataDir}/step020" />
+		<mkdir dir="${buildDataDir}/step020" />
+	</target>
+
+	<target name="build">
+		<available file="${buildDataDir}/step020/output/features.created" property="skipCreateFeatures" />
+		<antcall target="createFeatures" />
+	</target>
+
+
+	<target name="createFeatures" unless="skipCreateFeatures">
+		<antcall target="clean" />
+		<antcall target="buildScoutRtFeature" />
+		<antcall target="buildScoutSdkFeature" />
+		<touch file="${buildDataDir}/step020/output/features.created" />
+		<delete dir="${buildDataDir}/step020/input" failonerror="false" />
+	</target>
+
+
+	<target name="buildScoutRtFeature" unless="skipRtFeature">
+		<antcall target="setupBuildWorkspace" />
+		<java classname="org.eclipse.equinox.launcher.Main" fork="true" failonerror="true">
+			<arg line="-application org.eclipse.ant.core.antRunner " />
+			<arg line="-buildfile ${relengRootDir}/working/eclipse/plugins/org.eclipse.pde.build_${pdeBuildPluginVersion}/scripts/build.xml" />
+			<arg line="-DforceContextQualifier=${featureTimestamp}" />
+			<arg line="-Dtimestamp=${timestamp}" />
+			<arg line="-DarchivePrefix=rtFeature" />
+			<arg line="-DtopLevelElementId=org.eclipse.scout.rt.feature" />
+			<arg line="-Dbuilder=${buildFileDir}/featureBuild" />
+			<arg line="-DrelengRootDir=${relengRootDir}" />
+			<arg line="-Djavahome=${env.JAVA_HOME}" />
+			<arg line="-DIndividualSourceBundles=true" />
+			<arg line="-DbuildType=${buildType}" />
+			<classpath>
+				<pathelement location="${relengRootDir}/working/eclipse/plugins/org.eclipse.equinox.launcher_${equinoxLauncherPluginVersion}.jar" />
+			</classpath>
+		</java>
+		<mkdir dir="${buildDataDir}/step020/output" />
+		<unzip dest="${buildDataDir}/step020/output">
+			<fileset dir="${buildDataDir}/step020/input/${buildType}">
+				<include name="org.eclipse.scout.rt.feature-${buildType}.zip" />
+			</fileset>
+		</unzip>
+	</target>
+
+	<target name="buildScoutSdkFeature" unless="skipSdkFeature">
+		<antcall target="setupBuildWorkspace" />
+		<java classname="org.eclipse.equinox.launcher.Main" fork="true" failonerror="true">
+			<arg line="-application org.eclipse.ant.core.antRunner " />
+			<arg line="-buildfile ${relengRootDir}/working/eclipse/plugins/org.eclipse.pde.build_${pdeBuildPluginVersion}/scripts/build.xml" />
+			<arg line="-Dtimestamp=${timestamp}" />
+			<arg line="-DarchivePrefix=sdkFeature" />
+			<arg line="-DforceContextQualifier=${featureTimestamp}" />
+			<!--			<arg line="-DbuildId=ScoutRt" />  -->
+			<arg line="-DtopLevelElementId=org.eclipse.scout.sdk.feature" />
+			<arg line="-Dbuilder=${buildFileDir}/featureBuild" />
+			<arg line="-DrelengRootDir=${relengRootDir}" />
+			<arg line="-Djavahome=${env.JAVA_HOME}" />
+			<arg line="-DIndividualSourceBundles=true" />
+			<arg line="-DbuildType=${buildType}" />
+			<classpath>
+				<pathelement location="${relengRootDir}/working/eclipse/plugins/org.eclipse.equinox.launcher_${equinoxLauncherPluginVersion}.jar" />
+			</classpath>
+		</java>
+		<mkdir dir="${buildDataDir}/step020/output" />
+		<unzip dest="${buildDataDir}/step020/output">
+			<fileset dir="${buildDataDir}/step020/input/${buildType}">
+				<include name="org.eclipse.scout.sdk.feature-${buildType}.zip" />
+			</fileset>
+		</unzip>
+	</target>
+
+
+	<target name="setupBuildWorkspace">
+		<delete dir="${buildDataDir}/step020/input" />
+		<property name="inputPlugins" location="${buildDataDir}/step020/input/plugins" />
+		<property name="inputFeatures" location="${buildDataDir}/step020/input/features" />
+		<!-- mkdirs -->
+		<mkdir dir="${inputPlugins}" />
+		<mkdir dir="${inputFeatures}" />
+		<!-- copy plugins to build to the buildDirectory -->
+		<copy todir="${inputPlugins}">
+			<fileset dir="${workspace}/scout.rt">
+				<include name="org.eclipse.scout.*/**" />
+				<!--				<include name="javax.*/**" /> -->
+				<exclude name="org.eclipse.scout*build*/**" />
+				<exclude name="*testing*/**" />
+				<exclude name="*test*/**" />
+				<exclude name="*feature*/**" />
+			</fileset>
+			<fileset dir="${workspace}/scout.sdk">
+				<include name="org.eclipse.scout.*/**" />
+				<exclude name="*testing*/**" />
+				<exclude name="*test*/**" />
+				<exclude name="*feature*/**" />
+			</fileset>
+		</copy>
+		<copy todir="${inputFeatures}">
+			<fileset dir="${workspace}/scout.rt">
+				<include name="*scout.*feature*/**" />
+			</fileset>
+			<fileset dir="${workspace}/scout.sdk">
+				<include name="*scout.*feature*/**" />
+			</fileset>
+		</copy>
+		<!-- rt source tamplate -->
+		<copy todir="${inputFeatures}/org.eclipse.scout.rt.feature.source" failonerror="false">
+			<fileset dir="${relengRootDir}/templates/sourceTemplateFeature">
+				<include name="**" />
+			</fileset>
+		</copy>
+		<replace file="${inputFeatures}/org.eclipse.scout.rt.feature.source/feature.properties" token="%%featureName%%" value="Scout Runtime Source" />
+		<!-- sdk source tamplate -->
+		<copy todir="${inputFeatures}/org.eclipse.scout.sdk.feature.source" failonerror="false">
+			<fileset dir="${relengRootDir}/templates/sourceTemplateFeature">
+				<include name="**" />
+			</fileset>
+		</copy>
+		<replace file="${inputFeatures}/org.eclipse.scout.sdk.feature.source/feature.properties" token="%%featureName%%" value="Scout SDK Source" />
+	</target>
+
+
+</project>

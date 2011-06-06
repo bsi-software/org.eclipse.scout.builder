@@ -1,0 +1,69 @@
+<!--
+   Copyright (c) 2010 BSI Business Systems Integration AG.
+   All rights reserved. This program and the accompanying materials
+   are made available under the terms of the Eclipse Public License v1.0
+   which accompanies this distribution, and is available at
+   http://www.eclipse.org/legal/epl-v10.html
+   
+   Contributors:
+       BSI Business Systems Integration AG - initial API and implementation
+ -->
+<!--
+	A drop in zip will be created (${outputFolder}/${buildType}-scout-${scoutVersion}${versionMilestone}-${buildTimestamp}${incubationValue}.zip):
+	Root folders of the zip are plugins and features.
+
+	The output folder (${buildDataDir}/step110/output) is used by upload. 
+-->
+
+<project name="step110.zipCreate" default="build">
+	<property file="build.properties" />
+
+
+	<target name="clean">
+		<delete dir="${buildDataDir}/step110" />
+	</target>
+
+	<target name="build">
+		<available file="${buildDataDir}/step110/output/zip.created" property="skipStep110" />
+		<antcall target="createZip" />
+		<delete dir="${buildDataDir}/step110/input" failonerror="false" />
+	</target>
+
+
+	<target name="createZip" unless="skipStep110">
+		<antcall target="clean" />
+		<property name="inputFolder" location="${buildDataDir}/step110/input" />
+		<property name="outputFolder" location="${buildDataDir}/step110/output" />
+		<mkdir dir="${inputFolder}" />
+		<copy todir="${inputFolder}">
+			<fileset dir="${buildDataDir}/step100/output">
+				<include name="**/*" />
+				<exclude name="*.created" />
+			</fileset>
+		</copy>
+		<mkdir dir="${outputFolder}" />
+
+		<condition property="incubationValue" value="-Incubation">
+			<istrue value="${incubation}" />
+		</condition>
+		<property name="incubationValue" value="" />
+
+		<zip destfile="${outputFolder}/${buildType}-scout-${scoutVersion}${versionMilestone}-${buildTimestamp}${incubationValue}.zip">
+			<fileset dir="${inputFolder}/rtFeature">
+				<include name="**/**" />
+			</fileset>
+			<fileset dir="${inputFolder}/sdkFeature">
+				<include name="**/**" />
+			</fileset>
+			<fileset dir="${templateDir}/dropins/eclipse">
+				<include name="**/**" />
+			</fileset>
+
+		</zip>
+
+		<touch file="${outputFolder}/zip.created" />
+	</target>
+
+
+
+</project>

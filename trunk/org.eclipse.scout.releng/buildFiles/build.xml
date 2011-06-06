@@ -1,0 +1,153 @@
+<!--
+   Copyright (c) 2010 BSI Business Systems Integration AG.
+   All rights reserved. This program and the accompanying materials
+   are made available under the terms of the Eclipse Public License v1.0
+   which accompanies this distribution, and is available at
+   http://www.eclipse.org/legal/epl-v10.html
+   
+   Contributors:
+       BSI Business Systems Integration AG - initial API and implementation
+ -->
+
+<project name="scout.releng" default="build">
+	<property environment="env" />
+	<property file="build.properties" />
+
+	<tstamp>
+		<format property="buildTimestamp" pattern="yyyyMMdd-hhmm" />
+		<format property="featureTimestamp" pattern="yyyyMMddhhmm" />
+	</tstamp>
+
+	<!-- condition properties -->
+	<condition property="major" value="${versionMajor}">
+		<isset property="versionMajor" />
+	</condition>
+	<property name="major" value="" />
+
+	<condition property="minor" value=".${versionMinor}">
+		<and>
+			<isset property="versionMajor" />
+			<isset property="versionMinor" />
+		</and>
+	</condition>
+	<property name="minor" value="" />
+
+	<condition property="micro" value=".${versionMicro}">
+		<and>
+			<isset property="versionMinor" />
+			<isset property="versionMicro" />
+		</and>
+	</condition>
+	<property name="micro" value="" />
+
+	<property name="scoutVersion" value="${major}${minor}${micro}" />
+
+	<condition property="conditionSkipClean">
+		<istrue value="${skipClean}" />
+	</condition>
+
+	<condition property="conditionCheckStaged">
+		<and>
+			<available file="${scoutDownloadLocation}/stagingArea/doStage" />
+			<isfalse value="${skipUpload}" />
+			<isfalse value="${testBuild}" />
+		</and>
+	</condition>
+
+	<target name="build">
+		<antcall target="precheck" />
+		<antcall target="testBuild3.6" />
+		<antcall target="testBuild3.7" />
+		<property name="doFinalBuild" value="true" />
+		<antcall target="build${finalBuildVersion}" />
+		<!--
+		<antcall target="clean" />
+		<available file="${relengRootDir}/working/eclipse" property="skipInstallEclipse" />
+		<antcall target="setupEclipse" />
+
+		<ant antfile="${buildFileDir}/step010_downloadRepository.xml" target="build" />
+		<ant antfile="${buildFileDir}/step020_buildFeatures.xml" target="build" />
+		<ant antfile="${buildFileDir}/step030_archiveAll.xml" target="build" />
+		<ant antfile="${buildFileDir}/step040_markIncubation.xml" target="build" />
+		<ant antfile="${buildFileDir}/step050_pack200Normalize.xml" target="build" />
+		<ant antfile="${buildFileDir}/step060_sign.xml" target="build" />
+		<ant antfile="${buildFileDir}/step100_zipUnpack.xml" target="build" />
+		<ant antfile="${buildFileDir}/step110_zipCreate.xml" target="build" />
+		<ant antfile="${buildFileDir}/step200_p2Pack200.xml" target="build" />
+		<ant antfile="${buildFileDir}/step210_p2mergeRepository.xml" target="build" />
+		<ant antfile="${buildFileDir}/step220_p2metadata.xml" target="build" />
+		<ant antfile="${buildFileDir}/step230_p2categorize.xml" target="build" />
+		<ant antfile="${buildFileDir}/upload.xml" target="build" />
+		-->
+	</target>
+
+	<target name="testBuild3.6" depends="clean" unless="3.6_skipValidateBuild">
+		<antcall target="build3.6" />
+	</target>
+
+	<target name="build3.6" depends="clean">
+		<property name="eclipseFileName" value="${3.6_eclipseFileName}" />
+		<property name="eclipseDownloadUrl" value="${3.6_eclipseDownloadUrl}" />
+		<property name="eclipseDeltapackName" value="${3.6_eclipseDeltapackName}" />
+		<property name="eclipseDeltapackUrl" value="${3.6_eclipseDeltapackUrl}" />
+		<property name="pdeBuildPluginVersion" value="${3.6_pdeBuildPluginVersion}" />
+		<property name="equinoxLauncherPluginVersion" value="${3.6_equinoxLauncherPluginVersion}" />
+		<antcall target="setupEclipse" />
+		<ant antfile="${buildFileDir}/step020_buildFeatures.xml" target="build" />
+		<antcall target="finalBuild" />
+	</target>
+
+	<target name="testBuild3.7" depends="clean" unless="3.7_skipValidateBuild">
+		<antcall target="build3.7" />
+	</target>
+
+	<target name="build3.7" depends="clean">
+		<property name="eclipseFileName" value="${3.7_eclipseFileName}" />
+		<property name="eclipseDownloadUrl" value="${3.7_eclipseDownloadUrl}" />
+		<property name="eclipseDeltapackName" value="${3.7_eclipseDeltapackName}" />
+		<property name="eclipseDeltapackUrl" value="${3.7_eclipseDeltapackUrl}" />
+		<property name="pdeBuildPluginVersion" value="${3.7_pdeBuildPluginVersion}" />
+		<property name="equinoxLauncherPluginVersion" value="${3.7_equinoxLauncherPluginVersion}" />
+		<antcall target="setupEclipse" />
+		<ant antfile="${buildFileDir}/step020_buildFeatures.xml" target="build" />
+		<antcall target="finalBuild" />
+	</target>
+	
+	<target name="finalBuild" if="doFinalBuild">
+		<ant antfile="${buildFileDir}/step010_downloadRepository.xml" target="build" />
+		<ant antfile="${buildFileDir}/step030_archiveAll.xml" target="build" />
+		<ant antfile="${buildFileDir}/step040_markIncubation.xml" target="build" />
+		<ant antfile="${buildFileDir}/step050_pack200Normalize.xml" target="build" />
+		<ant antfile="${buildFileDir}/step060_sign.xml" target="build" />
+		<ant antfile="${buildFileDir}/step100_zipUnpack.xml" target="build" />
+		<ant antfile="${buildFileDir}/step110_zipCreate.xml" target="build" />
+		<ant antfile="${buildFileDir}/step200_p2Pack200.xml" target="build" />
+		<ant antfile="${buildFileDir}/step210_p2mergeRepository.xml" target="build" />
+		<ant antfile="${buildFileDir}/step220_p2metadata.xml" target="build" />
+		<ant antfile="${buildFileDir}/step230_p2categorize.xml" target="build" />
+		<ant antfile="${buildFileDir}/upload.xml" target="build" />
+		<antcall target="clean"/>
+	</target>
+
+
+	<target name="clean" unless="conditionSkipClean">
+		<echo message="clean working dir" />
+		<delete dir="${relengRootDir}/working" />
+	</target>
+
+
+	<target name="precheck" depends="checkStaged">
+
+	</target>
+
+	<target name="checkStaged" if="conditionCheckStaged">
+		<fail message="already staged. Ensure the staged build is applied to the repository!" />
+	</target>
+
+	<target name="setupEclipse" unless="skipInstallEclipse">
+		<mkdir dir="${relengRootDir}/working" />
+		<ant antfile="${buildFileDir}/setupEclipse.xml" target="setupEclipse" />
+	</target>
+
+
+</project>

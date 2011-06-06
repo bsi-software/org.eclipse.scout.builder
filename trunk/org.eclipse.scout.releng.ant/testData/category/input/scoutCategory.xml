@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<site>
+  <feature id="org.eclipse.scout.rt.feature.source" url="features/org.eclipse.scout.rt.feature.source_3.5.5.201146260946.jar" version="3.5.5.201146260946">
+    <category name="Scout"/>
+  </feature>
+  <feature id="org.eclipse.scout.rt.feature" url="features/org.eclipse.scout.rt.feature_3.5.5.201146260946.jar" version="3.5.5.201146260946">
+    <category name="Scout"/>
+  </feature>
+  <feature id="org.eclipse.scout.sdk.feature.source" url="features/org.eclipse.scout.sdk.feature.source_3.5.5.201146260946.jar" version="3.5.5.201146260946">
+    <category name="Scout"/>
+  </feature>
+  <feature id="org.eclipse.scout.sdk.feature" url="features/org.eclipse.scout.sdk.feature_3.5.5.201146260946.jar" version="3.5.5.201146260946">
+    <category name="Scout"/>
+  </feature>
+  <category-def label="Scout Application Development" name="Scout"/>
+</site>

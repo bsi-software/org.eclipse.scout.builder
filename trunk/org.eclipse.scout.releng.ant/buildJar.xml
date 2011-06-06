@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="org.eclipse.scout.releng.ant" default="buildAll" basedir=".">
+	<property file="buildJar.properties" />
+
+	<path id="@dot.classpath">
+		<pathelement path="${antBundleLocation}/lib/ant.jar" />
+		<pathelement path="${antBundleLocation}/lib/ant-antlr.jar" />
+		<pathelement path="${antBundleLocation}/lib/ant-apache-bcel.jar" />
+		<pathelement path="${antBundleLocation}/lib/ant-apache-bsf.jar" />
+		<pathelement path="${antBundleLocation}/lib/ant-apache-log4j.jar" />
+		<pathelement path="${antBundleLocation}/lib/ant-apache-oro.jar" />
+		<pathelement path="${antBundleLocation}/lib/ant-apache-regexp.jar" />
+		<pathelement path="${antBundleLocation}/lib/ant-apache-resolver.jar" />
+		<pathelement path="${antBundleLocation}/lib/ant-commons-logging.jar" />
+		<pathelement path="${antBundleLocation}/lib/ant-commons-net.jar" />
+		<pathelement path="${antBundleLocation}/lib/ant-jai.jar" />
+		<pathelement path="${antBundleLocation}/lib/ant-javamail.jar" />
+		<pathelement path="${antBundleLocation}/lib/ant-jdepend.jar" />
+		<pathelement path="${antBundleLocation}/lib/ant-jmf.jar" />
+		<pathelement path="${antBundleLocation}/lib/ant-jsch.jar" />
+		<pathelement path="${antBundleLocation}/lib/ant-junit.jar" />
+		<pathelement path="${antBundleLocation}/lib/ant-launcher.jar" />
+		<pathelement path="${antBundleLocation}/lib/ant-netrexx.jar" />
+		<pathelement path="${antBundleLocation}/lib/ant-nodeps.jar" />
+		<pathelement path="${antBundleLocation}/lib/ant-starteam.jar" />
+		<pathelement path="${antBundleLocation}/lib/ant-stylebook.jar" />
+		<pathelement path="${antBundleLocation}/lib/ant-swing.jar" />
+		<pathelement path="${antBundleLocation}/lib/ant-trax.jar" />
+		<pathelement path="${antBundleLocation}/lib/ant-weblogic.jar" />
+	</path>
+
+	<target name="clean">
+		<delete dir="${build.result.folder}" />
+		<mkdir dir="${build.result.folder}/@dot" />
+	</target>
+
+	<target name="buildAll" depends="clean, compile, packJar, publish">
+		
+		<delete dir="${build.result.folder}" />
+	</target>
+
+	<target name="compile">
+		<javac destdir="${build.result.folder}/@dot" failonerror="${javacFailOnError}" verbose="${javacVerbose}" debug="true" includeAntRuntime="no" bootclasspath="${bundleBootClasspath}">
+			<!--			<compilerarg line="${compilerArg}" compiler="${build.compiler}"/> -->
+			<classpath refid="@dot.classpath" />
+			<src path="src/" />
+			<compilerarg value="@${basedir}/javaCompiler...args" compiler="org.eclipse.jdt.core.JDTCompilerAdapter" />
+			<!--			<compilerarg line="-log &apos;${build.result.folder}/@dot${logExtension}&apos;" compiler="org.eclipse.jdt.core.JDTCompilerAdapter"			/> -->
+		</javac>
+	</target>
+
+	<target name="packJar">
+		<jar destfile="${build.result.folder}/${jarName}">
+			<fileset dir="${build.result.folder}/@dot">
+				<include name="**/**" />
+			</fileset>
+		</jar>
+	</target>
+	
+	<target name="publish" if="publishDir">
+		<copy file="${build.result.folder}/${jarName}" todir="${publishDir}" />
+	</target>
+
+</project>
