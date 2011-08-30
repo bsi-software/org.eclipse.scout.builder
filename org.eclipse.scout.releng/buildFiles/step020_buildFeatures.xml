@@ -53,6 +53,7 @@
 			<arg line="-Djavahome=${env.JAVA_HOME}" />
 			<arg line="-DIndividualSourceBundles=true" />
 			<arg line="-DbuildType=${buildType}" />
+			<arg line="-DjavacDebugInfo=true" />
 			<classpath>
 				<pathelement location="${relengRootDir}/working/eclipse/plugins/org.eclipse.equinox.launcher_${equinoxLauncherPluginVersion}.jar" />
 			</classpath>
@@ -80,6 +81,7 @@
 			<arg line="-Djavahome=${env.JAVA_HOME}" />
 			<arg line="-DIndividualSourceBundles=true" />
 			<arg line="-DbuildType=${buildType}" />
+			<arg line="-DjavacDebugInfo=true" />
 			<classpath>
 				<pathelement location="${relengRootDir}/working/eclipse/plugins/org.eclipse.equinox.launcher_${equinoxLauncherPluginVersion}.jar" />
 			</classpath>

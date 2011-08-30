@@ -23,29 +23,19 @@
 		<delete dir="${buildDataDir}/step040" />
 	</target>
 
+	
 	<target name="build">
-		<condition property="conditionIncubation">
-			<istrue value="${incubation}" />
+		<condition property="skipMarkIncubation">
+			<isfalse value="${incubation}" />
 		</condition>
 		<available file="${buildDataDir}/step040/output/incubationMarker.created" property="skipStep040" />
-		<antcall target="markIncubation" />
+		<antcall target="prepareMarkIncubation" />
 		<delete dir="${buildDataDir}/step040/input" failonerror="false" />
 	</target>
 
-	<target name="skipTask" unless="conditionIncubation">
-		<antcall target="clean" />
-		<property name="outputFolder" location="${buildDataDir}/step040/output" />
-		<mkdir dir="${outputFolder}" />
-		<copy todir="${outputFolder}">
-			<fileset dir="${buildDataDir}/step030/output">
-				<include name="**/*" />
-				<exclude name="*.created" />
-			</fileset>
-		</copy>
-		<touch file="${outputFolder}/incubationMarker.created" />
-	</target>
 
-	<target name="markIncubation" unless="skipStep040">
+
+	<target name="prepareMarkIncubation" unless="skipStep040">
 		<antcall target="clean" />
 		<property name="inputFolder" location="${buildDataDir}/step040/input" />
 		<property name="outputFolder" location="${buildDataDir}/step040/output" />
@@ -57,13 +47,16 @@
 				<exclude name="*.created" />
 			</fileset>
 		</copy>
+		<antcall target="markIncubation" />
+		<touch file="${outputFolder}/incubationMarker.created" />
+	</target>
+	
+	<target name="markIncubation" unless="skipMarkIncubation">
 		<custom.markIncubation>
 			<fileset dir="${buildDataDir}/step040/output">
 				<include name="**/**.jar" />
 			</fileset>
 		</custom.markIncubation>
-		<touch file="${outputFolder}/incubationMarker.created" />
 	</target>
-
 
 </project>
