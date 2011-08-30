@@ -31,7 +31,7 @@
 		<condition property="repository" value="nightly">
 			<equals arg1="N" arg2="${buildType}" />
 		</condition>
-		<condition property="repository" value="${versionMajor}.${versionMinor}">
+		<condition property="repository" value="${versionMajor}.${versionMinor}.${versionMicro}">
 			<or>
 				<equals arg1="R" arg2="${buildType}" />
 				<equals arg1="S" arg2="${buildType}" />
