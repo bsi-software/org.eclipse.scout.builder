@@ -4,15 +4,15 @@
    are made available under the terms of the Eclipse Public License v1.0
    which accompanies this distribution, and is available at
    http://www.eclipse.org/legal/epl-v10.html
-   
+
    Contributors:
        BSI Business Systems Integration AG - initial API and implementation
  -->
 <!--
-	Uploads the packed updated repository to the stagingArea. Beside a doStage
-	file containing the MD5 hash of the uploaded zip will be created to trigger the 
+	Uploads the packed updated repository to the ${stagingAreaFolder}. Beside a doStage
+	file containing the MD5 hash of the uploaded zip will be created to trigger the
 	publish job.
-	
+
 	Set ${skipUpload} property to true to skip this step.
 -->
 
@@ -31,7 +31,7 @@
 		<condition property="repository" value="nightly">
 			<equals arg1="N" arg2="${buildType}" />
 		</condition>
-		<condition property="repository" value="${versionMajor}.${versionMinor}.${versionMicro}">
+		<condition property="repository" value="${scoutRepositoryFolder}">
 			<or>
 				<equals arg1="R" arg2="${buildType}" />
 				<equals arg1="S" arg2="${buildType}" />
@@ -105,6 +105,8 @@
 				<include name="**/**" />
 			</fileset>
 		</zip>
+		<checksum algorithm="MD5" file="${buildDataDir}/upload/output/stage_${featureTimestamp}.zip" property="md5checksum" />
+    	<echo file="${buildDataDir}/upload/output/pending" append="false" message="${md5checksum}  stage_${featureTimestamp}.zip" />
 	</target>
 
 	<target name="testUpload" if="conditionTestBuild">
@@ -121,14 +123,12 @@
 	</target>
 
 	<target name="finalUpload" unless="conditionTestBuild">
-		<checksum algorithm="MD5" file="${buildDataDir}/upload/output/stage_${featureTimestamp}.zip" property="md5checksum" />
-		<echo file="${buildDataDir}/upload/output/pending" append="false" message="${md5checksum}  stage_${featureTimestamp}.zip" />
-		<copy todir="${scoutDownloadLocation}/stagingArea">
+		<copy todir="${scoutDownloadLocation}/${stagingAreaFolder}">
 			<fileset dir="${buildDataDir}/upload/output">
 				<include name="stage_${featureTimestamp}.zip" />
 			</fileset>
 		</copy>
-		<copy file="${buildDataDir}/upload/output/pending" tofile="${scoutDownloadLocation}/stagingArea/doStage" />
+		<copy file="${buildDataDir}/upload/output/pending" tofile="${scoutDownloadLocation}/${stagingAreaFolder}/doStage" />
 	</target>
 
 
