@@ -33,9 +33,9 @@ set logfile=org.eclipse.scout.releng/scoutBuild.log
 
 PATH=%JAVA_HOME%\bin;%ANT_HOME%\bin;%PATH%
 
-set buildFlags=-DskipClean=false -DskipSign=true -DskipDownloadRepository=false -DskipUpload=false -DbuildType=S -DscoutDownloadLocation=D:/Temp/max24h/eclipseBuild/download -DtestBuild=false
+set buildFlags=-DskipClean=false -DskipSign=true -DskipDownloadRepository=false -DskipUpload=false -DbuildType=S -DscoutDownloadLocation=D:/Temp/max24h/eclipseBuild/download -DtestBuild=true
 
-call ant -f org.eclipse.scout.releng/buildFiles/build.xml  -lib org.eclipse.scout.releng/buildFiles/lib %buildOpts% %buildFlags% %nighltyRepoVar% %* build
+call ant -f org.eclipse.scout.releng/buildFiles/compositeRepository/build.xml  -lib org.eclipse.scout.releng/buildFiles/lib %buildOpts% %buildFlags% %nighltyRepoVar% %* build
 :# call ant -f org.eclipse.scout.builder/buildFiles/build.xml -lib org.eclipse.scout.releng %buildOpts%  %nighltyRepoVar% -DskipSign=true %* buildNightly  > %logfile%
 
 endlocal

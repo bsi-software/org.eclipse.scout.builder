@@ -1,0 +1,33 @@
+<!--
+   Copyright (c) 2010 BSI Business Systems Integration AG.
+   All rights reserved. This program and the accompanying materials
+   are made available under the terms of the Eclipse Public License v1.0
+   which accompanies this distribution, and is available at
+   http://www.eclipse.org/legal/epl-v10.html
+
+   Contributors:
+       BSI Business Systems Integration AG - initial API and implementation
+ -->
+
+<project name="scout.releng.compositeRepository" default="build">
+	<property environment="env" />
+	<property file="../build.properties" />
+
+	<target name="clean">
+		<delete dir="${buildDataDir}/compositeRepository" />
+		<mkdir dir="${buildDataDir}/compositeRepository" />
+	</target>
+
+	<target name="build" depends="clean">
+		<echo message="blubber ${3.6_eclipseDeltapackName}">
+		</echo>
+
+		<p2.composite.repository>
+			<repository compressed="false" location="file:/${buildDataDir}/compositeRepository" name="Scout Indigo Repository" />
+			<add>
+				<repository location="../R/update" />
+				<repository location="../../tests/3.8/SP1RC4/update" />
+			</add>
+		</p2.composite.repository>
+	</target>
+</project>

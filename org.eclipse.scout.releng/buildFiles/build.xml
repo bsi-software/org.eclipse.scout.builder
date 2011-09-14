@@ -4,7 +4,7 @@
    are made available under the terms of the Eclipse Public License v1.0
    which accompanies this distribution, and is available at
    http://www.eclipse.org/legal/epl-v10.html
-   
+
    Contributors:
        BSI Business Systems Integration AG - initial API and implementation
  -->
@@ -48,7 +48,7 @@
 
 	<condition property="conditionCheckStaged">
 		<and>
-			<available file="${scoutDownloadLocation}/stagingArea/doStage" />
+			<available file="${scoutDownloadLocation}/${stagingAreaFolder}/doStage" />
 			<isfalse value="${skipUpload}" />
 			<isfalse value="${testBuild}" />
 		</and>
@@ -112,7 +112,7 @@
 		<ant antfile="${buildFileDir}/step020_buildFeatures.xml" target="build" />
 		<antcall target="finalBuild" />
 	</target>
-	
+
 	<target name="finalBuild" if="doFinalBuild">
 		<ant antfile="${buildFileDir}/step010_downloadRepository.xml" target="build" />
 		<ant antfile="${buildFileDir}/step030_archiveAll.xml" target="build" />
