@@ -29,7 +29,7 @@ set nighltyRepoVar=-DnightlyRepository=E:\workspaces\scout.build\p2Workspace\org
 
 
 :# create a log file named according to this pattern: log.<this shell sctipt name, i.e. make>
-set logfile=org.eclipse.scout.releng/scoutBuild.log
+set logfile=org.eclipse.scout.releng/compositeRepository.log
 
 PATH=%JAVA_HOME%\bin;%ANT_HOME%\bin;%PATH%
 

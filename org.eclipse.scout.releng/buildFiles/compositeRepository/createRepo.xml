@@ -12,22 +12,42 @@
 <project name="scout.releng.compositeRepository" default="build">
 	<property environment="env" />
 	<property file="../build.properties" />
+	<property file="./build.properties" />
 
 	<target name="clean">
-		<delete dir="${buildDataDir}/compositeRepository" />
-		<mkdir dir="${buildDataDir}/compositeRepository" />
+
 	</target>
 
 	<target name="build" depends="clean">
-		<echo message="blubber ${3.6_eclipseDeltapackName}">
-		</echo>
+		<condition property="conditionAdd">
+			<equals arg1="add" arg2="${mode}" />
+		</condition>
 
+		<condition property="conditionRemove">
+			<equals arg1="remove" arg2="${mode}" />
+		</condition>
+		<antcall target="add" />
+		<antcall target="remove" />
+	</target>
+
+	<target name="add" if="conditionAdd">
+		<echo message="do add"></echo>
 		<p2.composite.repository>
-			<repository compressed="false" location="file:/${buildDataDir}/compositeRepository" name="Scout Indigo Repository" />
+			<repository compressed="false" location="file:/${buildDataDir}/compositeRepository" name="${repositoryName}"/>
 			<add>
-				<repository location="../R/update" />
-				<repository location="../../tests/3.8/SP1RC4/update" />
+				<repository location="${repository}" />
 			</add>
 		</p2.composite.repository>
 	</target>
+
+	<target name="remove" if="conditionRemove">
+		<echo message="do remove"></echo>
+		<p2.composite.repository>
+			<repository compressed="false" location="file:/${buildDataDir}/compositeRepository" name="${repositoryName}" />
+			<remove>
+				<repository location="${repository}" />
+			</remove>
+		</p2.composite.repository>
+	</target>
+
 </project>
