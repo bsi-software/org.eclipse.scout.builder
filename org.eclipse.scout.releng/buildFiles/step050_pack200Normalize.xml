@@ -4,15 +4,15 @@
    are made available under the terms of the Eclipse Public License v1.0
    which accompanies this distribution, and is available at
    http://www.eclipse.org/legal/epl-v10.html
-   
+
    Contributors:
        BSI Business Systems Integration AG - initial API and implementation
  -->
 <!--
-	All jar files getting repacked using pack200. This step is needed to ensure the signature stays the 
+	All jar files getting repacked using pack200. This step is needed to ensure the signature stays the
 	same to create pack200 archives later (step200).
-	
-	The output folder (${buildDataDir}/step050/output) is used by step060. 
+
+	The output folder (${buildDataDir}/step050/output) is used by step060.
 -->
 
 <project name="step050.pack200Normalize" default="build">
@@ -35,7 +35,7 @@
 		<property name="outputFolder" location="${buildDataDir}/step050/output" />
 		<mkdir dir="${inputFolder}" />
 		<copy todir="${inputFolder}">
-			<fileset dir="${buildDataDir}/step040/output">
+			<fileset dir="${buildDataDir}/step030/output">
 				<include name="**/*" />
 				<exclude name="*.created"/>
 			</fileset>
