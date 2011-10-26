@@ -106,6 +106,7 @@
 		<copy todir="${inputPlugins}">
 			<fileset dir="${workspace}/scout.rt">
 				<include name="org.eclipse.scout.*/**" />
+				<include name="org.apache.derby.jdbc_*/**" />
 				<!--				<include name="javax.*/**" /> -->
 				<exclude name="org.eclipse.scout*build*/**" />
 				<exclude name="*testing*/**" />
