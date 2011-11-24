@@ -1,33 +1,35 @@
-<!-- Copyright (c) 2010 BSI Business Systems Integration AG. All rights reserved. 
-	This program and the accompanying materials are made available under the 
-	terms of the Eclipse Public License v1.0 which accompanies this distribution, 
-	and is available at http://www.eclipse.org/legal/epl-v10.html Contributors: 
+<!-- Copyright (c) 2010 BSI Business Systems Integration AG. All rights reserved.
+	This program and the accompanying materials are made available under the
+	terms of the Eclipse Public License v1.0 which accompanies this distribution,
+	and is available at http://www.eclipse.org/legal/epl-v10.html Contributors:
 	BSI Business Systems Integration AG - initial API and implementation -->
 
 <!--
 	expecting properties:
 	- downloadDir
 		the directory to download the eclipse and delta pack to. The download only occures if the two files do not exist.
-	- templateDir 
+	- templateDir
 		the directory contains a dropins folder with some bundles or features.
-	- eclipseFileName 
+	- eclipseFileName
 		the name of the eclipse file to download e.g. eclipse-SDK-3.7M3-win32.zip
-		
+
 	- eclipseDownloadUrl
 		the url to download the eclipse e.g. http://download.eclipse.org/eclipse/downloads/drops/S-3.7M3-201010281441/${eclipseFileName}
 	- eclipseDeltapackName
 		the eclipse delta pack file name e.g. eclipse-3.7M3-delta-pack.zip
 	- eclipseDeltapackUrl
 		the url to download the delta pack e.g. http://download.eclipse.org/eclipse/downloads/drops/S-3.7M3-201010281441/${eclipseDeltapackName}
-	
+
 	 -->
 <project name="setupEclipse" default="">
 	<property environment="env" />
 	<property file="build.properties" />
+	<taskdef resource="net/sf/antcontrib/antlib.xml"/>
 
 	<target name="setupEclipse" depends="downloadEclipse, downloadDeltapack">
 		<antcall target="downloadEclipse" />
 		<antcall target="downloadDeltapack" />
+		<antcall target="downloadAllDropins" />
 		<!-- setup eclipse to the ${workingDir} -->
 		<!-- unzip eclipse and delta pack -->
 		<unzip dest="${relengRootDir}/working" overwrite="true" src="${downloadDir}/${eclipseFileName}" />
@@ -35,7 +37,7 @@
 		<copy todir="${relengRootDir}/working" failonerror="false">
 			<fileset dir="${templateDir}/dropins" />
 		</copy>
-		
+
 		<!-- jre -->
 <!--		<mkdir dir="${workingDir}/eclipse/jre"/>
 		<copy todir="${workingDir}/eclipse/jre">
@@ -45,6 +47,32 @@
 			<fileset dir="${templateDir}/jre" />
 		</copy>
 		-->
+	</target>
+
+	<target name="checkDownloadDropinNeeded">
+	    <available property="skipDownloadDropin" file="${dropin.dest.path}"/>
+	</target>
+
+	<target name="downloadDropin" depends="checkDownloadDropinNeeded" unless="skipDownloadDropin">
+		<!-- expects ${dropin.src.url} parameter -->
+		<!-- expects ${dropin.dest.path} parameter -->
+		<get src="${dropin.src.url}" dest="${dropin.dest.path}" />
+	</target>
+
+	<target name="downloadAllDropins">
+		<!--<delete dir="${templateDir}/dropins/eclipse/plugins" failonerror="false" />-->
+		<mkdir dir="${templateDir}/dropins/eclipse/plugins"/>
+		<for list="${orbitDownloadPluginList}" param="plugin">
+			<sequential>
+				<var name="dropinDestPath" value="${templateDir}/dropins/eclipse/plugins/@{plugin}" />
+				<var name="dropinSrcUrl" value="${orbitDropUrl}/@{plugin}" />
+				<echo message="downloading dropin from '${dropinSrcUrl}' to '${dropinDestPath}'." />
+				<antcall target="downloadDropin">
+					<param name="dropin.src.url" value="${dropinSrcUrl}"/>
+					<param name="dropin.dest.path" value="${dropinDestPath}"/>
+				</antcall>
+			</sequential>
+		</for>
 	</target>
 
 	<target name="downloadEclipse" depends="checkDownloadEclipse" unless="skipDownloadEclipse">

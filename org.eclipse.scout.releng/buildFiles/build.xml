@@ -92,6 +92,8 @@
 		<property name="eclipseDeltapackUrl" value="${3.6_eclipseDeltapackUrl}" />
 		<property name="pdeBuildPluginVersion" value="${3.6_pdeBuildPluginVersion}" />
 		<property name="equinoxLauncherPluginVersion" value="${3.6_equinoxLauncherPluginVersion}" />
+		<property name="orbitDownloadPluginList" value="${3.6_orbitDownloadPluginList}" />
+		<property name="orbitDropUrl" value="${3.6_orbitDropUrl}" />
 		<antcall target="setupEclipse" />
 		<ant antfile="${buildFileDir}/step020_buildFeatures.xml" target="build" />
 		<antcall target="finalBuild" />
@@ -108,6 +110,8 @@
 		<property name="eclipseDeltapackUrl" value="${3.7_eclipseDeltapackUrl}" />
 		<property name="pdeBuildPluginVersion" value="${3.7_pdeBuildPluginVersion}" />
 		<property name="equinoxLauncherPluginVersion" value="${3.7_equinoxLauncherPluginVersion}" />
+		<property name="orbitDownloadPluginList" value="${3.7_orbitDownloadPluginList}" />
+		<property name="orbitDropUrl" value="${3.7_orbitDropUrl}" />
 		<antcall target="setupEclipse" />
 		<ant antfile="${buildFileDir}/step020_buildFeatures.xml" target="build" />
 		<antcall target="finalBuild" />
