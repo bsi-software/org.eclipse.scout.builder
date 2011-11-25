@@ -24,7 +24,11 @@
 <project name="setupEclipse" default="">
 	<property environment="env" />
 	<property file="build.properties" />
-	<taskdef resource="net/sf/antcontrib/antlib.xml"/>
+	<taskdef resource="net/sf/antcontrib/antlib.xml">
+		<classpath>
+			<pathelement location="${buildFileDir}/lib/ant-contrib-1.0b3.jar" />
+		</classpath>
+	</taskdef>
 
 	<target name="setupEclipse" depends="downloadEclipse, downloadDeltapack">
 		<antcall target="downloadEclipse" />
@@ -39,7 +43,7 @@
 		</copy>
 
 		<!-- jre -->
-<!--		<mkdir dir="${workingDir}/eclipse/jre"/>
+		<!--		<mkdir dir="${workingDir}/eclipse/jre"/>
 		<copy todir="${workingDir}/eclipse/jre">
 			<fileset dir="${env.JAVA_HOME}/jre" />
 		</copy>
@@ -49,28 +53,16 @@
 		-->
 	</target>
 
-	<target name="checkDownloadDropinNeeded">
-	    <available property="skipDownloadDropin" file="${dropin.dest.path}"/>
-	</target>
-
-	<target name="downloadDropin" depends="checkDownloadDropinNeeded" unless="skipDownloadDropin">
-		<!-- expects ${dropin.src.url} parameter -->
-		<!-- expects ${dropin.dest.path} parameter -->
-		<get src="${dropin.src.url}" dest="${dropin.dest.path}" />
-	</target>
-
 	<target name="downloadAllDropins">
-		<!--<delete dir="${templateDir}/dropins/eclipse/plugins" failonerror="false" />-->
-		<mkdir dir="${templateDir}/dropins/eclipse/plugins"/>
+		<property name="pluginsDir" value="${templateDir}/dropins/eclipse/plugins" />
+		<delete dir="${pluginsDir}" failonerror="false" />
+		<mkdir dir="${pluginsDir}"/>
 		<for list="${orbitDownloadPluginList}" param="plugin">
 			<sequential>
-				<var name="dropinDestPath" value="${templateDir}/dropins/eclipse/plugins/@{plugin}" />
+				<var name="dropinDestPath" value="${pluginsDir}/@{plugin}" />
 				<var name="dropinSrcUrl" value="${orbitDropUrl}/@{plugin}" />
 				<echo message="downloading dropin from '${dropinSrcUrl}' to '${dropinDestPath}'." />
-				<antcall target="downloadDropin">
-					<param name="dropin.src.url" value="${dropinSrcUrl}"/>
-					<param name="dropin.dest.path" value="${dropinDestPath}"/>
-				</antcall>
+				<get src="${dropinSrcUrl}" dest="${dropinDestPath}" />
 			</sequential>
 		</for>
 	</target>

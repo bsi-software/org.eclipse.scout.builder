@@ -4,15 +4,15 @@
    are made available under the terms of the Eclipse Public License v1.0
    which accompanies this distribution, and is available at
    http://www.eclipse.org/legal/epl-v10.html
-   
+
    Contributors:
        BSI Business Systems Integration AG - initial API and implementation
  -->
 <!--
-   Features org.eclipse.scout.rt.feature and org.eclipse.scout.sdk.feature are build including source bundles 
+   Features org.eclipse.scout.rt.feature and org.eclipse.scout.sdk.feature are build including source bundles
    and also creates the source featrues.
    The output in  ${buildDataDir}/step020/output folder are two directory rtFeature and sdkFeature.
-   
+
    The output folder is read by step030.
 -->
 
@@ -34,8 +34,9 @@
 		<antcall target="clean" />
 		<antcall target="buildScoutRtFeature" />
 		<antcall target="buildScoutSdkFeature" />
+		<!-- <antcall target="buildScoutSdkTestFeature" /> -->
 		<touch file="${buildDataDir}/step020/output/features.created" />
-		<delete dir="${buildDataDir}/step020/input" failonerror="false" />
+		<!-- <delete dir="${buildDataDir}/step020/input" failonerror="false" /> -->
 	</target>
 
 
@@ -94,6 +95,32 @@
 		</unzip>
 	</target>
 
+	<target name="buildScoutSdkTestFeature" unless="skipSdkFeature">
+		<antcall target="setupBuildWorkspace" />
+		<java classname="org.eclipse.equinox.launcher.Main" fork="true" failonerror="true">
+			<arg line="-application org.eclipse.ant.core.antRunner " />
+			<arg line="-buildfile ${relengRootDir}/working/eclipse/plugins/org.eclipse.pde.build_${pdeBuildPluginVersion}/scripts/build.xml" />
+			<arg line="-Dtimestamp=${timestamp}" />
+			<arg line="-DarchivePrefix=sdkTestFeature" />
+			<arg line="-DforceContextQualifier=${featureTimestamp}" />
+			<arg line="-DtopLevelElementId=org.eclipse.scout.sdk.test.feature" />
+			<arg line="-Dbuilder=${buildFileDir}/featureBuild" />
+			<arg line="-DrelengRootDir=${relengRootDir}" />
+			<arg line="-Djavahome=${env.JAVA_HOME}" />
+			<arg line="-DIndividualSourceBundles=true" />
+			<arg line="-DbuildType=${buildType}" />
+			<arg line="-DjavacDebugInfo=true" />
+			<classpath>
+				<pathelement location="${relengRootDir}/working/eclipse/plugins/org.eclipse.equinox.launcher_${equinoxLauncherPluginVersion}.jar" />
+			</classpath>
+		</java>
+		<mkdir dir="${buildDataDir}/step020/output" />
+		<unzip dest="${buildDataDir}/step020/output">
+			<fileset dir="${buildDataDir}/step020/input/${buildType}">
+				<include name="org.eclipse.scout.sdk.test.feature-${buildType}.zip" />
+			</fileset>
+		</unzip>
+	</target>
 
 	<target name="setupBuildWorkspace">
 		<delete dir="${buildDataDir}/step020/input" />
@@ -109,14 +136,10 @@
 				<include name="org.apache.derby.jdbc_*/**" />
 				<!--				<include name="javax.*/**" /> -->
 				<exclude name="org.eclipse.scout*build*/**" />
-				<exclude name="*testing*/**" />
-				<exclude name="*test*/**" />
 				<exclude name="*feature*/**" />
 			</fileset>
 			<fileset dir="${workspace}/scout.sdk">
 				<include name="org.eclipse.scout.*/**" />
-				<exclude name="*testing*/**" />
-				<exclude name="*test*/**" />
 				<exclude name="*feature*/**" />
 			</fileset>
 		</copy>
@@ -142,6 +165,13 @@
 			</fileset>
 		</copy>
 		<replace file="${inputFeatures}/org.eclipse.scout.sdk.feature.source/feature.properties" token="%%featureName%%" value="Scout SDK Source" />
+		<!-- sdk source tamplate -->
+		<copy todir="${inputFeatures}/org.eclipse.scout.sdk.test.feature.source" failonerror="false">
+			<fileset dir="${relengRootDir}/templates/sourceTemplateFeature">
+				<include name="**" />
+			</fileset>
+		</copy>
+		<replace file="${inputFeatures}/org.eclipse.scout.sdk.test.feature.source/feature.properties" token="%%featureName%%" value="Scout SDK Test Source" />
 	</target>
 
 
