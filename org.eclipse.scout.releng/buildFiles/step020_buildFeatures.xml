@@ -36,13 +36,14 @@
 		<antcall target="buildScoutRtFeature" />
 		<antcall target="buildScoutSdkFeature" />
 		<antcall target="buildScoutSdkTestFeature" />
+		<antcall target="testSdk" />
 		<touch file="${buildDataDir}/step020/output/features.created" />
 		<delete dir="${buildDataDir}/step020/input" failonerror="false" />
 	</target>
 
 
 	<target name="buildScoutRtFeature" unless="skipRtFeature">
-		<java classname="org.eclipse.equinox.launcher.Main" fork="true" failonerror="true">
+		<java classname="org.eclipse.equinox.launcher.Main" maxmemory="512m" fork="true" failonerror="true">
 			<arg line="-application org.eclipse.ant.core.antRunner " />
 			<arg line="-buildfile ${relengRootDir}/working/eclipse/plugins/org.eclipse.pde.build_${pdeBuildPluginVersion}/scripts/build.xml" />
 			<arg line="-DforceContextQualifier=${featureTimestamp}" />
@@ -68,7 +69,7 @@
 	</target>
 
 	<target name="buildScoutSdkFeature" unless="skipSdkFeature">
-		<java classname="org.eclipse.equinox.launcher.Main" fork="true" failonerror="true">
+		<java classname="org.eclipse.equinox.launcher.Main" maxmemory="512m" fork="true" failonerror="true">
 			<arg line="-application org.eclipse.ant.core.antRunner " />
 			<arg line="-buildfile ${relengRootDir}/working/eclipse/plugins/org.eclipse.pde.build_${pdeBuildPluginVersion}/scripts/build.xml" />
 			<arg line="-Dtimestamp=${timestamp}" />
@@ -95,7 +96,7 @@
 	</target>
 
 	<target name="buildScoutSdkTestFeature" unless="skipSdkFeature">
-		<java classname="org.eclipse.equinox.launcher.Main" fork="true" failonerror="true">
+		<java classname="org.eclipse.equinox.launcher.Main" maxmemory="512m" fork="true" failonerror="true">
 			<arg line="-application org.eclipse.ant.core.antRunner " />
 			<arg line="-buildfile ${relengRootDir}/working/eclipse/plugins/org.eclipse.pde.build_${pdeBuildPluginVersion}/scripts/build.xml" />
 			<arg line="-Dtimestamp=${timestamp}" />
@@ -118,6 +119,58 @@
 				<include name="org.eclipse.scout.sdk.test.feature-${buildType}.zip" />
 			</fileset>
 		</unzip>
+	</target>
+
+	<target name="testSdk" depends="setupTestWorkspace">
+		<property name="tmpWs" location="${testWorkspace}/ws" />
+		<property name="outputFile" location="${testReportsDir}/result.${equinoxLauncherPluginVersion}.org.eclipse.scout.sdk.test.xml" />
+		<java classname="org.eclipse.equinox.launcher.Main" maxmemory="512m" fork="true" failonerror="false">
+			<arg line="-application org.eclipse.test.uitestapplication " />
+			<arg line="-data ${tmpWs} " />
+			<arg line="formatter=org.apache.tools.ant.taskdefs.optional.junit.XMLJUnitResultFormatter,${outputFile} " />
+			<arg line="-testPluginName org.eclipse.scout.sdk.test " />
+			<arg line="-className org.eclipse.scout.sdk.internal.test._SuiteInternalTest " />
+			<arg line="-nosplash " />
+			<classpath>
+				<pathelement location="${testEclipse}/plugins/org.eclipse.equinox.launcher_${equinoxLauncherPluginVersion}.jar" />
+			</classpath>
+		</java>
+	</target>
+
+	<target name="setupTestWorkspace">
+		<property name="testWorkspace" location="${buildDataDir}/step020/testWs" />
+		<property name="testEclipse" location="${testWorkspace}/eclipse" />
+		<delete dir="${testWorkspace}" failonerror="false" />
+		<mkdir dir="${testEclipse}"/>
+
+		<!-- copy eclipse (includes eclipse, deltapack, test-framework) -->
+		<unzip dest="${testWorkspace}" overwrite="true" src="${downloadDir}/${eclipseFileName}" />
+		<unzip dest="${testWorkspace}" overwrite="true" src="${downloadDir}/${eclipseDeltapackName}" />
+		<unzip dest="${testWorkspace}${eclipseTestFrameworkSubFolder}" overwrite="true" src="${downloadDir}/${eclipseTestFrameworkName}">
+			<patternset>
+		        <exclude name="artifacts.xml"/>
+		    </patternset>
+		</unzip>
+		<copy todir="${testWorkspace}" failonerror="false">
+			<fileset dir="${templateDir}/dropins" />
+		</copy>
+
+		<!-- copy built fragments to workspace -->
+		<copy todir="${testEclipse}" overwrite="true">
+			<fileset dir="${buildDataDir}/step020/output/rtFeature">
+				<include name="**/**" />
+			</fileset>
+		</copy>
+		<copy todir="${testEclipse}" overwrite="true">
+			<fileset dir="${buildDataDir}/step020/output/sdkFeature">
+				<include name="**/**" />
+			</fileset>
+		</copy>
+		<copy todir="${testEclipse}" overwrite="true">
+			<fileset dir="${buildDataDir}/step020/output/sdkTestFeature">
+				<include name="**/**" />
+			</fileset>
+		</copy>
 	</target>
 
 	<target name="setupBuildWorkspace">

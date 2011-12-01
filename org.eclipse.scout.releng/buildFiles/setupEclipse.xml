@@ -30,10 +30,7 @@
 		</classpath>
 	</taskdef>
 
-	<target name="setupEclipse" depends="downloadEclipse, downloadDeltapack">
-		<antcall target="downloadEclipse" />
-		<antcall target="downloadDeltapack" />
-		<antcall target="downloadAllDropins" />
+	<target name="setupEclipse" depends="downloadEclipse, downloadDeltapack, downloadAllDropins, downloadTestFramework">
 		<!-- setup eclipse to the ${workingDir} -->
 		<!-- unzip eclipse and delta pack -->
 		<delete dir="${relengRootDir}/working/eclipse" failonerror="false" />
@@ -85,6 +82,15 @@
 
 	<target name="checkDownloadDeltapack">
 		<available file="${downloadDir}/${eclipseDeltapackName}" property="skipDownloadDeltapack" />
+	</target>
+
+	<target name="downloadTestFramework" depends="checkDownloadTestFramework" unless="skipDownloadTestFramework">
+		<echo message="download test framework from '${eclipseTestFrameworkUrl}'." />
+		<get src="${eclipseTestFrameworkUrl}" dest="${downloadDir}/${eclipseTestFrameworkName}" />
+	</target>
+
+	<target name="checkDownloadTestFramework">
+		<available file="${downloadDir}/${eclipseTestFrameworkName}" property="skipDownloadTestFramework" />
 	</target>
 
 </project>

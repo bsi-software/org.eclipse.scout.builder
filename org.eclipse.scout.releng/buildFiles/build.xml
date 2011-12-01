@@ -55,30 +55,16 @@
 	</condition>
 
 	<target name="build">
+		<!-- prepare junit test report folders -->
+		<delete dir="${testReportsDir}" failonerror="false" />
+		<mkdir dir="${testReportsDir}"/>
+
+		<!-- run build -->
 		<antcall target="precheck" />
 		<antcall target="testBuild3.6" />
 		<antcall target="testBuild3.7" />
 		<property name="doFinalBuild" value="true" />
 		<antcall target="build${finalBuildVersion}" />
-		<!--
-		<antcall target="clean" />
-		<available file="${relengRootDir}/working/eclipse" property="skipInstallEclipse" />
-		<antcall target="setupEclipse" />
-
-		<ant antfile="${buildFileDir}/step010_downloadRepository.xml" target="build" />
-		<ant antfile="${buildFileDir}/step020_buildFeatures.xml" target="build" />
-		<ant antfile="${buildFileDir}/step030_archiveAll.xml" target="build" />
-		<ant antfile="${buildFileDir}/step040_markIncubation.xml" target="build" />
-		<ant antfile="${buildFileDir}/step050_pack200Normalize.xml" target="build" />
-		<ant antfile="${buildFileDir}/step060_sign.xml" target="build" />
-		<ant antfile="${buildFileDir}/step100_zipUnpack.xml" target="build" />
-		<ant antfile="${buildFileDir}/step110_zipCreate.xml" target="build" />
-		<ant antfile="${buildFileDir}/step200_p2Pack200.xml" target="build" />
-		<ant antfile="${buildFileDir}/step210_p2mergeRepository.xml" target="build" />
-		<ant antfile="${buildFileDir}/step220_p2metadata.xml" target="build" />
-		<ant antfile="${buildFileDir}/step230_p2categorize.xml" target="build" />
-		<ant antfile="${buildFileDir}/upload.xml" target="build" />
-		-->
 	</target>
 
 	<target name="testBuild3.6" depends="clean" unless="3.6_skipValidateBuild">
@@ -94,6 +80,9 @@
 		<property name="equinoxLauncherPluginVersion" value="${3.6_equinoxLauncherPluginVersion}" />
 		<property name="orbitDownloadPluginList" value="${3.6_orbitDownloadPluginList}" />
 		<property name="orbitDropUrl" value="${3.6_orbitDropUrl}" />
+		<property name="eclipseTestFrameworkName" value="${3.6_eclipseTestFrameworkName}" />
+		<property name="eclipseTestFrameworkUrl" value="${3.6_eclipseTestFrameworkUrl}" />
+		<property name="eclipseTestFrameworkSubFolder" value="${3.6_eclipseTestFrameworkSubFolder}" />
 		<antcall target="setupEclipse" />
 		<ant antfile="${buildFileDir}/step020_buildFeatures.xml" target="build" />
 		<antcall target="finalBuild" />
@@ -112,6 +101,9 @@
 		<property name="equinoxLauncherPluginVersion" value="${3.7_equinoxLauncherPluginVersion}" />
 		<property name="orbitDownloadPluginList" value="${3.7_orbitDownloadPluginList}" />
 		<property name="orbitDropUrl" value="${3.7_orbitDropUrl}" />
+		<property name="eclipseTestFrameworkName" value="${3.7_eclipseTestFrameworkName}" />
+		<property name="eclipseTestFrameworkUrl" value="${3.7_eclipseTestFrameworkUrl}" />
+		<property name="eclipseTestFrameworkSubFolder" value="${3.7_eclipseTestFrameworkSubFolder}" />
 		<antcall target="setupEclipse" />
 		<ant antfile="${buildFileDir}/step020_buildFeatures.xml" target="build" />
 		<antcall target="finalBuild" />
