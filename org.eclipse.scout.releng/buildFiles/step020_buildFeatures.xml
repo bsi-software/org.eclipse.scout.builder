@@ -32,16 +32,16 @@
 
 	<target name="createFeatures" unless="skipCreateFeatures">
 		<antcall target="clean" />
+		<antcall target="setupBuildWorkspace" />
 		<antcall target="buildScoutRtFeature" />
 		<antcall target="buildScoutSdkFeature" />
-		<!-- <antcall target="buildScoutSdkTestFeature" /> -->
+		<antcall target="buildScoutSdkTestFeature" />
 		<touch file="${buildDataDir}/step020/output/features.created" />
-		<!-- <delete dir="${buildDataDir}/step020/input" failonerror="false" /> -->
+		<delete dir="${buildDataDir}/step020/input" failonerror="false" />
 	</target>
 
 
 	<target name="buildScoutRtFeature" unless="skipRtFeature">
-		<antcall target="setupBuildWorkspace" />
 		<java classname="org.eclipse.equinox.launcher.Main" fork="true" failonerror="true">
 			<arg line="-application org.eclipse.ant.core.antRunner " />
 			<arg line="-buildfile ${relengRootDir}/working/eclipse/plugins/org.eclipse.pde.build_${pdeBuildPluginVersion}/scripts/build.xml" />
@@ -68,7 +68,6 @@
 	</target>
 
 	<target name="buildScoutSdkFeature" unless="skipSdkFeature">
-		<antcall target="setupBuildWorkspace" />
 		<java classname="org.eclipse.equinox.launcher.Main" fork="true" failonerror="true">
 			<arg line="-application org.eclipse.ant.core.antRunner " />
 			<arg line="-buildfile ${relengRootDir}/working/eclipse/plugins/org.eclipse.pde.build_${pdeBuildPluginVersion}/scripts/build.xml" />
@@ -96,7 +95,6 @@
 	</target>
 
 	<target name="buildScoutSdkTestFeature" unless="skipSdkFeature">
-		<antcall target="setupBuildWorkspace" />
 		<java classname="org.eclipse.equinox.launcher.Main" fork="true" failonerror="true">
 			<arg line="-application org.eclipse.ant.core.antRunner " />
 			<arg line="-buildfile ${relengRootDir}/working/eclipse/plugins/org.eclipse.pde.build_${pdeBuildPluginVersion}/scripts/build.xml" />
@@ -151,21 +149,24 @@
 				<include name="*scout.*feature*/**" />
 			</fileset>
 		</copy>
-		<!-- rt source tamplate -->
+
+		<!-- rt source template -->
 		<copy todir="${inputFeatures}/org.eclipse.scout.rt.feature.source" failonerror="false">
 			<fileset dir="${relengRootDir}/templates/sourceTemplateFeature">
 				<include name="**" />
 			</fileset>
 		</copy>
 		<replace file="${inputFeatures}/org.eclipse.scout.rt.feature.source/feature.properties" token="%%featureName%%" value="Scout Runtime Source" />
-		<!-- sdk source tamplate -->
+
+		<!-- sdk source template -->
 		<copy todir="${inputFeatures}/org.eclipse.scout.sdk.feature.source" failonerror="false">
 			<fileset dir="${relengRootDir}/templates/sourceTemplateFeature">
 				<include name="**" />
 			</fileset>
 		</copy>
 		<replace file="${inputFeatures}/org.eclipse.scout.sdk.feature.source/feature.properties" token="%%featureName%%" value="Scout SDK Source" />
-		<!-- sdk source tamplate -->
+
+		<!-- sdk test source template -->
 		<copy todir="${inputFeatures}/org.eclipse.scout.sdk.test.feature.source" failonerror="false">
 			<fileset dir="${relengRootDir}/templates/sourceTemplateFeature">
 				<include name="**" />

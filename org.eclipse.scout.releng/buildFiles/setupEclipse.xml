@@ -36,6 +36,7 @@
 		<antcall target="downloadAllDropins" />
 		<!-- setup eclipse to the ${workingDir} -->
 		<!-- unzip eclipse and delta pack -->
+		<delete dir="${relengRootDir}/working/eclipse" failonerror="false" />
 		<unzip dest="${relengRootDir}/working" overwrite="true" src="${downloadDir}/${eclipseFileName}" />
 		<unzip dest="${relengRootDir}/working" overwrite="true" src="${downloadDir}/${eclipseDeltapackName}" />
 		<copy todir="${relengRootDir}/working" failonerror="false">
