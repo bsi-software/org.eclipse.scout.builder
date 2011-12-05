@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -33,7 +33,7 @@ import org.w3c.dom.NodeList;
 
 /**
  * <h4>TestCreateArchive</h4>
- * 
+ *
  * @author aho
  * @since 1.1.0 (27.01.2011)
  */
@@ -91,24 +91,23 @@ public class TestIncubation extends AbstractTestCase {
     catch (Exception e) {
       Assert.fail();
     }
-    
+
     try {
       expectManifestMf(new File(m_workingDir + "/output/rtFeature/plugins/org.eclipse.scout.commons_3.5.5.201112280312.jar"));
     }
     catch (Exception e) {
       Assert.fail();
     }
-    
+
     try {
       expectPluginProps(new File(m_workingDir + "/output/rtFeature/plugins/org.eclipse.scout.commons.source_3.5.5.201112280312.jar"));
     }
     catch (Exception e) {
       Assert.fail();
     }
-    
+
   }
 
-  @SuppressWarnings("unused")
   private void expectFeatureXml(File feature) throws Exception {
     Assert.assertTrue(feature.exists());
     JarFile jarFile = new JarFile(feature);
@@ -155,7 +154,7 @@ public class TestIncubation extends AbstractTestCase {
       jarFile.close();
     }
   }
-  
+
   private void expectManifestMf(File file) throws Exception {
     Assert.assertTrue(file.exists());
     JarFile jarFile = new JarFile(file);
@@ -180,7 +179,7 @@ public class TestIncubation extends AbstractTestCase {
       jarFile.close();
     }
   }
-  
+
   private void expectPluginProps(File file) throws Exception {
     Assert.assertTrue(file.exists());
     JarFile jarFile = new JarFile(file);

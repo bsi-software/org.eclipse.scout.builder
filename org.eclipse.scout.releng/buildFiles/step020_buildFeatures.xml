@@ -26,6 +26,10 @@
 
 	<target name="build">
 		<available file="${buildDataDir}/step020/output/features.created" property="skipCreateFeatures" />
+		<condition property="conditionSkipTestSdk">
+			<istrue value="${skipTestSdk}"/>
+		</condition>
+
 		<antcall target="createFeatures" />
 	</target>
 
@@ -121,7 +125,7 @@
 		</unzip>
 	</target>
 
-	<target name="testSdk" depends="setupTestWorkspace">
+	<target name="testSdk" unless="conditionSkipTestSdk" depends="setupTestWorkspace">
 		<property name="tmpWs" location="${testWorkspace}/ws" />
 		<property name="outputFile" location="${testReportsDir}/result.${equinoxLauncherPluginVersion}.org.eclipse.scout.sdk.test.xml" />
 		<java classname="org.eclipse.equinox.launcher.Main" maxmemory="512m" fork="true" failonerror="false">
@@ -137,7 +141,7 @@
 		</java>
 	</target>
 
-	<target name="setupTestWorkspace">
+	<target name="setupTestWorkspace" unless="conditionSkipTestSdk">
 		<property name="testWorkspace" location="${buildDataDir}/step020/testWs" />
 		<property name="testEclipse" location="${testWorkspace}/eclipse" />
 		<delete dir="${testWorkspace}" failonerror="false" />
