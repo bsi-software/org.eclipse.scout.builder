@@ -12,6 +12,11 @@
 <project name="scout.releng" default="build">
 	<property environment="env" />
 	<property file="build.properties" />
+	<taskdef resource="net/sf/antcontrib/antlib.xml">
+		<classpath>
+			<pathelement location="${buildFileDir}/lib/ant-contrib-1.0b3.jar" />
+		</classpath>
+	</taskdef>
 
 	<tstamp>
 		<format property="buildTimestamp" pattern="yyyyMMdd-hhmm" />
@@ -59,95 +64,43 @@
 		<delete dir="${testReportsDir}" failonerror="false" />
 		<mkdir dir="${testReportsDir}"/>
 
-		<!-- run build -->
+		<!-- run test builds -->
 		<antcall target="precheck" />
-		<antcall target="testBuild3.8" />
-		<antcall target="testBuild3.6" />
-		<antcall target="testBuild3.7" />
-		<antcall target="testBuild4.2" />
+		<for list="3.8,3.6,3.7,4.2" param="version">
+			<sequential>
+				<propertycopy name="skipValidateBuildVersion" from="@{version}_skipValidateBuild" />
+				<if><equals arg1="${skipValidateBuildVersion}" arg2="true" /><then></then>
+			 		<else>
+			 			<antcall target="buildVersion">
+							<param name="eclipsePlatformVersion" value="@{version}" />
+						</antcall>
+			 		</else>
+				</if>
+			</sequential>
+		</for>
+
+		<!-- run final build -->
 		<property name="doFinalBuild" value="true" />
-		<antcall target="build${finalBuildVersion}" />
+		<antcall target="buildVersion">
+			<param name="eclipsePlatformVersion" value="${finalBuildVersion}" />
+		</antcall>
 	</target>
 
-	<target name="testBuild3.6" depends="clean" unless="3.6_skipValidateBuild">
-		<antcall target="build3.6" />
-	</target>
+	<!-- expects property "eclipsePlatformVersion" -->
+	<target name="buildVersion" depends="clean">
+		<echo message="BUILD USING ECLIPSE VERSION ${eclipsePlatformVersion}" />
+		<propertycopy name="eclipseFileName" from="${eclipsePlatformVersion}_eclipseFileName" />
+		<propertycopy name="eclipseDownloadUrl" from="${eclipsePlatformVersion}_eclipseDownloadUrl" />
+		<propertycopy name="eclipseDeltapackName" from="${eclipsePlatformVersion}_eclipseDeltapackName" />
+		<propertycopy name="eclipseDeltapackUrl" from="${eclipsePlatformVersion}_eclipseDeltapackUrl" />
+		<propertycopy name="pdeBuildPluginVersion" from="${eclipsePlatformVersion}_pdeBuildPluginVersion" />
+		<propertycopy name="equinoxLauncherPluginVersion" from="${eclipsePlatformVersion}_equinoxLauncherPluginVersion" />
+		<propertycopy name="orbitDownloadPluginList" from="${eclipsePlatformVersion}_orbitDownloadPluginList" />
+		<propertycopy name="orbitDropUrl" from="${eclipsePlatformVersion}_orbitDropUrl" />
+		<propertycopy name="eclipseTestFrameworkName" from="${eclipsePlatformVersion}_eclipseTestFrameworkName" />
+		<propertycopy name="eclipseTestFrameworkUrl" from="${eclipsePlatformVersion}_eclipseTestFrameworkUrl" />
+		<propertycopy name="eclipseTestFrameworkSubFolder" from="${eclipsePlatformVersion}_eclipseTestFrameworkSubFolder" />
 
-	<target name="testBuild3.7" depends="clean" unless="3.7_skipValidateBuild">
-		<antcall target="build3.7" />
-	</target>
-
-	<target name="testBuild3.8" depends="clean" unless="3.8_skipValidateBuild">
-		<antcall target="build3.8" />
-	</target>
-
-	<target name="testBuild4.2" depends="clean" unless="4.2_skipValidateBuild">
-		<antcall target="build4.2" />
-	</target>
-
-	<target name="build3.6" depends="clean">
-		<property name="eclipseFileName" value="${3.6_eclipseFileName}" />
-		<property name="eclipseDownloadUrl" value="${3.6_eclipseDownloadUrl}" />
-		<property name="eclipseDeltapackName" value="${3.6_eclipseDeltapackName}" />
-		<property name="eclipseDeltapackUrl" value="${3.6_eclipseDeltapackUrl}" />
-		<property name="pdeBuildPluginVersion" value="${3.6_pdeBuildPluginVersion}" />
-		<property name="equinoxLauncherPluginVersion" value="${3.6_equinoxLauncherPluginVersion}" />
-		<property name="orbitDownloadPluginList" value="${3.6_orbitDownloadPluginList}" />
-		<property name="orbitDropUrl" value="${3.6_orbitDropUrl}" />
-		<property name="eclipseTestFrameworkName" value="${3.6_eclipseTestFrameworkName}" />
-		<property name="eclipseTestFrameworkUrl" value="${3.6_eclipseTestFrameworkUrl}" />
-		<property name="eclipseTestFrameworkSubFolder" value="${3.6_eclipseTestFrameworkSubFolder}" />
-		<antcall target="setupEclipse" />
-		<ant antfile="${buildFileDir}/step020_buildFeatures.xml" target="build" />
-		<antcall target="finalBuild" />
-	</target>
-
-	<target name="build3.8" depends="clean">
-		<property name="eclipseFileName" value="${3.8_eclipseFileName}" />
-		<property name="eclipseDownloadUrl" value="${3.8_eclipseDownloadUrl}" />
-		<property name="eclipseDeltapackName" value="${3.8_eclipseDeltapackName}" />
-		<property name="eclipseDeltapackUrl" value="${3.8_eclipseDeltapackUrl}" />
-		<property name="pdeBuildPluginVersion" value="${3.8_pdeBuildPluginVersion}" />
-		<property name="equinoxLauncherPluginVersion" value="${3.8_equinoxLauncherPluginVersion}" />
-		<property name="eclipseTestFrameworkName" value="${3.8_eclipseTestFrameworkName}" />
-		<property name="eclipseTestFrameworkUrl" value="${3.8_eclipseTestFrameworkUrl}" />
-		<property name="eclipseTestFrameworkSubFolder" value="${3.8_eclipseTestFrameworkSubFolder}" />
-		<property name="orbitDownloadPluginList" value="${3.8_orbitDownloadPluginList}" />
-		<property name="orbitDropUrl" value="${3.8_orbitDropUrl}" />
-		<antcall target="setupEclipse" />
-		<ant antfile="${buildFileDir}/step020_buildFeatures.xml" target="build" />
-		<antcall target="finalBuild" />
-	</target>
-
-	<target name="build4.2" depends="clean">
-		<property name="eclipseFileName" value="${4.2_eclipseFileName}" />
-		<property name="eclipseDownloadUrl" value="${4.2_eclipseDownloadUrl}" />
-		<property name="eclipseDeltapackName" value="${4.2_eclipseFileName}" />
-		<property name="eclipseDeltapackUrl" value="${4.2_eclipseDownloadUrl}" />
-		<property name="pdeBuildPluginVersion" value="${4.2_pdeBuildPluginVersion}" />
-		<property name="equinoxLauncherPluginVersion" value="${4.2_equinoxLauncherPluginVersion}" />
-		<property name="orbitDownloadPluginList" value="${4.2_orbitDownloadPluginList}" />
-		<property name="orbitDropUrl" value="${4.2_orbitDropUrl}" />
-		<property name="eclipseTestFrameworkName" value="${4.2_eclipseTestFrameworkName}" />
-		<property name="eclipseTestFrameworkUrl" value="${4.2_eclipseTestFrameworkUrl}" />
-		<property name="eclipseTestFrameworkSubFolder" value="${4.2_eclipseTestFrameworkSubFolder}" />
-		<antcall target="setupEclipse" />
-		<ant antfile="${buildFileDir}/step020_buildFeatures.xml" target="build" />
-		<antcall target="finalBuild" />
-	</target>
-
-	<target name="build3.7" depends="clean">
-		<property name="eclipseFileName" value="${3.7_eclipseFileName}" />
-		<property name="eclipseDownloadUrl" value="${3.7_eclipseDownloadUrl}" />
-		<property name="eclipseDeltapackName" value="${3.7_eclipseDeltapackName}" />
-		<property name="eclipseDeltapackUrl" value="${3.7_eclipseDeltapackUrl}" />
-		<property name="pdeBuildPluginVersion" value="${3.7_pdeBuildPluginVersion}" />
-		<property name="equinoxLauncherPluginVersion" value="${3.7_equinoxLauncherPluginVersion}" />
-		<property name="orbitDownloadPluginList" value="${3.7_orbitDownloadPluginList}" />
-		<property name="orbitDropUrl" value="${3.7_orbitDropUrl}" />
-		<property name="eclipseTestFrameworkName" value="${3.7_eclipseTestFrameworkName}" />
-		<property name="eclipseTestFrameworkUrl" value="${3.7_eclipseTestFrameworkUrl}" />
-		<property name="eclipseTestFrameworkSubFolder" value="${3.7_eclipseTestFrameworkSubFolder}" />
 		<antcall target="setupEclipse" />
 		<ant antfile="${buildFileDir}/step020_buildFeatures.xml" target="build" />
 		<antcall target="finalBuild" />
@@ -174,9 +127,7 @@
 		<delete dir="${relengRootDir}/working" />
 	</target>
 
-
 	<target name="precheck" depends="checkStaged">
-
 	</target>
 
 	<target name="checkStaged" if="conditionCheckStaged">
@@ -187,6 +138,4 @@
 		<mkdir dir="${relengRootDir}/working" />
 		<ant antfile="${buildFileDir}/setupEclipse.xml" target="setupEclipse" />
 	</target>
-
-
 </project>

@@ -24,11 +24,6 @@
 <project name="setupEclipse" default="">
 	<property environment="env" />
 	<property file="build.properties" />
-	<taskdef resource="net/sf/antcontrib/antlib.xml">
-		<classpath>
-			<pathelement location="${buildFileDir}/lib/ant-contrib-1.0b3.jar" />
-		</classpath>
-	</taskdef>
 
 	<target name="setupEclipse" depends="downloadEclipse, downloadDeltapack, downloadAllDropins, downloadTestFramework">
 		<!-- setup eclipse to the ${workingDir} -->
@@ -39,16 +34,6 @@
 		<copy todir="${relengRootDir}/working" failonerror="false">
 			<fileset dir="${templateDir}/dropins" />
 		</copy>
-
-		<!-- jre -->
-		<!--		<mkdir dir="${workingDir}/eclipse/jre"/>
-		<copy todir="${workingDir}/eclipse/jre">
-			<fileset dir="${env.JAVA_HOME}/jre" />
-		</copy>
-		<copy todir="${workingDir}/eclipse/jre/lib" failonerror="false">
-			<fileset dir="${templateDir}/jre" />
-		</copy>
-		-->
 	</target>
 
 	<target name="downloadAllDropins">
