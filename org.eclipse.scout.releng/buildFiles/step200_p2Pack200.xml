@@ -56,7 +56,7 @@
 		</custom.removeUnpackSuffix>
 		<custom.pack>
 			<fileset dir="${outputFolder}">
-				<include name="**/*.jar" />
+				<include name="**/org.eclipse.scout.*/**" />
 			</fileset>
 		</custom.pack>
 
