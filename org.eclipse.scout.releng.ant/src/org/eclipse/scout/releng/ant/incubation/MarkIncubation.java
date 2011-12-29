@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -13,6 +13,7 @@ package org.eclipse.scout.releng.ant.incubation;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.ByteArrayOutputStream;
+import java.io.Closeable;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -27,6 +28,7 @@ import java.util.jar.JarFile;
 import java.util.jar.JarOutputStream;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.zip.ZipFile;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.OutputKeys;
@@ -46,7 +48,7 @@ import org.w3c.dom.NodeList;
 
 /**
  * <h4>MarkIncubation</h4>
- * 
+ *
  * @author aho
  * @since 1.1.0 (28.01.2011)
  */
@@ -137,18 +139,16 @@ public class MarkIncubation extends Task {
           }
           out.putNextEntry(newEntry);
           out.write(entryStream.toByteArray());
+          entryStream.close();
           out.closeEntry();
-
         }
         out.finish();
         out.flush();
       }
-
     }
     finally {
-      if (jarFile != null) {
-        jarFile.close();
-      }
+      closeQuiet(out);
+      closeQuiet(jarFile);
     }
     FileOutputStream outputStream = null;
     try {
@@ -158,43 +158,50 @@ public class MarkIncubation extends Task {
     finally {
       if (outputStream != null) {
         outputStream.flush();
-        outputStream.close();
+        closeQuiet(outputStream);
       }
     }
   }
 
   private ByteArrayOutputStream processFeatureXml(InputStream fileStream, StringHolder labelKeyHolder) throws Exception {
-    DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-    factory.setExpandEntityReferences(false);
-    Document doc = factory.newDocumentBuilder().parse(fileStream);
-    NodeList nodeList = doc.getElementsByTagName("feature");
-    if (nodeList.getLength() == 1) {
-      Element originalFeatureElement = (Element) nodeList.item(0);
-      String label = originalFeatureElement.getAttribute("label");
-      if (label.startsWith("%")) {
-        labelKeyHolder.value = label.substring(1);
+    try {
+      DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+      factory.setExpandEntityReferences(false);
+      Document doc = factory.newDocumentBuilder().parse(fileStream);
+      NodeList nodeList = doc.getElementsByTagName("feature");
+      if (nodeList.getLength() == 1) {
+        Element originalFeatureElement = (Element) nodeList.item(0);
+        String label = originalFeatureElement.getAttribute("label");
+        if (label.startsWith("%")) {
+          labelKeyHolder.value = label.substring(1);
+        }
+        else {
+          originalFeatureElement.setAttribute("label", label + INCUBATION_APPENDIX);
+        }
       }
-      else {
-        originalFeatureElement.setAttribute("label", label + INCUBATION_APPENDIX);
-      }
+      TransformerFactory transformerFactory = TransformerFactory.newInstance();
+      Transformer transformer = transformerFactory.newTransformer();
+      transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+      transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
+      DOMSource source = new DOMSource(doc);
+      ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+      StreamResult result = new StreamResult(outputStream);
+      transformer.transform(source, result);
+      return outputStream;
     }
-    TransformerFactory transformerFactory = TransformerFactory.newInstance();
-    Transformer transformer = transformerFactory.newTransformer();
-    transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-    transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
-    DOMSource source = new DOMSource(doc);
-    ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-    StreamResult result = new StreamResult(outputStream);
-    transformer.transform(source, result);
-    return outputStream;
+    finally {
+      closeQuiet(fileStream);
+    }
   }
 
   private ByteArrayOutputStream processFeatureProperties(InputStream fileStream, String labelKey) throws IOException {
-    ByteArrayOutputStream out = new ByteArrayOutputStream();
-    BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(out));
+    BufferedWriter writer = null;
+    BufferedReader reader = null;
     try {
+      ByteArrayOutputStream out = new ByteArrayOutputStream();
+      writer = new BufferedWriter(new OutputStreamWriter(out));
+      reader = new BufferedReader(new InputStreamReader(fileStream));
       Pattern pattern = Pattern.compile("^(" + labelKey + "\\=\\s*)(.*)$");
-      BufferedReader reader = new BufferedReader(new InputStreamReader(fileStream));
       String line = reader.readLine();
       while (line != null) {
         Matcher m = pattern.matcher(line);
@@ -208,19 +215,22 @@ public class MarkIncubation extends Task {
         line = reader.readLine();
       }
       writer.flush();
+      return out;
     }
     finally {
-      writer.close();
+      closeQuiet(reader);
+      closeQuiet(writer);
     }
-    return out;
   }
 
   private ByteArrayOutputStream processManifest(InputStream manifest, StringHolder nameKey) throws IOException {
-    ByteArrayOutputStream out = new ByteArrayOutputStream();
-    BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(out));
+    BufferedWriter writer = null;
+    BufferedReader reader = null;
     try {
+      ByteArrayOutputStream out = new ByteArrayOutputStream();
+      writer = new BufferedWriter(new OutputStreamWriter(out));
+      reader = new BufferedReader(new InputStreamReader(manifest));
       Pattern pattern = Pattern.compile("^(Bundle-Name\\:\\s*)(.*)$");
-      BufferedReader reader = new BufferedReader(new InputStreamReader(manifest));
       String line = reader.readLine();
       while (line != null) {
         Matcher m = pattern.matcher(line);
@@ -237,19 +247,22 @@ public class MarkIncubation extends Task {
         line = reader.readLine();
       }
       writer.flush();
+      return out;
     }
     finally {
-      writer.close();
+      closeQuiet(reader);
+      closeQuiet(writer);
     }
-    return out;
   }
 
   private ByteArrayOutputStream processPluginProperties(InputStream fileStream, String nameKey) throws IOException {
-    ByteArrayOutputStream out = new ByteArrayOutputStream();
-    BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(out));
+    BufferedWriter writer = null;
+    BufferedReader reader = null;
     try {
+      ByteArrayOutputStream out = new ByteArrayOutputStream();
+      writer = new BufferedWriter(new OutputStreamWriter(out));
+      reader = new BufferedReader(new InputStreamReader(fileStream));
       Pattern pattern = Pattern.compile("^(" + nameKey + "\\=\\s*)(.*)$");
-      BufferedReader reader = new BufferedReader(new InputStreamReader(fileStream));
       String line = reader.readLine();
       while (line != null) {
         Matcher m = pattern.matcher(line);
@@ -263,22 +276,27 @@ public class MarkIncubation extends Task {
         line = reader.readLine();
       }
       writer.flush();
+      return out;
     }
     finally {
-      writer.close();
+      closeQuiet(reader);
+      closeQuiet(writer);
     }
-    return out;
   }
 
   private ByteArrayOutputStream processAnyFile(InputStream inputStream) throws IOException {
-    ByteArrayOutputStream out = null;
-    out = new ByteArrayOutputStream();
-    byte[] buffer = new byte[1024];
-    int read;
-    while ((read = inputStream.read(buffer)) != -1) {
-      out.write(buffer, 0, read);
+    try {
+      ByteArrayOutputStream out = new ByteArrayOutputStream();
+      byte[] buffer = new byte[1024];
+      int read;
+      while ((read = inputStream.read(buffer)) != -1) {
+        out.write(buffer, 0, read);
+      }
+      return out;
     }
-    return out;
+    finally {
+      closeQuiet(inputStream);
+    }
   }
 
   private void validate() throws BuildException {
@@ -287,4 +305,17 @@ public class MarkIncubation extends Task {
     }
   }
 
+  private static void closeQuiet(Closeable c) {
+    if(c == null)return;
+    try {
+      c.close();
+    } catch(Exception e) {}
+  }
+
+  private static void closeQuiet(ZipFile c) {
+    if(c == null)return;
+    try {
+      c.close();
+    } catch(Exception e) {}
+  }
 }

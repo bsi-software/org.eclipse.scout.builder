@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -42,7 +42,7 @@ import org.w3c.dom.Element;
 
 /**
  * <h4>CreateRepositoryOverview</h4>
- * 
+ *
  * @author aho
  * @since 1.1.0 (31.01.2011)
  */
@@ -175,13 +175,23 @@ public class CreateRepositoryOverview extends Task {
       try {
         File eclipseVersionFile = new File(releaseDir.getFile().getAbsolutePath() + File.separator + "eclipseVersion.txt");
         if (eclipseVersionFile.exists()) {
-          BufferedReader reader = new BufferedReader(new FileReader(eclipseVersionFile));
-          String line = reader.readLine();
-          if (line != null) {
-            Matcher m = Pattern.compile("^\\s*\\[\\s*([0-9]{1,2}\\.[0-9]{1,2})\\s*\\,\\s*([0-9]{1,2}\\.[0-9]{1,2})\\s*\\]\\s*$").matcher(line);
-            if (m.matches()) {
-              releaseElement.setAttribute("eclipseMinVersion", m.group(1));
-              releaseElement.setAttribute("eclipseMaxVersion", m.group(2));
+          BufferedReader reader = null;
+          try {
+            reader = new BufferedReader(new FileReader(eclipseVersionFile));
+            String line = reader.readLine();
+            if (line != null) {
+              Matcher m = Pattern.compile("^\\s*\\[\\s*([0-9]{1,2}\\.[0-9]{1,2})\\s*\\,\\s*([0-9]{1,2}\\.[0-9]{1,2})\\s*\\]\\s*$").matcher(line);
+              if (m.matches()) {
+                releaseElement.setAttribute("eclipseMinVersion", m.group(1));
+                releaseElement.setAttribute("eclipseMaxVersion", m.group(2));
+              }
+            }
+          }
+          finally {
+            if(reader != null) {
+              try {
+                reader.close();
+              } catch(Exception e) {}
             }
           }
         }
@@ -197,7 +207,7 @@ public class CreateRepositoryOverview extends Task {
   private void findZips(ReleaseFile releseFile, Document doc, Element releaseElement) {
     File zipDir = new File(releseFile.getFile().getAbsolutePath()+File.separator+"zip");
     if(zipDir.exists() && zipDir.isDirectory()){
-    
+
     String attVersion = releaseElement.getAttribute("version");
     DropInZipFilter filter = new DropInZipFilter();
     zipDir.list(filter);
@@ -263,16 +273,16 @@ public class CreateRepositoryOverview extends Task {
     }
   }
 
-  
+
   private class ReleaseFile{
     private File file;
     private URI folder;
-    
+
     public ReleaseFile(File file, URI folder){
      this.file = file;
      this.folder = folder;
     }
-    
+
     /**
      * @return the file
      */
