@@ -39,6 +39,7 @@
 		<antcall target="clean" />
 		<antcall target="setupBuildWorkspace" />
 		<antcall target="buildScoutRtFeature" />
+		<antcall target="buildScoutRtRapFeature" />
 		<antcall target="buildScoutSdkFeature" />
 		<antcall target="buildScoutSdkTestFeature" />
 		<antcall target="testSdk" />
@@ -58,6 +59,18 @@
 			</fileset>
 		</unzip>
 	</target>
+
+	<target name="buildScoutRtRapFeature" unless="skipRtRapFeature">
+			<pde.build.feature eclipseBaseDir="${relengRootDir}/working/eclipse" timestamp="${featureTimestamp}"
+				archivePrefix="rtRapFeature" featureName="org.eclipse.scout.rt.rap.feature" buildType="${buildType}" pdeBuildPluginVersion="${pdeBuildPluginVersion}" />
+
+			<mkdir dir="${buildDataDir}/step020/output" />
+			<unzip dest="${buildDataDir}/step020/output">
+				<fileset dir="${buildDataDir}/step020/input/${buildType}">
+					<include name="org.eclipse.scout.rt.rap.feature-${buildType}.zip" />
+				</fileset>
+			</unzip>
+		</target>
 
 	<target name="buildScoutSdkFeature" unless="skipSdkFeature">
 		<pde.build.feature eclipseBaseDir="${relengRootDir}/working/eclipse" timestamp="${featureTimestamp}"
