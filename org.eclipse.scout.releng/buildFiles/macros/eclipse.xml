@@ -45,6 +45,7 @@
 			<arg line="-DforceContextQualifier=@{timestamp}" />
 			<arg line="-DtopLevelElementId=@{featureName}" />
 			<arg line="-Dbuilder=${buildFileDir}/featureBuild" />
+      		<arg line="-DbaseLocation=@{eclipseBaseDir}" />
 			<arg line="-DrelengRootDir=${relengRootDir}" />
 			<arg line="-Djavahome=${env.JAVA_HOME}" />
 			<arg line="-DIndividualSourceBundles=true" />

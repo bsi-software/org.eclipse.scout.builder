@@ -66,7 +66,7 @@
 
 		<!-- run test builds -->
 		<antcall target="precheck" />
-		<for list="3.8,3.6,3.7,4.2" param="version">
+		<for list="3.6,3.7,3.8,4.2" param="version">
 			<sequential>
 				<propertycopy name="skipValidateBuildVersion" from="@{version}_skipValidateBuild" />
 				<if><equals arg1="${skipValidateBuildVersion}" arg2="true" /><then></then>
@@ -89,8 +89,14 @@
 	<!-- expects property "eclipsePlatformVersion" -->
 	<target name="buildVersion" depends="clean">
 		<echo message="BUILD USING ECLIPSE VERSION ${eclipsePlatformVersion}" />
+		<property name="workingDirRap" value="${relengRootDir}/workingRap" />
+		<property name="workingDirNonRap" value="${relengRootDir}/working" />
+
+		<!-- extract properties based on current version built -->
 		<propertycopy name="eclipseFileName" from="${eclipsePlatformVersion}_eclipseFileName" />
 		<propertycopy name="eclipseDownloadUrl" from="${eclipsePlatformVersion}_eclipseDownloadUrl" />
+		<propertycopy name="eclipseRapDownloadUrl" from="${eclipsePlatformVersion}_eclipseRapDownloadUrl" />
+		<propertycopy name="eclipseRapFileName" from="${eclipsePlatformVersion}_eclipseRapFileName" />
 		<propertycopy name="eclipseDeltapackName" from="${eclipsePlatformVersion}_eclipseDeltapackName" />
 		<propertycopy name="eclipseDeltapackUrl" from="${eclipsePlatformVersion}_eclipseDeltapackUrl" />
 		<propertycopy name="pdeBuildPluginVersion" from="${eclipsePlatformVersion}_pdeBuildPluginVersion" />
@@ -101,9 +107,32 @@
 		<propertycopy name="eclipseTestFrameworkUrl" from="${eclipsePlatformVersion}_eclipseTestFrameworkUrl" />
 		<propertycopy name="eclipseTestFrameworkSubFolder" from="${eclipsePlatformVersion}_eclipseTestFrameworkSubFolder" />
 
-		<antcall target="setupEclipse" />
-		<ant antfile="${buildFileDir}/step020_buildFeatures.xml" target="build" />
-		<antcall target="finalBuild" />
+		<!-- build RT, SDK, RAP SDK based on Classic Eclipse in own working dir -->
+		<antcall target="setupEclipse">
+			<param name="workingDir" value="${workingDirNonRap}" />
+			<param name="buildDataDir" value="${workingDirNonRap}/buildData" />
+		</antcall>
+		<ant antfile="${buildFileDir}/step020_buildFeatures.xml" target="build">
+			<property name="workingDir" value="${workingDirNonRap}"/>
+			<property name="buildDataDir" value="${workingDirNonRap}/buildData" />
+		</ant>
+
+		<!-- build RAP RT based on RAP Eclipse in own working dir -->
+		<antcall target="setupEclipse">
+			<param name="workingDir" value="${workingDirRap}" />
+			<param name="buildDataDir" value="${workingDirRap}/buildData" />
+		</antcall>
+		<property name="nonRapBuildDataDir" value="${workingDirNonRap}/buildData" />
+		<ant antfile="${buildFileDir}/step020_buildFeatures.xml" target="buildRap">
+			<property name="workingDir" value="${workingDirRap}"/>
+			<property name="buildDataDir" value="${workingDirRap}/buildData" />
+		</ant>
+
+		<!-- do final build -->
+		<antcall target="finalBuild">
+			<param name="workingDir" value="${workingDirNonRap}" />
+			<param name="buildDataDir" value="${workingDirNonRap}/buildData" />
+		</antcall>
 	</target>
 
 	<target name="finalBuild" if="doFinalBuild">
@@ -121,10 +150,10 @@
 		<antcall target="clean"/>
 	</target>
 
-
 	<target name="clean" unless="conditionSkipClean">
-		<echo message="clean working dir" />
-		<delete dir="${relengRootDir}/working" />
+		<echo message="clean working dirs" />
+		<delete failonerror="false" dir="${relengRootDir}/working" />
+		<delete failonerror="false" dir="${relengRootDir}/workingRap" />
 	</target>
 
 	<target name="precheck" depends="checkStaged">
@@ -135,7 +164,7 @@
 	</target>
 
 	<target name="setupEclipse" unless="skipInstallEclipse">
-		<mkdir dir="${relengRootDir}/working" />
+		<mkdir dir="${workingDir}" />
 		<ant antfile="${buildFileDir}/setupEclipse.xml" target="setupEclipse" />
 	</target>
 </project>

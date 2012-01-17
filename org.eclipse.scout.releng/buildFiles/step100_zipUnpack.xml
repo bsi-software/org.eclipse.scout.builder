@@ -4,22 +4,22 @@
    are made available under the terms of the Eclipse Public License v1.0
    which accompanies this distribution, and is available at
    http://www.eclipse.org/legal/epl-v10.html
-   
+
    Contributors:
        BSI Business Systems Integration AG - initial API and implementation
  -->
 <!--
 	All jars temporarly packed by step030 will be unpacked here. As a marker for jars to unpack
-	a _unpack is expected. 
-    E.g. folder org.eclipse.scout.rt.feature_3.7.0.201102030528_unpack.jar -> org.eclipse.scout.rt.feature_3.7.0.201102030528 
-	
-	The output folder (${buildDataDir}/step100/output) is used by step110. 
+	a _unpack is expected.
+    E.g. folder org.eclipse.scout.rt.feature_3.7.0.201102030528_unpack.jar -> org.eclipse.scout.rt.feature_3.7.0.201102030528
+
+	The output folder (${buildDataDir}/step100/output) is used by step110.
 -->
 
 <project name="step100.zipUnpack" default="build">
 	<property file="build.properties" />
 	<taskdef name="custom.extract" classname="org.eclipse.scout.releng.ant.archive.ExtractArchive" />
-	
+
 
 	<target name="clean">
 		<delete dir="${buildDataDir}/step100" />
@@ -46,8 +46,12 @@
 		<!-- unpack -->
 		<custom.extract inputDir="${inputFolder}/rtFeature/features" outputDir="${outputFolder}/rtFeature/features"/>
 		<custom.extract inputDir="${inputFolder}/rtFeature/plugins" outputDir="${outputFolder}/rtFeature/plugins"/>
+		<custom.extract inputDir="${inputFolder}/rtRapFeature/features" outputDir="${outputFolder}/rtRapFeature/features"/>
+		<custom.extract inputDir="${inputFolder}/rtRapFeature/plugins" outputDir="${outputFolder}/rtRapFeature/plugins"/>
 		<custom.extract inputDir="${inputFolder}/sdkFeature/features" outputDir="${outputFolder}/sdkFeature/features"/>
 		<custom.extract inputDir="${inputFolder}/sdkFeature/plugins" outputDir="${outputFolder}/sdkFeature/plugins"/>
+		<custom.extract inputDir="${inputFolder}/sdkRapFeature/features" outputDir="${outputFolder}/sdkRapFeature/features"/>
+		<custom.extract inputDir="${inputFolder}/sdkRapFeature/plugins" outputDir="${outputFolder}/sdkRapFeature/plugins"/>
 		<touch file="${outputFolder}/unpack.created" />
 	</target>
 

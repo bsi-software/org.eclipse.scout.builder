@@ -25,13 +25,13 @@
 	<property environment="env" />
 	<property file="build.properties" />
 
-	<target name="setupEclipse" depends="downloadEclipse, downloadDeltapack, downloadAllDropins, downloadTestFramework">
+	<target name="setupEclipse" depends="downloadEclipse, downloadRapEclipse, downloadDeltapack, downloadAllDropins, downloadTestFramework">
 		<!-- setup eclipse to the ${workingDir} -->
-		<!-- unzip eclipse and delta pack -->
-		<delete dir="${relengRootDir}/working/eclipse" failonerror="false" />
-		<unzip dest="${relengRootDir}/working" overwrite="true" src="${downloadDir}/${eclipseFileName}" />
-		<unzip dest="${relengRootDir}/working" overwrite="true" src="${downloadDir}/${eclipseDeltapackName}" />
-		<copy todir="${relengRootDir}/working" failonerror="false">
+		<!-- unzip eclipse and delta pack and copy all dropins -->
+		<delete dir="${workingDir}/eclipse" />
+		<unzip dest="${workingDir}" overwrite="true" src="${downloadDir}/${eclipseFileName}" />
+		<unzip dest="${workingDir}" overwrite="true" src="${downloadDir}/${eclipseDeltapackName}" />
+		<copy todir="${workingDir}" failonerror="false">
 			<fileset dir="${templateDir}/dropins" />
 		</copy>
 	</target>
@@ -44,14 +44,12 @@
 			<sequential>
 				<var name="dropinDestPath" value="${pluginsDir}/@{plugin}" />
 				<var name="dropinSrcUrl" value="${orbitDropUrl}/@{plugin}" />
-				<echo message="downloading dropin from '${dropinSrcUrl}' to '${dropinDestPath}'." />
 				<get src="${dropinSrcUrl}" dest="${dropinDestPath}" />
 			</sequential>
 		</for>
 	</target>
 
 	<target name="downloadEclipse" depends="checkDownloadEclipse" unless="skipDownloadEclipse">
-		<echo message="download eclipse from '${eclipseDownloadUrl}'." />
 		<mkdir dir="${downloadDir}" />
 		<get src="${eclipseDownloadUrl}" dest="${downloadDir}/${eclipseFileName}" />
 	</target>
@@ -60,8 +58,17 @@
 		<available file="${downloadDir}/${eclipseFileName}" property="skipDownloadEclipse" />
 	</target>
 
+	<target name="downloadRapEclipse" depends="checkDownloadRapEclipse" unless="skipDownloadRapEclipse">
+		<mkdir dir="${downloadDir}" />
+		<get src="${eclipseRapDownloadUrl}" dest="${downloadDir}/${eclipseRapFileName}" />
+	</target>
+
+	<target name="checkDownloadRapEclipse">
+		<available file="${downloadDir}/${eclipseRapFileName}" property="skipDownloadRapEclipse" />
+	</target>
+
+
 	<target name="downloadDeltapack" depends="checkDownloadDeltapack" unless="skipDownloadDeltapack">
-		<echo message="download delta pack from '${eclipseDeltapackUrl}'." />
 		<get src="${eclipseDeltapackUrl}" dest="${downloadDir}/${eclipseDeltapackName}" />
 	</target>
 
@@ -70,7 +77,6 @@
 	</target>
 
 	<target name="downloadTestFramework" depends="checkDownloadTestFramework" unless="skipDownloadTestFramework">
-		<echo message="download test framework from '${eclipseTestFrameworkUrl}'." />
 		<get src="${eclipseTestFrameworkUrl}" dest="${downloadDir}/${eclipseTestFrameworkName}" />
 	</target>
 
