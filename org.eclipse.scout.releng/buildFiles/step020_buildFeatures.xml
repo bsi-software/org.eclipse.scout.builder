@@ -159,7 +159,17 @@
 			</fileset>
 		</copy>
 		<copy todir="${testEclipse}" overwrite="true">
+			<fileset dir="${buildDataDir}/step020/output/rtRapFeature">
+				<include name="**/**" />
+			</fileset>
+		</copy>
+		<copy todir="${testEclipse}" overwrite="true">
 			<fileset dir="${buildDataDir}/step020/output/sdkFeature">
+				<include name="**/**" />
+			</fileset>
+		</copy>
+		<copy todir="${testEclipse}" overwrite="true">
+			<fileset dir="${buildDataDir}/step020/output/sdkRapFeature">
 				<include name="**/**" />
 			</fileset>
 		</copy>
