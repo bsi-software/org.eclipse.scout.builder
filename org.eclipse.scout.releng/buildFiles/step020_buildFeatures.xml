@@ -275,7 +275,7 @@
 				<include name="**" />
 			</fileset>
 		</copy>
-		<replace file="${inputFeatures}/org.eclipse.scout.rt.rap.feature.source/feature.properties" token="%%featureName%%" value="Scout RAP Runtime Source" />
+		<replace file="${inputFeatures}/org.eclipse.scout.rt.rap.feature.source/feature.properties" token="%%featureName%%" value="Scout Runtime RAP Source" />
 
 		<!-- sdk source template -->
 		<copy todir="${inputFeatures}/org.eclipse.scout.sdk.feature.source" failonerror="false">
@@ -291,7 +291,7 @@
 				<include name="**" />
 			</fileset>
 		</copy>
-		<replace file="${inputFeatures}/org.eclipse.scout.sdk.rap.feature.source/feature.properties" token="%%featureName%%" value="Scout RAP SDK Source" />
+		<replace file="${inputFeatures}/org.eclipse.scout.sdk.rap.feature.source/feature.properties" token="%%featureName%%" value="Scout SDK RAP Source" />
 
 		<!-- sdk test source template -->
 		<copy todir="${inputFeatures}/org.eclipse.scout.sdk.test.feature.source" failonerror="false">
