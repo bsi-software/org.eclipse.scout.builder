@@ -67,7 +67,6 @@
 		<available file="${downloadDir}/${eclipseRapFileName}" property="skipDownloadRapEclipse" />
 	</target>
 
-
 	<target name="downloadDeltapack" depends="checkDownloadDeltapack" unless="skipDownloadDeltapack">
 		<get src="${eclipseDeltapackUrl}" dest="${downloadDir}/${eclipseDeltapackName}" />
 	</target>
@@ -83,5 +82,4 @@
 	<target name="checkDownloadTestFramework">
 		<available file="${downloadDir}/${eclipseTestFrameworkName}" property="skipDownloadTestFramework" />
 	</target>
-
 </project>

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feature
+		id="%%preBuildFeatureName%%"
+		label="Feature"
+		version="1.0.0.qualifier">
+
+		<description url="http://www.example.com/description">desc</description>
+
+		<copyright url="http://www.example.com/copyright">copy</copyright>
+
+		<license url="http://www.example.com/license">lic</license>
+
+		<includes
+			id="%%preBuildFeatureName%%.source"
+			version="0.0.0"
+			optional="true"/>
+
+  		<plugin
+			id="%%preBuildFragmentName%%"
+			download-size="0"
+			install-size="0"
+			version="0.0.0"
+			fragment="true"
+			unpack="false"/>
+</feature>

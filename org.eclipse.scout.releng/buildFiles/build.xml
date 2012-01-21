@@ -64,9 +64,25 @@
 		<delete dir="${testReportsDir}" failonerror="false" />
 		<mkdir dir="${testReportsDir}"/>
 
+		<!-- run compatibility pre-builds against the defined platform version -->
+		<delete dir="${preBuildDir}" failonerror="false" />
+		<mkdir dir="${preBuildDir}" />
+		<antcall target="preBuildVersion">
+			<param name="eclipsePlatformVersion" value="3.5" />
+			<param name="compatFragmentVersion" value="v35" />
+		</antcall>
+		<antcall target="preBuildVersion">
+			<param name="eclipsePlatformVersion" value="3.6" />
+			<param name="compatFragmentVersion" value="v36v37" />
+		</antcall>
+		<antcall target="preBuildVersion">
+			<param name="eclipsePlatformVersion" value="3.8" />
+			<param name="compatFragmentVersion" value="v38v42" />
+		</antcall>
+
 		<!-- run test builds -->
 		<antcall target="precheck" />
-		<for list="3.6,3.7,3.8,4.2" param="version">
+		<for list="3.5,3.6,3.7,3.8,4.2" param="version">
 			<sequential>
 				<propertycopy name="skipValidateBuildVersion" from="@{version}_skipValidateBuild" />
 				<if><equals arg1="${skipValidateBuildVersion}" arg2="true" /><then></then>
@@ -84,6 +100,36 @@
 		<antcall target="buildVersion">
 			<param name="eclipsePlatformVersion" value="${finalBuildVersion}" />
 		</antcall>
+
+		<!-- remove pre-built features again (no longer needed) -->
+		<delete dir="${preBuildDir}" failonerror="false" />
+	</target>
+
+	<!-- expects property "eclipsePlatformVersion" -->
+	<target name="preBuildVersion" depends="clean">
+		<!-- extract properties based on current version built -->
+		<propertycopy name="eclipseFileName" from="${eclipsePlatformVersion}_eclipseFileName" />
+		<propertycopy name="eclipseDownloadUrl" from="${eclipsePlatformVersion}_eclipseDownloadUrl" />
+		<propertycopy name="eclipseRapDownloadUrl" from="${eclipsePlatformVersion}_eclipseRapDownloadUrl" />
+		<propertycopy name="eclipseRapFileName" from="${eclipsePlatformVersion}_eclipseRapFileName" />
+		<propertycopy name="eclipseDeltapackName" from="${eclipsePlatformVersion}_eclipseDeltapackName" />
+		<propertycopy name="eclipseDeltapackUrl" from="${eclipsePlatformVersion}_eclipseDeltapackUrl" />
+		<propertycopy name="pdeBuildPluginVersion" from="${eclipsePlatformVersion}_pdeBuildPluginVersion" />
+		<propertycopy name="equinoxLauncherPluginVersion" from="${eclipsePlatformVersion}_equinoxLauncherPluginVersion" />
+		<propertycopy name="orbitDownloadPluginList" from="${eclipsePlatformVersion}_orbitDownloadPluginList" />
+		<propertycopy name="orbitDropUrl" from="${eclipsePlatformVersion}_orbitDropUrl" />
+		<propertycopy name="eclipseTestFrameworkName" from="${eclipsePlatformVersion}_eclipseTestFrameworkName" />
+		<propertycopy name="eclipseTestFrameworkUrl" from="${eclipsePlatformVersion}_eclipseTestFrameworkUrl" />
+		<propertycopy name="eclipseTestFrameworkSubFolder" from="${eclipsePlatformVersion}_eclipseTestFrameworkSubFolder" />
+
+		<antcall target="setupEclipse">
+			<param name="workingDir" value="${relengRootDir}/working" />
+			<param name="buildDataDir" value="${relengRootDir}/working/buildData" />
+		</antcall>
+		<ant antfile="${buildFileDir}/step020_buildFeatures.xml" target="preBuild">
+			<property name="workingDir" value="${relengRootDir}/working" />
+			<property name="buildDataDir" value="${relengRootDir}/working/buildData" />
+		</ant>
 	</target>
 
 	<!-- expects property "eclipsePlatformVersion" -->
@@ -117,16 +163,21 @@
 			<property name="buildDataDir" value="${workingDirNonRap}/buildData" />
 		</ant>
 
-		<!-- build RAP RT based on RAP Eclipse in own working dir -->
-		<antcall target="setupEclipse">
-			<param name="workingDir" value="${workingDirRap}" />
-			<param name="buildDataDir" value="${workingDirRap}/buildData" />
-		</antcall>
-		<property name="nonRapBuildDataDir" value="${workingDirNonRap}/buildData" />
-		<ant antfile="${buildFileDir}/step020_buildFeatures.xml" target="buildRap">
-			<property name="workingDir" value="${workingDirRap}"/>
-			<property name="buildDataDir" value="${workingDirRap}/buildData" />
-		</ant>
+		<!-- build RAP RT based on RAP Eclipse in own working dir (only eclipse >= 3.6) -->
+		<if><equals arg1="${eclipsePlatformVersion}" arg2="3.5" /><then></then>
+	 		<else>
+	 			<!-- eclipse RAP runtime requires at least eclipse 3.6: dont build scout rap against eclipse 3.5 -->
+	 			<antcall target="setupEclipse">
+					<param name="workingDir" value="${workingDirRap}" />
+					<param name="buildDataDir" value="${workingDirRap}/buildData" />
+				</antcall>
+				<property name="nonRapBuildDataDir" value="${workingDirNonRap}/buildData" />
+				<ant antfile="${buildFileDir}/step020_buildFeatures.xml" target="buildRap">
+					<property name="workingDir" value="${workingDirRap}"/>
+					<property name="buildDataDir" value="${workingDirRap}/buildData" />
+				</ant>
+	 		</else>
+		</if>
 
 		<!-- do final build -->
 		<antcall target="finalBuild">

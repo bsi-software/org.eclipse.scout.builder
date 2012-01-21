@@ -30,7 +30,7 @@
 
   -->
   <macrodef name="pde.build.feature" description="Builds the given feature">
-    <attribute name="eclipseBaseDir" />        <!-- The base directory pointing to the eclipse home to use to run the tests. this folder must contain e.g. the "plugins" folder. -->
+    <attribute name="eclipseBaseDir" />        <!-- The base directory pointing to the eclipse home to use to build the feature. this folder must contain e.g. the "plugins" folder. -->
     <attribute name="timestamp" />             <!-- The timestamp to use for the build -->
     <attribute name="archivePrefix" />         <!-- The name of the archive root folder -->
     <attribute name="featureName" />           <!-- The feature to build -->
