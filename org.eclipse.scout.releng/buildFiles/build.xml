@@ -73,7 +73,7 @@
 		</antcall>
 		<antcall target="preBuildVersion">
 			<param name="eclipsePlatformVersion" value="3.6" />
-			<param name="compatFragmentVersion" value="v36v37" />
+			<param name="compatFragmentVersion" value="v36v37v41" />
 		</antcall>
 		<antcall target="preBuildVersion">
 			<param name="eclipsePlatformVersion" value="3.8" />
@@ -82,7 +82,7 @@
 
 		<!-- run test builds -->
 		<antcall target="precheck" />
-		<for list="3.5,3.6,3.7,3.8,4.2" param="version">
+		<for list="3.5,3.6,3.7,3.8,4.1,4.2" param="version">
 			<sequential>
 				<propertycopy name="skipValidateBuildVersion" from="@{version}_skipValidateBuild" />
 				<if><equals arg1="${skipValidateBuildVersion}" arg2="true" /><then></then>
