@@ -59,7 +59,7 @@
 			<fileset dir="${inputFolder}/sdkRapFeature">
 				<include name="**/**" />
 			</fileset>
-			<fileset dir="${templateDir}/dropins/eclipse">
+			<fileset dir="${templateDir}/dropins/eclipse" excludes="${finalZipLegacyPluginList}">
 				<include name="**/**" />
 			</fileset>
 			<fileset dir="${workingDir}/eclipse" includes="${finalZipLegacyPluginList}" />
