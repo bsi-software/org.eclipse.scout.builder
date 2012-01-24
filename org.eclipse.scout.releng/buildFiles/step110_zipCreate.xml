@@ -62,7 +62,7 @@
 			<fileset dir="${templateDir}/dropins/eclipse">
 				<include name="**/**" />
 			</fileset>
-			<fileset dir="${workingDir}/eclipse/plugins" includes="${finalZipLegacyPluginList}" />
+			<fileset dir="${workingDir}/eclipse" includes="${finalZipLegacyPluginList}" />
 		</zip>
 		<touch file="${outputFolder}/zip.created" />
 	</target>
