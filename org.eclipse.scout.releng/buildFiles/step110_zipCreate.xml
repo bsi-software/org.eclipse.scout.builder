@@ -49,7 +49,7 @@
 		<property name="incubationValue" value="" />
 
 		<!-- do not include scout rap rt in this zip -->
-		<zip destfile="${outputFolder}/${buildType}-scout-${scoutVersion}${versionMilestone}-${buildTimestamp}${incubationValue}.zip">
+		<zip destfile="${outputFolder}/${buildType}-scout-${scoutVersion}${versionMilestone}-${buildTimestamp}${incubationValue}.zip" duplicate="preserve">
 			<fileset dir="${inputFolder}/rtFeature">
 				<include name="**/**" />
 			</fileset>
@@ -59,7 +59,7 @@
 			<fileset dir="${inputFolder}/sdkRapFeature">
 				<include name="**/**" />
 			</fileset>
-			<fileset dir="${templateDir}/dropins/eclipse" excludes="${finalZipLegacyPluginList}">
+			<fileset dir="${templateDir}/dropins/eclipse">
 				<include name="**/**" />
 			</fileset>
 			<fileset dir="${workingDir}/eclipse" includes="${finalZipLegacyPluginList}" />
