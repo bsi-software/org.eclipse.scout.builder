@@ -120,6 +120,7 @@
       </fileset>
     </unzip>
 
+  	<!-- store the pre built compatibility fragment for later use -->
   	<copy todir="${preBuildDir}">
   		<fileset dir="${buildDataDir}/step020/output/sdkPreBuiltFeature/plugins">
   			<include name="**/*${preBuildFragmentName}*.jar"/>
@@ -252,12 +253,15 @@
   </target>
 
   <target name="setupRapBuildWorkspace">
-    <!-- unzip rap eclipse into existing eclipse platform -->
+    <!-- unzip eclipse rap runtime into existing eclipse platform -->
     <unzip dest="${workingDir}/eclipse" overwrite="true" src="${downloadDir}/${eclipseRapFileName}">
       <patternset>
-            <include name="**/org.eclipse.rap*.jar"/>
-        </patternset>
+      	<include name="**/org.eclipse.rap*.jar"/>
+      </patternset>
     </unzip>
+
+    <!-- unzip RAP Incubator -->
+  	<unzip dest="${workingDir}/eclipse" overwrite="true" src="${downloadDir}/${incubatorFileName}" />
 
     <!-- setup workspace -->
     <antcall target="setupBuildWorkspace" />
@@ -278,25 +282,8 @@
       </fileset>
     </copy>
 
-    <!-- download RAP Incubator plugins and features -->
-    <property name="rapPluginsDir" value="${workingDir}/eclipse/plugins" />
-    <for list="${incubatorDownloadPluginList}" param="plugin">
-      <sequential>
-        <var name="incubDestPath" value="${rapPluginsDir}/@{plugin}" />
-        <var name="incubSrcUrl" value="${incubatorDownloadUrl}/plugins/@{plugin}" />
-        <get src="${incubSrcUrl}" dest="${incubDestPath}" />
-      </sequential>
-    </for>
-    <property name="rapFeaturesDir" value="${workingDir}/eclipse/features" />
-    <for list="${incubatorDownloadFeatureList}" param="feature">
-      <sequential>
-        <var name="incubDestPath" value="${rapFeaturesDir}/@{feature}" />
-        <var name="incubSrcUrl" value="${incubatorDownloadUrl}/features/@{feature}" />
-        <get src="${incubSrcUrl}" dest="${incubDestPath}" />
-      </sequential>
-    </for>
-
     <!-- replace the patched eclipse plugins (TODO: remove!) -->
+    <property name="rapPluginsDir" value="${workingDir}/eclipse/plugins" />
     <delete>
       <fileset dir="${rapPluginsDir}" includes="org.eclipse.rap.rwt_1.5.*.jar"/>
       <fileset dir="${rapPluginsDir}" includes="org.eclipse.rap.rwt.source_1.5.*.jar"/>

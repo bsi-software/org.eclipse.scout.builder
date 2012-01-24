@@ -25,7 +25,7 @@
 	<property environment="env" />
 	<property file="build.properties" />
 
-	<target name="setupEclipse" depends="downloadEclipse, downloadRapEclipse, downloadDeltapack, downloadAllDropins, downloadTestFramework">
+	<target name="setupEclipse" depends="downloadEclipse, downloadRapEclipse, downloadRapIncubator, downloadDeltapack, downloadAllDropins, downloadTestFramework">
 		<!-- setup eclipse to the ${workingDir} -->
 		<!-- unzip eclipse and delta pack and copy all dropins -->
 		<delete dir="${workingDir}/eclipse" />
@@ -56,6 +56,15 @@
 
 	<target name="checkDownloadEclipse">
 		<available file="${downloadDir}/${eclipseFileName}" property="skipDownloadEclipse" />
+	</target>
+
+	<target name="downloadRapIncubator" depends="checkDownloadRapIncubator" unless="skipDownloadRapIncubator">
+		<mkdir dir="${downloadDir}" />
+		<get src="${incubatorDownloadUrl}" dest="${downloadDir}/${incubatorFileName}" />
+	</target>
+
+	<target name="checkDownloadRapIncubator">
+		<available file="${downloadDir}/${incubatorFileName}" property="skipDownloadRapIncubator" />
 	</target>
 
 	<target name="downloadRapEclipse" depends="checkDownloadRapEclipse" unless="skipDownloadRapEclipse">
