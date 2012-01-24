@@ -19,8 +19,8 @@
 	</taskdef>
 
 	<tstamp>
-		<format property="buildTimestamp" pattern="yyyyMMdd-hhmm" />
-		<format property="featureTimestamp" pattern="yyyyMMddhhmm" />
+		<format property="buildTimestamp" pattern="yyyyMMdd-HHmm" />
+		<format property="featureTimestamp" pattern="yyyyMMddHHmm" />
 	</tstamp>
 
 	<!-- condition properties -->
