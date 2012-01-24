@@ -31,7 +31,7 @@
 		<delete dir="${workingDir}/eclipse" />
 		<unzip dest="${workingDir}" overwrite="true" src="${downloadDir}/${eclipseFileName}" />
 		<unzip dest="${workingDir}" overwrite="true" src="${downloadDir}/${eclipseDeltapackName}" />
-		<copy todir="${workingDir}" failonerror="false">
+		<copy todir="${workingDir}" overwrite="true" failonerror="false">
 			<fileset dir="${templateDir}/dropins" />
 		</copy>
 	</target>
