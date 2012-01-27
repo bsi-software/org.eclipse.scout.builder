@@ -1,0 +1,54 @@
+<!--
+   Copyright (c) 2010 BSI Business Systems Integration AG.
+   All rights reserved. This program and the accompanying materials
+   are made available under the terms of the Eclipse Public License v1.0
+   which accompanies this distribution, and is available at
+   http://www.eclipse.org/legal/epl-v10.html
+
+   Contributors:
+       BSI Business Systems Integration AG - initial API and implementation
+ -->
+<!--
+   Ensures all bundles and features are packed in jar files.
+   E.g. folder org.eclipse.scout.rt.feature_3.7.0.201102030528  -> org.eclipse.scout.rt.feature_3.7.0.201102030528_unpack.jar
+   To mark the packed files the _unpack marker is used.
+
+   The output (${buildDataDir}/step030/output) is used by step040.
+-->
+
+<project name="step030.archiveAll" default="build">
+	<property file="build.properties" />
+	<taskdef name="custom.createArchive" classname="org.eclipse.scout.releng.ant.archive.CreateArchive" />
+
+	<target name="clean">
+		<delete dir="${buildDataDir}/step030" />
+	</target>
+
+	<target name="build">
+		<available file="${buildDataDir}/step030/output/archives.created" property="skipArchiveAll"/>
+		<antcall target="archiveAll"></antcall>
+		<delete dir="${buildDataDir}/step030/input" failonerror="false" />
+	</target>
+
+	<target name="archiveAll" unless="skipArchiveAll">
+		<antcall target="clean" />
+		<property name="inputFolder" location="${buildDataDir}/step030/input" />
+		<property name="outputFolder" location="${buildDataDir}/step030/output" />
+		<mkdir dir="${inputFolder}"/>
+		<copy todir="${inputFolder}">
+			<fileset dir="${buildDataDir}/step020/output">
+				<include name="**/*"/>
+				<exclude name="*.created"/>
+			</fileset>
+		</copy>
+		<custom.createArchive inputDir="${inputFolder}/rtFeature/features" outputDir="${outputFolder}/rtFeature/features"/>
+		<custom.createArchive inputDir="${inputFolder}/rtFeature/plugins" outputDir="${outputFolder}/rtFeature/plugins"/>
+		<custom.createArchive inputDir="${inputFolder}/rtRapFeature/features" outputDir="${outputFolder}/rtRapFeature/features"/>
+		<custom.createArchive inputDir="${inputFolder}/rtRapFeature/plugins" outputDir="${outputFolder}/rtRapFeature/plugins"/>
+		<custom.createArchive inputDir="${inputFolder}/sdkFeature/features" outputDir="${outputFolder}/sdkFeature/features"/>
+		<custom.createArchive inputDir="${inputFolder}/sdkFeature/plugins" outputDir="${outputFolder}/sdkFeature/plugins"/>
+		<custom.createArchive inputDir="${inputFolder}/sdkRapFeature/features" outputDir="${outputFolder}/sdkRapFeature/features"/>
+		<custom.createArchive inputDir="${inputFolder}/sdkRapFeature/plugins" outputDir="${outputFolder}/sdkRapFeature/plugins"/>
+		<touch file="${outputFolder}/archives.created"></touch>
+	</target>
+</project>

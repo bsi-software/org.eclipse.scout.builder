@@ -1,0 +1,106 @@
+<!--
+   Copyright (c) 2010 BSI Business Systems Integration AG.
+   All rights reserved. This program and the accompanying materials
+   are made available under the terms of the Eclipse Public License v1.0
+   which accompanies this distribution, and is available at
+   http://www.eclipse.org/legal/epl-v10.html
+
+   Contributors:
+       BSI Business Systems Integration AG - initial API and implementation
+ -->
+
+<project name="scout.releng.compositeRepository" default="build">
+	<property environment="env" />
+	<property file="../build.properties" />
+	<property file="./build.properties" />
+
+	<target name="clean">
+		<delete dir="${relengRootDir}/working" />
+	</target>
+
+	<target name="build" depends="clean">
+		<property name="eclipseFileName" value="${3.6_eclipseFileName}" />
+		<property name="eclipseDownloadUrl" value="${3.6_eclipseDownloadUrl}" />
+		<property name="eclipseDeltapackName" value="${3.6_eclipseDeltapackName}" />
+		<property name="eclipseDeltapackUrl" value="${3.6_eclipseDeltapackUrl}" />
+		<property name="pdeBuildPluginVersion" value="${3.6_pdeBuildPluginVersion}" />
+		<property name="equinoxLauncherPluginVersion" value="${3.6_equinoxLauncherPluginVersion}" />
+
+		<condition property="conditionRemoteRepo">
+			 <matches pattern="http.*" string="${repositoryLocation}"/>
+		</condition>
+
+
+		<antcall target="setupEclipse" />
+		<antcall target="download" />
+		<antcall target="compositeRepository" />
+
+	</target>
+
+
+	<target name="compositeRepository">
+		<java classname="org.eclipse.equinox.launcher.Main" fork="true" failonerror="true">
+			<arg line="-application org.eclipse.ant.core.antRunner " />
+			<arg line="-buildfile ${relengRootDir}/buildFiles/compositeRepository/createRepo.xml" />
+			<arg line="-DrelengRootDir=${relengRootDir}" />
+			<arg line="-Djavahome=${env.JAVA_HOME}" />
+			<arg line="-DjavacDebugInfo=true" />
+			<classpath>
+				<pathelement location="${relengRootDir}/working/eclipse/plugins/org.eclipse.equinox.launcher_${equinoxLauncherPluginVersion}.jar" />
+			</classpath>
+		</java>
+	</target>
+
+	<target name="setupEclipse">
+		<mkdir dir="${relengRootDir}/working" />
+		<ant antfile="${buildFileDir}/setupEclipse.xml" target="setupEclipse" />
+	</target>
+
+	<target name="download" >
+		<mkdir dir="${buildDataDir}/compositeRepository" />
+		<antcall target="downloadRemote" />
+		<antcall target="downloadLocal" />
+	</target>
+
+	<target name="downloadRemote" if="conditionRemoteRepo">
+		<get dest="${buildDataDir}/compositeRepository/compositeArtifacts.xml" src="${repositoryLocation}/compositeArtifacts.xml" ignoreerrors="true" />
+		<get dest="${buildDataDir}/compositeRepository/compositeContent.xml" src="${repositoryLocation}/compositeContent.xml" ignoreerrors="true" />
+	</target>
+
+	<target name="downloadLocal" unless="conditionRemoteRepo" >
+		<copy todir="${buildDataDir}/compositeRepository">
+			<fileset dir="${repositoryLocation}">
+				<include name="compositeArtifacts.xml"/>
+				<include name="compositeContent.xml"/>
+			</fileset>
+		</copy>
+	</target>
+
+	<target name="create">
+		<mkdir dir="${repoDir}" />
+		<p2.composite.repository>
+			<repository compressed="false" name="${repoName}" location="${repoDir}" />
+		</p2.composite.repository>
+	</target>
+
+	<target name="add">
+		<p2.composite.repository>
+			<repository compressed="false" location="${repoDir}" />
+			<add>
+				<repository location="${repoName}" />
+			</add>
+		</p2.composite.repository>
+	</target>
+
+	<target name="remove">
+		<p2.composite.repository>
+			<repository compressed="false" location="${repoDir}" />
+			<remove>
+				<repository location="${repoName}" />
+			</remove>
+		</p2.composite.repository>
+	</target>
+
+
+
+</project>

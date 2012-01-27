@@ -1,0 +1,89 @@
+<!--
+   Copyright (c) 2010 BSI Business Systems Integration AG.
+   All rights reserved. This program and the accompanying materials
+   are made available under the terms of the Eclipse Public License v1.0
+   which accompanies this distribution, and is available at
+   http://www.eclipse.org/legal/epl-v10.html
+
+   Contributors:
+       BSI Business Systems Integration AG - initial API and implementation
+ -->
+<!--
+	Downloads the current p2 repository from ${scoutDownloadLocation}/[nightly|[0-9]{1,2}\\.[0-9]{1,2}].
+	In case of a nightly build the downloaded repository will be trunkated to the size of ${nightlyKeepVersions} releases.
+
+	Set ${skipDownloadRepository} property to true to skip this step.
+
+	The output folder (${buildDataDir}/step010/output) is used by step210 and upload.
+-->
+
+<project name="step010.downlaodRepository" default="build">
+	<property file="build.properties" />
+
+	<taskdef name="custom.trunkateReposiory" classname="org.eclipse.scout.releng.ant.TrunkateRepository" />
+
+
+	<target name="clean">
+		<delete dir="${buildDataDir}/step010" />
+	</target>
+
+	<target name="build">
+		<condition property="conditionNightly">
+			<equals arg1="N" arg2="${buildType}" />
+		</condition>
+
+		<condition property="scoutRepositoryLocation" value="${scoutDownloadLocation}/nightly">
+			<equals arg1="N" arg2="${buildType}" />
+		</condition>
+		<condition property="scoutRepositoryLocation" value="${scoutDownloadLocation}/${scoutRepositoryFolder}">
+			<or>
+				<equals arg1="R" arg2="${buildType}" />
+				<equals arg1="S" arg2="${buildType}" />
+			</or>
+		</condition>
+
+		<condition property="conditionSkipDownloadRepository">
+			<or>
+				<not>
+					<available file="${scoutRepositoryLocation}" />
+				</not>
+				<istrue value="${skipDownloadRepository}" />
+			</or>
+		</condition>
+		<available file="${buildDataDir}/step010/output/download.created" property="skipStep010" />
+		<antcall target="setupRepository" />
+	</target>
+
+	<target name="setupRepository" unless="skipStep010">
+		<antcall target="clean" />
+		<mkdir dir="${buildDataDir}/step010/output" />
+		<mkdir dir="${buildDataDir}/step010/output/zip" />
+		<mkdir dir="${buildDataDir}/step010/output/update" />
+
+		<antcall target="downlaodRepository" />
+		<touch file="${buildDataDir}/step010/output/download.created" />
+		<delete dir="${buildDataDir}/step010/input" failonerror="false" />
+	</target>
+
+
+
+
+	<target name="downlaodRepository" unless="conditionSkipDownloadRepository">
+		<echo message="execute target downloadRepository" />
+		<!-- download -->
+		<copy todir="${buildDataDir}/step010/output" overwrite="true">
+			<fileset dir="${scoutRepositoryLocation}">
+				<include name="**/**" />
+				<exclude name="update/content.jar" />
+				<exclude name="update/artifacts.jar" />
+				<exclude name="eclipseVersion.txt" />
+			</fileset>
+		</copy>
+		<antcall target="trunkateRepository" />
+	</target>
+
+	<target name="trunkateRepository" if="conditionNightly">
+		<custom.trunkateReposiory repositoryLocation="${buildDataDir}/step010/output" keep="${nightlyKeepVersions}" />
+	</target>
+
+</project>

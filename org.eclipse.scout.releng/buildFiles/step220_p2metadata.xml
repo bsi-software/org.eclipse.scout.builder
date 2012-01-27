@@ -1,0 +1,67 @@
+<!--
+   Copyright (c) 2010 BSI Business Systems Integration AG.
+   All rights reserved. This program and the accompanying materials
+   are made available under the terms of the Eclipse Public License v1.0
+   which accompanies this distribution, and is available at
+   http://www.eclipse.org/legal/epl-v10.html
+   
+   Contributors:
+       BSI Business Systems Integration AG - initial API and implementation
+ -->
+<!--
+	Creates artifacts.jar and content.jar.  
+	
+	The output folder (${buildDataDir}/step220/output) is used by step230. 
+-->
+
+<project name="step220.p2metadata" default="build">
+	<property file="build.properties" />
+
+
+	<target name="clean">
+		<delete dir="${buildDataDir}/step220" />
+	</target>
+
+	<target name="build">
+		<available file="${buildDataDir}/step220/output/metadata.created" property="skipStep220" />
+		<antcall target="createMetadata" />
+		<delete dir="${buildDataDir}/step220/input" failonerror="false" />
+	</target>
+
+
+	<target name="createMetadata" unless="skipStep220">
+		<antcall target="clean" />
+		<property name="inputFolder" location="${buildDataDir}/step220/input" />
+		<property name="outputFolder" location="${buildDataDir}/step220/output" />
+		<mkdir dir="${inputFolder}" />
+		<copy todir="${inputFolder}">
+			<fileset dir="${buildDataDir}/step210/output">
+				<include name="**/*" />
+				<exclude name="*.created" />
+			</fileset>
+		</copy>
+		<copy todir="${outputFolder}">
+			<fileset dir="${inputFolder}">
+				<include name="**/*" />
+			</fileset>
+		</copy>
+		<!-- create metadata-->
+		<java classname="org.eclipse.equinox.launcher.Main" fork="true" failonerror="true">
+			<arg line="-application org.eclipse.equinox.p2.publisher.FeaturesAndBundlesPublisher" />
+			<arg line="-metadataRepository file:/${outputFolder}" />
+			<arg line="-artifactRepository file:/${outputFolder}" />
+			<arg line="-source ${outputFolder}" />
+			<arg line="-compress" />
+			<arg line="-publishArtifacts" />
+			<arg value="-artifactRepositoryName"/>
+			<arg value="Eclipse Scout Site"/>
+			<arg value="-metadataRepositoryName"/>
+			<arg value="Eclipse Scout Site"/>
+			<classpath>
+				<pathelement location="${relengRootDir}/working/eclipse/plugins/org.eclipse.equinox.launcher_${equinoxLauncherPluginVersion}.jar" />
+			</classpath>
+		</java>
+		<touch file="${outputFolder}/metadata.created" />
+	</target>
+
+</project>

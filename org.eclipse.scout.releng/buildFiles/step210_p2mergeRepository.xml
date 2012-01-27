@@ -1,0 +1,63 @@
+<!--
+   Copyright (c) 2010 BSI Business Systems Integration AG.
+   All rights reserved. This program and the accompanying materials
+   are made available under the terms of the Eclipse Public License v1.0
+   which accompanies this distribution, and is available at
+   http://www.eclipse.org/legal/epl-v10.html
+
+   Contributors:
+       BSI Business Systems Integration AG - initial API and implementation
+ -->
+<!--
+	The new created repository (taken from step200 output folder) and the existing repository
+	(taken from step010 output folder) will be merged to one.
+	${buildDataDir}/step210/output conatins the two folders pugins and features.
+
+	The output folder (${buildDataDir}/step200/output) is used by step220.
+-->
+
+<project name="step210.p2mergeRepository" default="build">
+	<property file="build.properties" />
+
+
+
+	<target name="clean">
+		<delete dir="${buildDataDir}/step210" />
+	</target>
+
+	<target name="build">
+		<available file="${buildDataDir}/step210/output/setupRepository.created" property="skipStep210" />
+		<antcall target="setupRepository" />
+	</target>
+
+	<target name="setupRepository" unless="skipStep210">
+		<antcall target="clean" />
+
+		<mkdir dir="${buildDataDir}/step210/output" />
+		<copy todir="${buildDataDir}/step210/output">
+			<fileset dir="${buildDataDir}/step200/output/rtFeature">
+				<include name="**/*" />
+				<exclude name="*.created" />
+			</fileset>
+			<fileset dir="${buildDataDir}/step200/output/rtRapFeature">
+				<include name="**/*" />
+				<exclude name="*.created" />
+			</fileset>
+			<fileset dir="${buildDataDir}/step200/output/sdkFeature">
+				<include name="**/*" />
+				<exclude name="*.created" />
+			</fileset>
+			<fileset dir="${buildDataDir}/step200/output/sdkRapFeature">
+				<include name="**/*" />
+				<exclude name="*.created" />
+			</fileset>
+			<fileset dir="${buildDataDir}/step010/output/update">
+				<include name="plugins/*" />
+				<include name="features/*" />
+			</fileset>
+		</copy>
+		<touch file="${buildDataDir}/step210/output/setupRepository.created" />
+	</target>
+
+
+</project>

@@ -1,0 +1,68 @@
+<!--
+   Copyright (c) 2010 BSI Business Systems Integration AG.
+   All rights reserved. This program and the accompanying materials
+   are made available under the terms of the Eclipse Public License v1.0
+   which accompanies this distribution, and is available at
+   http://www.eclipse.org/legal/epl-v10.html
+   
+   Contributors:
+       BSI Business Systems Integration AG - initial API and implementation
+ -->
+<!--
+	Categoriezes the repository. Creates a scout.categories file which is used by the p2 categorize task.
+	The category file is only used in this step and will be deleted after categorizing the repository. 
+	
+	The output folder (${buildDataDir}/step230/output) is used by upload. 
+-->
+
+<project name="step230.p2categorize" default="build">
+	<property file="build.properties" />
+	<taskdef name="custom.categoryXml" classname="org.eclipse.scout.releng.ant.category.CategoryTask" />
+
+	<target name="clean">
+		<delete dir="${buildDataDir}/step230" />
+	</target>
+
+	<target name="build">
+		<available file="${buildDataDir}/step230/output/category.created" property="skipStep230" />
+		<antcall target="categorize" />
+		<delete dir="${buildDataDir}/step230/input" failonerror="false" />
+		
+	</target>
+
+
+	<target name="categorize" unless="skipStep230">
+		<antcall target="clean" />
+		<property name="inputFolder" location="${buildDataDir}/step230/input" />
+		<property name="outputFolder" location="${buildDataDir}/step230/output" />
+		<mkdir dir="${inputFolder}" />
+		<copy todir="${inputFolder}">
+			<fileset dir="${buildDataDir}/step220/output">
+				<include name="**/*" />
+				<exclude name="*.created" />
+			</fileset>
+		</copy>
+		<copy todir="${outputFolder}">
+			<fileset dir="${inputFolder}">
+				<include name="**/*" />
+			</fileset>
+		</copy>
+		<!-- create category file -->
+		<custom.categoryXml categoryFile="${outputFolder}/scout.categories" featuresFolder="${outputFolder}/features" />
+		<java classname="org.eclipse.equinox.launcher.Main" fork="true" failonerror="true">
+			<arg line="-application org.eclipse.equinox.p2.publisher.CategoryPublisher" />
+			<arg line="-metadataRepository file:/${outputFolder}" />
+			<arg line="-source ${outputFolder}" />
+			<arg line="-categoryDefinition file:${outputFolder}/scout.categories" />
+			<arg line="-compress" />
+			<arg line="-categoryQualifier" />
+			<classpath>
+				<pathelement location="${relengRootDir}/working/eclipse/plugins/org.eclipse.equinox.launcher_${equinoxLauncherPluginVersion}.jar" />
+			</classpath>
+		</java>
+
+		<delete file="${outputFolder}/scout.categories" />
+		<touch file="${outputFolder}/category.created" />
+	</target>
+
+</project>
