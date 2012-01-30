@@ -282,8 +282,8 @@
       </fileset>
     </copy>
 
-    <!-- replace the patched eclipse plugins (TODO: remove!) -->
-    <property name="rapPluginsDir" value="${workingDir}/eclipse/plugins" />
+    <!-- replace the patched eclipse plugins (no longer needed) -->
+    <!--<property name="rapPluginsDir" value="${workingDir}/eclipse/plugins" />
     <delete>
       <fileset dir="${rapPluginsDir}" includes="org.eclipse.rap.rwt_1.5.*.jar"/>
       <fileset dir="${rapPluginsDir}" includes="org.eclipse.rap.rwt.source_1.5.*.jar"/>
@@ -292,7 +292,7 @@
       <fileset dir="${templateDir}/eclipsePatch">
         <include name="**.jar" />
       </fileset>
-    </copy>
+    </copy>-->
   </target>
 
   <target name="setupBuildWorkspace">
