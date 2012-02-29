@@ -310,7 +310,8 @@
         <include name="org.eclipse.scout.*/**" />
         <include name="org.apache.derby.jdbc*/**" />
         <exclude name="org.eclipse.scout*build*/**" />
-        <exclude name="*feature*/**" />
+        <exclude name="*feature/**" />
+      	<exclude name="*feature.source/**" />
       </fileset>
       <fileset dir="${workspace}/scout.sdk">
         <include name="org.eclipse.scout.*/**" />
@@ -320,6 +321,7 @@
     <copy todir="${inputFeatures}">
       <fileset dir="${workspace}/scout.rt">
         <include name="*scout.*feature*/**" />
+        <exclude name="*scout.*feature.about/**" />
       </fileset>
       <fileset dir="${workspace}/scout.sdk">
         <include name="*scout.*feature*/**" />
