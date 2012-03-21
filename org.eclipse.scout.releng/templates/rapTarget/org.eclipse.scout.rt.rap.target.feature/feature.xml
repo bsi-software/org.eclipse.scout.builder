@@ -29,6 +29,7 @@ BSI Business Systems Integration AG - initial API and implementation
          id="org.eclipse.scout.rt.rap.target"
          download-size="0"
          install-size="0"
-         version="0.0.0"/>
+         version="0.0.0"
+         unpack="false"/>
 
 </feature>

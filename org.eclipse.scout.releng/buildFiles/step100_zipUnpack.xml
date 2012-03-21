@@ -48,6 +48,8 @@
 		<custom.extract inputDir="${inputFolder}/rtFeature/plugins" outputDir="${outputFolder}/rtFeature/plugins"/>
 		<custom.extract inputDir="${inputFolder}/rtRapFeature/features" outputDir="${outputFolder}/rtRapFeature/features"/>
 		<custom.extract inputDir="${inputFolder}/rtRapFeature/plugins" outputDir="${outputFolder}/rtRapFeature/plugins"/>
+		<custom.extract inputDir="${inputFolder}/rtRapTargetFeature/features" outputDir="${outputFolder}/rtRapTargetFeature/features"/>
+		<custom.extract inputDir="${inputFolder}/rtRapTargetFeature/plugins" outputDir="${outputFolder}/rtRapTargetFeature/plugins"/>
 		<custom.extract inputDir="${inputFolder}/sdkFeature/features" outputDir="${outputFolder}/sdkFeature/features"/>
 		<custom.extract inputDir="${inputFolder}/sdkFeature/plugins" outputDir="${outputFolder}/sdkFeature/plugins"/>
 		<custom.extract inputDir="${inputFolder}/sdkRapFeature/features" outputDir="${outputFolder}/sdkRapFeature/features"/>

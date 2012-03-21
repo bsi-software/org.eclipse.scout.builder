@@ -60,9 +60,13 @@
 	</condition>
 
 	<target name="build">
+		<property name="workingDirRap" value="${relengRootDir}/workingRap" />
+		<property name="workingDirNonRap" value="${relengRootDir}/working" />
+
+		
 		<!-- prepare junit test report folders -->
 		<delete dir="${testReportsDir}" failonerror="false" />
-		<mkdir dir="${testReportsDir}"/>
+		<mkdir dir="${testReportsDir}" />
 
 		<!-- run compatibility pre-builds against the defined platform version -->
 		<delete dir="${preBuildDir}" failonerror="false" />
@@ -100,6 +104,18 @@
 		<antcall target="buildVersion">
 			<param name="eclipsePlatformVersion" value="${finalBuildVersion}" />
 		</antcall>
+		
+		<!-- create rap target plugin and feature -->
+		<antcall target="buildRapTarget">
+			<param name="eclipsePlatformVersion" value="${rapTargetEclipseVersion}" />
+		</antcall>
+		
+		<!-- do finalizing (updatesite, pack ...) -->
+		<antcall target="finalBuild">
+			<param name="workingDir" value="${workingDirNonRap}" />
+			<param name="buildDataDir" value="${workingDirNonRap}/buildData" />
+			<param name="eclipsePlatformVersion" value="${rapTargetEclipseVersion}" />
+		</antcall>
 
 		<!-- remove pre-built features again (no longer needed) -->
 		<delete dir="${preBuildDir}" failonerror="false" />
@@ -135,8 +151,6 @@
 	<!-- expects property "eclipsePlatformVersion" -->
 	<target name="buildVersion" depends="clean">
 		<echo message="BUILD USING ECLIPSE VERSION ${eclipsePlatformVersion}" />
-		<property name="workingDirRap" value="${relengRootDir}/workingRap" />
-		<property name="workingDirNonRap" value="${relengRootDir}/working" />
 
 		<!-- extract properties based on current version built -->
 		<propertycopy name="eclipseFileName" from="${eclipsePlatformVersion}_eclipseFileName" />
@@ -159,34 +173,74 @@
 			<param name="buildDataDir" value="${workingDirNonRap}/buildData" />
 		</antcall>
 		<ant antfile="${buildFileDir}/step020_buildFeatures.xml" target="build">
-			<property name="workingDir" value="${workingDirNonRap}"/>
+			<property name="workingDir" value="${workingDirNonRap}" />
 			<property name="buildDataDir" value="${workingDirNonRap}/buildData" />
 		</ant>
 
 		<!-- build RAP RT based on RAP Eclipse in own working dir (only eclipse >= 3.6) -->
-		<if><equals arg1="${eclipsePlatformVersion}" arg2="3.5" /><then></then>
-	 		<else>
-	 			<!-- eclipse RAP runtime requires at least eclipse 3.6: dont build scout rap against eclipse 3.5 -->
-	 			<antcall target="setupEclipse">
+		<if>
+			<equals arg1="${eclipsePlatformVersion}" arg2="3.5" />
+			<then>
+			</then>
+			<else>
+				<!-- eclipse RAP runtime requires at least eclipse 3.6: dont build scout rap against eclipse 3.5 -->
+				<antcall target="setupEclipse">
 					<param name="workingDir" value="${workingDirRap}" />
 					<param name="buildDataDir" value="${workingDirRap}/buildData" />
 				</antcall>
 				<property name="nonRapBuildDataDir" value="${workingDirNonRap}/buildData" />
 				<ant antfile="${buildFileDir}/step020_buildFeatures.xml" target="buildRap">
-					<property name="workingDir" value="${workingDirRap}"/>
+					<property name="workingDir" value="${workingDirRap}" />
 					<property name="buildDataDir" value="${workingDirRap}/buildData" />
 				</ant>
-	 		</else>
+			</else>
 		</if>
+	</target>
+	
+	<target name="buildRapTarget">
+		<echo message="Setting Rap Target Plugin using eclipse ${eclipsePlatformVersion}" />
 
-		<!-- do final build -->
-		<antcall target="finalBuild">
+		<!-- extract properties based on current version built -->
+		<propertycopy name="eclipseFileName" from="${eclipsePlatformVersion}_eclipseFileName" />
+		<propertycopy name="eclipseDownloadUrl" from="${eclipsePlatformVersion}_eclipseDownloadUrl" />
+		<propertycopy name="eclipseRapDownloadUrl" from="${eclipsePlatformVersion}_eclipseRapDownloadUrl" />
+		<propertycopy name="eclipseRapFileName" from="${eclipsePlatformVersion}_eclipseRapFileName" />
+		<propertycopy name="eclipseDeltapackName" from="${eclipsePlatformVersion}_eclipseDeltapackName" />
+		<propertycopy name="eclipseDeltapackUrl" from="${eclipsePlatformVersion}_eclipseDeltapackUrl" />
+		<propertycopy name="pdeBuildPluginVersion" from="${eclipsePlatformVersion}_pdeBuildPluginVersion" />
+		<propertycopy name="equinoxLauncherPluginVersion" from="${eclipsePlatformVersion}_equinoxLauncherPluginVersion" />
+		<propertycopy name="orbitDownloadPluginList" from="${eclipsePlatformVersion}_orbitDownloadPluginList" />
+		<propertycopy name="orbitDropUrl" from="${eclipsePlatformVersion}_orbitDropUrl" />
+		<propertycopy name="eclipseTestFrameworkName" from="${eclipsePlatformVersion}_eclipseTestFrameworkName" />
+		<propertycopy name="eclipseTestFrameworkUrl" from="${eclipsePlatformVersion}_eclipseTestFrameworkUrl" />
+		<propertycopy name="eclipseTestFrameworkSubFolder" from="${eclipsePlatformVersion}_eclipseTestFrameworkSubFolder" />
+			
+		<antcall target="setupEclipse">
 			<param name="workingDir" value="${workingDirNonRap}" />
 			<param name="buildDataDir" value="${workingDirNonRap}/buildData" />
 		</antcall>
+		<ant antfile="${buildFileDir}/step020_buildFeatures.xml" target="buildRapTarget">
+			<property name="workingDir" value="${workingDirNonRap}" />
+			<property name="buildDataDir" value="${workingDirNonRap}/buildData" />
+		</ant>
 	</target>
 
 	<target name="finalBuild" if="doFinalBuild">
+		<!-- extract properties based on current version built -->
+		<propertycopy name="eclipseFileName" from="${eclipsePlatformVersion}_eclipseFileName" />
+		<propertycopy name="eclipseDownloadUrl" from="${eclipsePlatformVersion}_eclipseDownloadUrl" />
+		<propertycopy name="eclipseRapDownloadUrl" from="${eclipsePlatformVersion}_eclipseRapDownloadUrl" />
+		<propertycopy name="eclipseRapFileName" from="${eclipsePlatformVersion}_eclipseRapFileName" />
+		<propertycopy name="eclipseDeltapackName" from="${eclipsePlatformVersion}_eclipseDeltapackName" />
+		<propertycopy name="eclipseDeltapackUrl" from="${eclipsePlatformVersion}_eclipseDeltapackUrl" />
+		<propertycopy name="pdeBuildPluginVersion" from="${eclipsePlatformVersion}_pdeBuildPluginVersion" />
+		<propertycopy name="equinoxLauncherPluginVersion" from="${eclipsePlatformVersion}_equinoxLauncherPluginVersion" />
+		<propertycopy name="orbitDownloadPluginList" from="${eclipsePlatformVersion}_orbitDownloadPluginList" />
+		<propertycopy name="orbitDropUrl" from="${eclipsePlatformVersion}_orbitDropUrl" />
+		<propertycopy name="eclipseTestFrameworkName" from="${eclipsePlatformVersion}_eclipseTestFrameworkName" />
+		<propertycopy name="eclipseTestFrameworkUrl" from="${eclipsePlatformVersion}_eclipseTestFrameworkUrl" />
+		<propertycopy name="eclipseTestFrameworkSubFolder" from="${eclipsePlatformVersion}_eclipseTestFrameworkSubFolder" />
+		
 		<ant antfile="${buildFileDir}/step010_downloadRepository.xml" target="build" />
 		<ant antfile="${buildFileDir}/step030_archiveAll.xml" target="build" />
 		<ant antfile="${buildFileDir}/step050_pack200Normalize.xml" target="build" />
@@ -198,7 +252,7 @@
 		<ant antfile="${buildFileDir}/step220_p2metadata.xml" target="build" />
 		<ant antfile="${buildFileDir}/step230_p2categorize.xml" target="build" />
 		<ant antfile="${buildFileDir}/upload.xml" target="build" />
-		<antcall target="clean"/>
+		<antcall target="clean" />
 	</target>
 
 	<target name="clean" unless="conditionSkipClean">

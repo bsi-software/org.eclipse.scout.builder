@@ -56,6 +56,9 @@
 			<fileset dir="${inputFolder}/sdkFeature">
 				<include name="**/**" />
 			</fileset>
+			<fileset dir="${inputFolder}/rtRapTargetFeature">
+				<include name="**/**" />
+			</fileset>
 			<fileset dir="${inputFolder}/sdkRapFeature">
 				<include name="**/**" />
 			</fileset>
