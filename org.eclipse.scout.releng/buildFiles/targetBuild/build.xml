@@ -1,0 +1,12 @@
+<project name="scout.releng.buildTarget" default="exportTarget">
+	<property environment="env" />
+	<property file="../build.properties" />
+
+	<target name="exportTarget" description="initializes target platform">
+		<echo>Exporting target ${targetfile} to ${destinationdirectory}</echo>
+		<loadfile property="RAPTargetContent" srcFile="${targetfile}" />
+		<echo>Target is ${RAPTargetContent}</echo>
+		<pde.provisionTargetDefinition cleardestination="yes" destinationdirectory="${destinationdirectory}" targetfile="${targetfile}" />
+	</target>
+
+</project>
