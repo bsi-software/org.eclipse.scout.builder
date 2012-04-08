@@ -4,24 +4,26 @@
    are made available under the terms of the Eclipse Public License v1.0
    which accompanies this distribution, and is available at
    http://www.eclipse.org/legal/epl-v10.html
-   
+
    Contributors:
        BSI Business Systems Integration AG - initial API and implementation
  -->
 <!--
-	All jar files getting signed with the Eclipse certificate. The input will be zipped and moved to the 
+	All jar files getting signed with the Eclipse certificate. The input will be zipped and moved to the
 	${signInputFolder}. Then the sign process (external process) is getting started. Since the sign process is async
-	a wait loop waits to receive the signd zip in the ${signOutputFolder}.  
-	
+	a wait loop waits to receive the signd zip in the ${signOutputFolder}.
+
 	Set ${skipSign} property to true to skip this step.
-	
-	The output folder (${buildDataDir}/step060/output) is used by step100 and step200. 
+
+	The output folder (${buildDataDir}/step060/output) is used by step100 and step200.
 -->
 
 <project name="step060.sign" default="build">
+	<property environment="env" />
 	<property file="build.properties" />
 	<taskdef name="waitForFile" classname="org.eclipse.scout.releng.ant.WaitForFile" />
-	
+	<taskdef name="moveSignedFiles" classname="org.eclipse.scout.releng.ant.sign.MoveSignedFiles" />
+
 
 	<target name="clean">
 		<delete dir="${buildDataDir}/step060" />
@@ -31,7 +33,7 @@
 		<condition property="conditionSkipSign">
 			<istrue value="${skipSign}"/>
 		</condition>
-		
+
 		<antcall target="skipSignTask" />
 		<available file="${buildDataDir}/step060/output/sign.created" property="skipStep060" />
 		<antcall target="sign" />
@@ -65,6 +67,14 @@
 				<exclude name="*.created" />
 			</fileset>
 		</copy>
+
+		<!-- skip already signed files (e.g. from orbit) -->
+		<moveSignedFiles outputDir="${outputFolder}">
+			<fileset dir="${inputFolder}" >
+				<include name="**/*.jar" />
+			</fileset>
+		</moveSignedFiles>
+
 		<!-- sign -->
 		<mkdir dir="${signInputFolder}" />
 		<mkdir dir="${signOutputFolder}" />

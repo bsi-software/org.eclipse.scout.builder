@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -26,7 +26,7 @@ import java.net.URI;
 
 /**
  * <h4>FileUtility</h4>
- * 
+ *
  * @author aho
  * @since 1.1.0 (22.01.2011)
  */
@@ -61,7 +61,7 @@ public class FileUtility {
             in.close();
           }
           catch (IOException e) {
-            // void 
+            // void
           }
         }
         if (out != null) {
@@ -69,7 +69,7 @@ public class FileUtility {
             out.close();
           }
           catch (IOException e) {
-            // void 
+            // void
           }
 
         }
@@ -78,11 +78,15 @@ public class FileUtility {
     }
   }
 
+  public static void moveToDir(File input, File inputDir, File outputDir){
+
+  }
+
   public static void copyToDir(File input, File toDir) throws IOException {
     copyToDir(input, toDir, input.getParentFile().getAbsoluteFile().toURI());
   }
 
-  private static void copyToDir(File input, File toDir, URI relPath) throws IOException {
+  public static void copyToDir(File input, File toDir, URI relPath) throws IOException {
     if (input.isDirectory()) {
       for (File f : input.listFiles()) {
         copyToDir(f, toDir, relPath);
@@ -110,7 +114,7 @@ public class FileUtility {
             in.close();
           }
           catch (IOException e) {
-            // void 
+            // void
           }
         }
         if (out != null) {
@@ -118,7 +122,7 @@ public class FileUtility {
             out.close();
           }
           catch (IOException e) {
-            // void 
+            // void
           }
         }
       }
