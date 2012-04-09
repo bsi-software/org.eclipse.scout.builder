@@ -12,7 +12,7 @@
 -->
 <project name="Eclipse Ant Macros">
 
-  <!--
+	<!--
     Launches eclipse and builds the given feature.
     Please note: Feature Build expects that binaries of dependent features are already present.
                  So dependent features are not built automatically, only the plugins of the given features are built.
@@ -29,38 +29,44 @@
 			archivePrefix="myFeature" featureName="org.eclipse.scout.my.feature" buildType="N" pdeBuildPluginVersion="3.7.0.v20110512-1320" />
 
   -->
-  <macrodef name="pde.build.feature" description="Builds the given feature">
-    <attribute name="eclipseBaseDir" />        <!-- The base directory pointing to the eclipse home to use to build the feature. this folder must contain e.g. the "plugins" folder. -->
-    <attribute name="timestamp" />             <!-- The timestamp to use for the build -->
-    <attribute name="archivePrefix" />         <!-- The name of the archive root folder -->
-    <attribute name="featureName" />           <!-- The feature to build -->
-    <attribute name="buildType" />             <!-- The build type (one of N=nightly, S=stable, R=release) -->
-  	<attribute name="pdeBuildPluginVersion" /> <!-- The version of the "org.eclipse.pde.build" plugin to use -->
-    <sequential>
-      <java classname="org.eclipse.equinox.launcher.Main" maxmemory="512m" fork="true" failonerror="true">
-			<arg line="-application org.eclipse.ant.core.antRunner " />
-			<arg line="-buildfile @{eclipseBaseDir}/plugins/org.eclipse.pde.build_@{pdeBuildPluginVersion}/scripts/build.xml" />
-			<arg line="-Dtimestamp=@{timestamp}" />
-			<arg line="-DarchivePrefix=@{archivePrefix}" />
-			<arg line="-DforceContextQualifier=@{timestamp}" />
-			<arg line="-DtopLevelElementId=@{featureName}" />
-			<arg line="-Dbuilder=${buildFileDir}/featureBuild" />
-      		<arg line="-DbaseLocation=@{eclipseBaseDir}" />
-			<arg line="-DrelengRootDir=${relengRootDir}" />
-			<arg line="-Djavahome=${env.JAVA_HOME}" />
-			<arg line="-DIndividualSourceBundles=true" />
-			<arg line="-DbuildType=@{buildType}" />
-			<arg line="-DjavacDebugInfo=true" />
-			<classpath>
-			  <fileset dir="@{eclipseBaseDir}/plugins">
-                <include name="org.eclipse.equinox.launcher_*.jar"/>
-      		  </fileset>
-			</classpath>
-		</java>
-    </sequential>
-  </macrodef>
+	<macrodef name="pde.build.feature" description="Builds the given feature">
+		<attribute name="eclipseBaseDir" />
+		<!-- The base directory pointing to the eclipse home to use to build the feature. this folder must contain e.g. the "plugins" folder. -->
+		<attribute name="timestamp" />
+		<!-- The timestamp to use for the build -->
+		<attribute name="archivePrefix" />
+		<!-- The name of the archive root folder -->
+		<attribute name="featureName" />
+		<!-- The feature to build -->
+		<attribute name="buildType" />
+		<!-- The build type (one of N=nightly, S=stable, R=release) -->
+		<attribute name="pdeBuildPluginVersion" />
+		<!-- The version of the "org.eclipse.pde.build" plugin to use -->
+		<sequential>
+			<java classname="org.eclipse.equinox.launcher.Main" maxmemory="512m" fork="true" failonerror="true">
+				<arg line="-application org.eclipse.ant.core.antRunner " />
+				<arg line="-buildfile @{eclipseBaseDir}/plugins/org.eclipse.pde.build_@{pdeBuildPluginVersion}/scripts/build.xml" />
+				<arg line="-Dtimestamp=@{timestamp}" />
+				<arg line="-DarchivePrefix=@{archivePrefix}" />
+				<arg line="-DforceContextQualifier=@{timestamp}" />
+				<arg line="-DtopLevelElementId=@{featureName}" />
+				<arg line="-Dbuilder=${buildFileDir}/featureBuild" />
+				<arg line="-DbaseLocation=@{eclipseBaseDir}" />
+				<arg line="-DrelengRootDir=${relengRootDir}" />
+				<arg line="-Djavahome=${env.JAVA_HOME}" />
+				<arg line="-DIndividualSourceBundles=true" />
+				<arg line="-DbuildType=@{buildType}" />
+				<arg line="-DjavacDebugInfo=true" />
+				<classpath>
+					<fileset dir="@{eclipseBaseDir}/plugins">
+						<include name="org.eclipse.equinox.launcher_*.jar"/>
+					</fileset>
+				</classpath>
+			</java>
+		</sequential>
+	</macrodef>
 
-  <!--
+	<!--
     Launches eclipse and runs the given test suite.
     Please note: The eclipse is started including UI to ensure all tests can be executed (might contain UI tests)
                  and that the behaviour of eclipse is the same as for the user.
@@ -78,26 +84,56 @@
 			junitReportOutputFile="${workspace}/output/testReports/result.org.eclipse.my.test.plugin.xml" />
 
   -->
-  <macrodef name="pde.launch.test.suite" description="Launches the given test suite in a new eclipse workbenach (with UI)">
-    <attribute name="workspaceBaseDir" />       <!-- The base directory of the workspace to use when running the tests. -->
-    <attribute name="eclipseBaseDir" />         <!-- The base directory pointing to the eclipse home to use to run the tests. this folder must contain e.g. the "plugins" folder. -->
-    <attribute name="testPluginName" />         <!-- The plugin symbolic name that contains the test suite class -->
-    <attribute name="testSuiteClassName" />     <!-- The fully qualified class name of the suite to start -->
-    <attribute name="junitReportOutputFile" />  <!-- The output filename (incl. path) where to store the test results -->
-    <sequential>
-      <java classname="org.eclipse.equinox.launcher.Main" maxmemory="512m" fork="true" failonerror="false">
-			<arg line="-application org.eclipse.test.uitestapplication " />
-			<arg line="-data @{workspaceBaseDir} " />
-			<arg line="formatter=org.apache.tools.ant.taskdefs.optional.junit.XMLJUnitResultFormatter,@{junitReportOutputFile} " />
-			<arg line="-testPluginName @{testPluginName} " />
-			<arg line="-className @{testSuiteClassName} " />
-			<arg line="-nosplash " />
-			<classpath>
-				<fileset dir="@{eclipseBaseDir}/plugins">
-        			<include name="org.eclipse.equinox.launcher_*.jar"/>
-      			</fileset>
-			</classpath>
-		</java>
-    </sequential>
-  </macrodef>
+	<macrodef name="pde.launch.test.suite" description="Launches the given test suite in a new eclipse workbenach (with UI)">
+		<attribute name="workspaceBaseDir" />
+		<!-- The base directory of the workspace to use when running the tests. -->
+		<attribute name="eclipseBaseDir" />
+		<!-- The base directory pointing to the eclipse home to use to run the tests. this folder must contain e.g. the "plugins" folder. -->
+		<attribute name="testPluginName" />
+		<!-- The plugin symbolic name that contains the test suite class -->
+		<attribute name="testSuiteClassName" />
+		<!-- The fully qualified class name of the suite to start -->
+		<attribute name="junitReportOutputFile" />
+		<!-- The output filename (incl. path) where to store the test results -->
+		<sequential>
+			<java classname="org.eclipse.equinox.launcher.Main" maxmemory="512m" fork="true" failonerror="false">
+				<arg line="-application org.eclipse.test.uitestapplication " />
+				<arg line="-data @{workspaceBaseDir} " />
+				<arg line="formatter=org.apache.tools.ant.taskdefs.optional.junit.XMLJUnitResultFormatter,@{junitReportOutputFile} " />
+				<arg line="-testPluginName @{testPluginName} " />
+				<arg line="-className @{testSuiteClassName} " />
+				<arg line="-nosplash " />
+				<classpath>
+					<fileset dir="@{eclipseBaseDir}/plugins">
+						<include name="org.eclipse.equinox.launcher_*.jar"/>
+					</fileset>
+				</classpath>
+			</java>
+		</sequential>
+	</macrodef>
+
+	<!-- property eclipsePlatformVersion must be set -->
+	<macrodef name="extract.platform.properties" description="Extracts properties based on current version built">
+		<sequential>
+			<propertycopy name="eclipseFileName" from="${eclipsePlatformVersion}_eclipseFileName" />
+			<propertycopy name="eclipseDownloadUrl" from="${eclipsePlatformVersion}_eclipseDownloadUrl" />
+			<propertycopy name="eclipseRapDownloadUrl" from="${eclipsePlatformVersion}_eclipseRapDownloadUrl" />
+			<propertycopy name="eclipseRapFileName" from="${eclipsePlatformVersion}_eclipseRapFileName" />
+			<propertycopy name="eclipseDeltapackName" from="${eclipsePlatformVersion}_eclipseDeltapackName" />
+			<propertycopy name="eclipseDeltapackUrl" from="${eclipsePlatformVersion}_eclipseDeltapackUrl" />
+			<propertycopy name="pdeBuildPluginVersion" from="${eclipsePlatformVersion}_pdeBuildPluginVersion" />
+			<propertycopy name="equinoxLauncherPluginVersion" from="${eclipsePlatformVersion}_equinoxLauncherPluginVersion" />
+			<propertycopy name="eclipseTestFrameworkName" from="${eclipsePlatformVersion}_eclipseTestFrameworkName" />
+			<propertycopy name="eclipseTestFrameworkUrl" from="${eclipsePlatformVersion}_eclipseTestFrameworkUrl" />
+			<propertycopy name="eclipseTestFrameworkSubFolder" from="${eclipsePlatformVersion}_eclipseTestFrameworkSubFolder" />
+
+			<propertycopy name="orbitDownloadPluginList" from="${eclipsePlatformVersion}_orbitDownloadPluginList" />
+			<propertycopy name="orbitDropUrl" from="${eclipsePlatformVersion}_orbitDropUrl" />
+			<propertyregex property="orbitDownloadPluginReplaced" input="${orbitDownloadPluginList}" regexp="," replace=",**/" global="true" />
+			<property name="orbitJarPattern" value="**/${orbitDownloadPluginReplaced}" />
+			<propertyregex property="orbitPackPattern" input="${orbitJarPattern}" regexp="jar" replace="jar.pack.gz" global="true" />
+			<propertyregex property="orbitDownloadPackList" input="${orbitDownloadPluginList}" regexp="jar" replace="jar.pack.gz" global="true" />
+		</sequential>
+	</macrodef>
+
 </project>

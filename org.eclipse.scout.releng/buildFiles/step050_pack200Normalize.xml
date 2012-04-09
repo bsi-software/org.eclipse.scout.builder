@@ -16,6 +16,7 @@
 -->
 
 <project name="step050.pack200Normalize" default="build">
+	<property environment="env" />
 	<property file="build.properties" />
 	<taskdef name="repack" classname="org.eclipse.scout.releng.ant.pack200.Repack" />
 
@@ -40,20 +41,19 @@
 				<exclude name="*.created"/>
 			</fileset>
 		</copy>
+		<echo>orbitJarPattern is ${orbitJarPattern}</echo>
+		<echo>exclusion dir is ${workspace}/templates/dropins/eclipse/plugins</echo>
 		<fileset id="jars2pack" dir="${inputFolder}">
 			<include name="**/*.jar" />
 		</fileset>
 
-		<!--
-    	<p200ant repack="true" >
-			<fileset refid="jars2pack" />
-		</p200ant>
-		-->
-		<repack outputDir="${outputFolder}">
-			<fileset refid="jars2pack" />
+		<repack outputDir="${outputFolder}" dropinDir="${templateDir}/dropins/eclipse/plugins">
+			<fileset id="jars2pack" dir="${inputFolder}">
+				<include name="**/*.jar" />
+			</fileset>
 		</repack>
-		<touch file="${outputFolder}/pack200Repack.created" />
 
+		<touch file="${outputFolder}/pack200Repack.created" />
 	</target>
 
 

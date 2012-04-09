@@ -54,10 +54,9 @@
 				<include name="**/*.jar" />
 			</fileset>
 		</custom.removeUnpackSuffix>
-		<custom.pack>
+		<custom.pack dropinDir="${templateDir}/dropins/eclipse/plugins">
 			<fileset dir="${outputFolder}">
-				<include name="**/org.eclipse.scout.*/**" />
-				<include name="**/org.apache.derby.jdbc*/**" />
+				<include name="**/*.jar" />
 			</fileset>
 		</custom.pack>
 		<touch file="${outputFolder}/pack200.created" />

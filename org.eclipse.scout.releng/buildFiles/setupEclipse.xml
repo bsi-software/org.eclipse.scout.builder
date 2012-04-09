@@ -25,70 +25,101 @@
 	<property environment="env" />
 	<property file="build.properties" />
 
-	<target name="setupEclipse" depends="downloadEclipse, downloadRapEclipse, downloadRapIncubator, downloadDeltapack, downloadAllDropins, downloadTestFramework">
+	<target name="setupEclipse" depends="downloadEclipse, downloadRapEclipse, downloadAllDropins">
 		<!-- setup eclipse to the ${workingDir} -->
 		<!-- unzip eclipse and delta pack and copy all dropins -->
 		<delete dir="${workingDir}/eclipse" />
 		<unzip dest="${workingDir}" overwrite="true" src="${downloadDir}/${eclipseFileName}" />
 		<unzip dest="${workingDir}" overwrite="true" src="${downloadDir}/${eclipseDeltapackName}" />
-		<copy todir="${workingDir}" overwrite="true" failonerror="false">
-			<fileset dir="${templateDir}/dropins" />
+		<copy todir="${workingDir}/eclipse/plugins" overwrite="true" failonerror="false">
+			<fileset dir="${templateDir}/dropins/eclipse/plugins"
+				includes="${orbitJarPattern}"
+			/>
 		</copy>
 	</target>
 
 	<target name="downloadAllDropins">
 		<property name="pluginsDir" value="${templateDir}/dropins/eclipse/plugins" />
-		<delete dir="${pluginsDir}" failonerror="false" />
+		<echo>Downloading dropins</echo>
 		<mkdir dir="${pluginsDir}"/>
 		<for list="${orbitDownloadPluginList}" param="plugin">
 			<sequential>
-				<var name="dropinDestPath" value="${pluginsDir}/@{plugin}" />
-				<var name="dropinSrcUrl" value="${orbitDropUrl}/@{plugin}" />
-				<get src="${dropinSrcUrl}" dest="${dropinDestPath}" />
+				<antcall target="downloadIfNotAvailable">
+					<param name="downloadFileDir" value="${pluginsDir}" />
+					<param name="downloadFileDest" value="@{plugin}" />
+					<param name="downloadFileSrc" value="${orbitDropUrl}/@{plugin}" />
+				</antcall>
+			</sequential>
+		</for>
+		<echo>Downloading packed dropins</echo>
+		<for list="${orbitDownloadPackList}" param="plugin">
+			<sequential>
+				<antcall target="downloadIfNotAvailable">
+					<param name="downloadFileDir" value="${pluginsDir}" />
+					<param name="downloadFileDest" value="@{plugin}" />
+					<param name="downloadFileSrc" value="${orbitDropUrl}/@{plugin}" />
+				</antcall>
 			</sequential>
 		</for>
 	</target>
 
-	<target name="downloadEclipse" depends="checkDownloadEclipse" unless="skipDownloadEclipse">
-		<mkdir dir="${downloadDir}" />
-		<get src="${eclipseDownloadUrl}" dest="${downloadDir}/${eclipseFileName}" />
+	<target name="test">
+		<property name="eclipseFileName" value="${3.5_eclipseFileName}"> </property>
+		<property name="eclipseDownloadUrl" value="${3.5_eclipseDownloadUrl}"> </property>
+		<echo>${downloadDir}</echo>
+		<echo>${downloadDir}/${eclipseFileName}</echo>
+
+		<antcall target="downloadIfNotAvailable" >
+			<param name="downloadFileDir" value="${downloadDir}" />
+			<param name="downloadFileName" value="${eclipseFileName}" />
+			<param name="downloadFileSrc" value="${eclipseDownloadUrl}" />
+		</antcall>
 	</target>
 
-	<target name="checkDownloadEclipse">
-		<available file="${downloadDir}/${eclipseFileName}" property="skipDownloadEclipse" />
+	<target name="downloadEclipse">
+		<!-- eclipse zip-->
+		<antcall target="downloadIfNotAvailable">
+			<param name="downloadFileDir" value="${downloadDir}" />
+			<param name="downloadFileDest" value="${eclipseFileName}" />
+			<param name="downloadFileSrc" value="${eclipseDownloadUrl}" />
+		</antcall>
+		<!-- eclipse delta pack-->
+		<antcall target="downloadIfNotAvailable">
+			<param name="downloadFileDir" value="${downloadDir}" />
+			<param name="downloadFileDest" value="${eclipseDeltapackName}" />
+			<param name="downloadFileSrc" value="${eclipseDeltapackUrl}" />
+		</antcall>
+		<!-- test framework-->
+		<antcall target="downloadIfNotAvailable">
+			<param name="downloadFileDir" value="${downloadDir}" />
+			<param name="downloadFileDest" value="${eclipseTestFrameworkName}" />
+			<param name="downloadFileSrc" value="${eclipseTestFrameworkUrl}" />
+		</antcall>
 	</target>
 
-	<target name="downloadRapIncubator" depends="checkDownloadRapIncubator" unless="skipDownloadRapIncubator">
-		<mkdir dir="${downloadDir}" />
-		<get src="${incubatorDownloadUrl}" dest="${downloadDir}/${incubatorFileName}" />
+	<target name="downloadRapEclipse" >
+		<!-- rap eclipse -->
+		<antcall target="downloadIfNotAvailable">
+			<param name="downloadFileDir" value="${downloadDir}" />
+			<param name="downloadFileDest" value="${eclipseRapFileName}" />
+			<param name="downloadFileSrc" value="${eclipseRapDownloadUrl}" />
+		</antcall>
+		<!-- rap incubator -->
+		<echo>Trying to download ${incubatorDownloadUrl}</echo>
+		<antcall target="downloadIfNotAvailable">
+			<param name="downloadFileDir" value="${downloadDir}" />
+			<param name="downloadFileDest" value="${incubatorFileName}" />
+			<param name="downloadFileSrc" value="${incubatorDownloadUrl}" />
+		</antcall>
 	</target>
 
-	<target name="checkDownloadRapIncubator">
-		<available file="${downloadDir}/${incubatorFileName}" property="skipDownloadRapIncubator" />
+	<target name="downloadIfNotAvailable"  depends="checkFileAvailable" unless="skipDownload" >
+		<mkdir dir="${downloadFileDir}" />
+		<get src="${downloadFileSrc}" dest="${downloadFileDir}/${downloadFileDest}" />
 	</target>
 
-	<target name="downloadRapEclipse" depends="checkDownloadRapEclipse" unless="skipDownloadRapEclipse">
-		<mkdir dir="${downloadDir}" />
-		<get src="${eclipseRapDownloadUrl}" dest="${downloadDir}/${eclipseRapFileName}" />
+	<target name="checkFileAvailable">
+		<available file="${downloadFileDir}/${downloadFileDest}" property="skipDownload"/>
 	</target>
 
-	<target name="checkDownloadRapEclipse">
-		<available file="${downloadDir}/${eclipseRapFileName}" property="skipDownloadRapEclipse" />
-	</target>
-
-	<target name="downloadDeltapack" depends="checkDownloadDeltapack" unless="skipDownloadDeltapack">
-		<get src="${eclipseDeltapackUrl}" dest="${downloadDir}/${eclipseDeltapackName}" />
-	</target>
-
-	<target name="checkDownloadDeltapack">
-		<available file="${downloadDir}/${eclipseDeltapackName}" property="skipDownloadDeltapack" />
-	</target>
-
-	<target name="downloadTestFramework" depends="checkDownloadTestFramework" unless="skipDownloadTestFramework">
-		<get src="${eclipseTestFrameworkUrl}" dest="${downloadDir}/${eclipseTestFrameworkName}" />
-	</target>
-
-	<target name="checkDownloadTestFramework">
-		<available file="${downloadDir}/${eclipseTestFrameworkName}" property="skipDownloadTestFramework" />
-	</target>
 </project>
