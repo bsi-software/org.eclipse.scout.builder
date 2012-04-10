@@ -43,6 +43,10 @@
 				<include name="**/*" />
 				<exclude name="*.created" />
 			</fileset>
+			<fileset dir="${buildDataDir}/step200/output/rtRapIncubatorFeature">
+				<include name="**/*" />
+				<exclude name="*.created" />
+			</fileset>
 			<fileset dir="${buildDataDir}/step200/output/rtRapTargetFeature">
 				<include name="**/*" />
 				<exclude name="*.created" />

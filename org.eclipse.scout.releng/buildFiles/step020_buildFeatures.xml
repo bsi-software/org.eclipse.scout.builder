@@ -66,7 +66,7 @@
 		<antcall target="clean" />
 		<antcall target="setupRapBuildWorkspace" />
 		<antcall target="buildScoutRtRapFeature" />
-
+		<antcall target="buildScoutRtRapIncubatorFeature" />
 		<mkdir dir="${buildDataDir}/step020/output" />
 		<touch file="${buildDataDir}/step020/output/features.created" />
 		<delete dir="${buildDataDir}/step020/input" failonerror="false" />
@@ -184,6 +184,17 @@
 		<unzip dest="${nonRapBuildDataDir}/step020/output">
 			<fileset dir="${nonRapBuildDataDir}/step020/input/${buildType}">
 				<include name="org.eclipse.scout.rt.rap.feature-${buildType}.zip" />
+			</fileset>
+		</unzip>
+	</target>
+	
+	<target name="buildScoutRtRapIncubatorFeature" unless="skipScoutRtRapIncubatorFeature">
+		<pde.build.feature eclipseBaseDir="${workingDir}/eclipse" timestamp="${featureTimestamp}" archivePrefix="rtRapIncubatorFeature" featureName="org.eclipse.scout.rt.ui.rap.incubator.filechooser.feature" buildType="${buildType}" pdeBuildPluginVersion="${pdeBuildPluginVersion}" />
+
+		<mkdir dir="${nonRapBuildDataDir}/step020/output" />
+		<unzip dest="${nonRapBuildDataDir}/step020/output">
+			<fileset dir="${nonRapBuildDataDir}/step020/input/${buildType}">
+				<include name="org.eclipse.scout.rt.ui.rap.incubator.filechooser.feature-${buildType}.zip" />
 			</fileset>
 		</unzip>
 	</target>
@@ -393,6 +404,10 @@
 				<exclude name="*feature/**" />
 				<exclude name="*feature.source/**" />
 			</fileset>
+			<fileset dir="${workspace}/scout.rt.incubator">
+				<include name="org.eclipse.scout.*/**" />
+				<exclude name="*feature*/**" />
+			</fileset>
 			<fileset dir="${workspace}/scout.sdk">
 				<include name="org.eclipse.scout.*/**" />
 				<exclude name="*feature*/**" />
@@ -403,49 +418,52 @@
 				<include name="*scout.*feature*/**" />
 				<exclude name="*scout.*feature.about/**" />
 			</fileset>
+			<fileset dir="${workspace}/scout.rt.incubator">
+				<include name="*scout.*feature*/**" />
+			</fileset>
 			<fileset dir="${workspace}/scout.sdk">
 				<include name="*scout.*feature*/**" />
 			</fileset>
 		</copy>
 
-		<!-- rt source template -->
-		<copy todir="${inputFeatures}/org.eclipse.scout.rt.feature.source" failonerror="false">
-			<fileset dir="${relengRootDir}/templates/sourceTemplateFeature">
-				<include name="**" />
-			</fileset>
-		</copy>
-		<replace file="${inputFeatures}/org.eclipse.scout.rt.feature.source/feature.properties" token="%%featureName%%" value="Scout Runtime Source" />
+		<!-- copy source feature templates -->
+		<antcall target="copySourceFeatureTemplate">
+			<param name="featureName" value="Scout Runtime Source"/>
+			<param name="featureId" value="org.eclipse.scout.rt.feature.source"/>
+		</antcall>
+		
+		<antcall target="copySourceFeatureTemplate">
+			<param name="featureName" value="Scout Runtime RAP Source"/>
+			<param name="featureId" value="org.eclipse.scout.rt.rap.feature.source"/>
+		</antcall>
+		
+		<antcall target="copySourceFeatureTemplate">
+			<param name="featureName" value="Scout SDK Source"/>
+			<param name="featureId" value="org.eclipse.scout.sdk.feature.source"/>
+		</antcall>
+		
+		<antcall target="copySourceFeatureTemplate">
+			<param name="featureName" value="Scout SDK RAP Source"/>
+			<param name="featureId" value="org.eclipse.scout.sdk.rap.feature.source"/>
+		</antcall>
+		
+		<antcall target="copySourceFeatureTemplate">
+			<param name="featureName" value="Scout SDK Test Source"/>
+			<param name="featureId" value="org.eclipse.scout.sdk.test.feature.source"/>
+		</antcall>
 
-		<!-- rt rap source template -->
-		<copy todir="${inputFeatures}/org.eclipse.scout.rt.rap.feature.source" failonerror="false">
-			<fileset dir="${relengRootDir}/templates/sourceTemplateFeature">
-				<include name="**" />
-			</fileset>
-		</copy>
-		<replace file="${inputFeatures}/org.eclipse.scout.rt.rap.feature.source/feature.properties" token="%%featureName%%" value="Scout Runtime RAP Source" />
-
-		<!-- sdk source template -->
-		<copy todir="${inputFeatures}/org.eclipse.scout.sdk.feature.source" failonerror="false">
-			<fileset dir="${relengRootDir}/templates/sourceTemplateFeature">
-				<include name="**" />
-			</fileset>
-		</copy>
-		<replace file="${inputFeatures}/org.eclipse.scout.sdk.feature.source/feature.properties" token="%%featureName%%" value="Scout SDK Source" />
-
-		<!-- sdk rap source template -->
-		<copy todir="${inputFeatures}/org.eclipse.scout.sdk.rap.feature.source" failonerror="false">
-			<fileset dir="${relengRootDir}/templates/sourceTemplateFeature">
-				<include name="**" />
-			</fileset>
-		</copy>
-		<replace file="${inputFeatures}/org.eclipse.scout.sdk.rap.feature.source/feature.properties" token="%%featureName%%" value="Scout SDK RAP Source" />
-
-		<!-- sdk test source template -->
-		<copy todir="${inputFeatures}/org.eclipse.scout.sdk.test.feature.source" failonerror="false">
-			<fileset dir="${relengRootDir}/templates/sourceTemplateFeature">
-				<include name="**" />
-			</fileset>
-		</copy>
-		<replace file="${inputFeatures}/org.eclipse.scout.sdk.test.feature.source/feature.properties" token="%%featureName%%" value="Scout SDK Test Source" />
+		<antcall target="copySourceFeatureTemplate">
+			<param name="featureName" value="Scout RT Rap Filedialog (Incubator)"/>
+			<param name="featureId" value="org.eclipse.scout.rt.ui.rap.incubator.filechooser.feature.source"/>
+		</antcall>
 	</target>
+	
+	<!-- expects params: featureId, featureName -->
+	<target name="copySourceFeatureTemplate">
+		<copy todir="${inputFeatures}/${featureId}/" failonerror="false">
+			<fileset dir="${relengRootDir}/templates/sourceTemplateFeature"><include name="**" /></fileset>
+		</copy>
+		<replace file="${inputFeatures}/${featureId}/feature.properties" token="%%featureName%%" value="${featureName}" />		
+	</target>
+	
 </project>

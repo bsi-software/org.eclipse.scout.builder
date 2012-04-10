@@ -45,6 +45,8 @@
 		<custom.createArchive inputDir="${inputFolder}/rtFeature/plugins" outputDir="${outputFolder}/rtFeature/plugins"/>
 		<custom.createArchive inputDir="${inputFolder}/rtRapFeature/features" outputDir="${outputFolder}/rtRapFeature/features"/>
 		<custom.createArchive inputDir="${inputFolder}/rtRapFeature/plugins" outputDir="${outputFolder}/rtRapFeature/plugins"/>
+		<custom.createArchive inputDir="${inputFolder}/rtRapIncubatorFeature/features" outputDir="${outputFolder}/rtRapIncubatorFeature/features"/>
+		<custom.createArchive inputDir="${inputFolder}/rtRapIncubatorFeature/plugins" outputDir="${outputFolder}/rtRapIncubatorFeature/plugins"/>
 		<custom.createArchive inputDir="${inputFolder}/rtRapTargetFeature/features" outputDir="${outputFolder}/rtRapTargetFeature/features"/>
 		<custom.createArchive inputDir="${inputFolder}/rtRapTargetFeature/plugins" outputDir="${outputFolder}/rtRapTargetFeature/plugins"/>
 		<custom.createArchive inputDir="${inputFolder}/sdkFeature/features" outputDir="${outputFolder}/sdkFeature/features"/>
