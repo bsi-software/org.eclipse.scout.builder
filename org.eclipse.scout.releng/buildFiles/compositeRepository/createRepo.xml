@@ -12,7 +12,7 @@
 <project name="scout.releng.compositeRepository" default="build">
 	<property environment="env" />
 	<property file="../build.properties" />
-	<property file="./build.properties" />
+	<!--	<property file="./build.properties" /> -->
 
 	<target name="clean">
 
@@ -31,9 +31,9 @@
 	</target>
 
 	<target name="add" if="conditionAdd">
-		<echo message="do add"></echo>
+		<echo message="Addding repository ${repository} to  ${location}"></echo>
 		<p2.composite.repository>
-			<repository compressed="false" location="file:/${buildDataDir}/compositeRepository" name="${repositoryName}"/>
+			<repository compressed="false" location="${location}" name="Scout"/>
 			<add>
 				<repository location="${repository}" />
 			</add>
@@ -41,9 +41,10 @@
 	</target>
 
 	<target name="remove" if="conditionRemove">
-		<echo message="do remove"></echo>
+		<property name="location" value="file:/${relengRootDir}/working/buildData/compositeRepository"/>
+		<echo message="Removing repository ${repository} to  ${location}"></echo>
 		<p2.composite.repository>
-			<repository compressed="false" location="file:/${buildDataDir}/compositeRepository" name="${repositoryName}" />
+			<repository compressed="false" location="${location}" />
 			<remove>
 				<repository location="${repository}" />
 			</remove>

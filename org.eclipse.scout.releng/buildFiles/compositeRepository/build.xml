@@ -12,19 +12,27 @@
 <project name="scout.releng.compositeRepository" default="build">
 	<property environment="env" />
 	<property file="../build.properties" />
-	<property file="./build.properties" />
+<!--	<property file="./build.properties" /> -->
+	<import file="../macros/eclipse.xml" />
+	<taskdef resource="net/sf/antcontrib/antlib.xml">
+		<classpath>
+			<pathelement location="${buildFileDir}/lib/ant-contrib-1.0b3.jar" />
+		</classpath>
+	</taskdef>
 
 	<target name="clean">
 		<delete dir="${relengRootDir}/working" />
 	</target>
 
 	<target name="build" depends="clean">
-		<property name="eclipseFileName" value="${3.6_eclipseFileName}" />
-		<property name="eclipseDownloadUrl" value="${3.6_eclipseDownloadUrl}" />
-		<property name="eclipseDeltapackName" value="${3.6_eclipseDeltapackName}" />
-		<property name="eclipseDeltapackUrl" value="${3.6_eclipseDeltapackUrl}" />
-		<property name="pdeBuildPluginVersion" value="${3.6_pdeBuildPluginVersion}" />
-		<property name="equinoxLauncherPluginVersion" value="${3.6_equinoxLauncherPluginVersion}" />
+		<property name="workingDir" value="${relengRootDir}/working" />	
+		<property name="buildDataDir" value="${relengRootDir}/working/buildData" />	
+		
+		<property name="eclipsePlatformVersion" value="4.2" />				
+
+		<echo message="BUILD USING ECLIPSE VERSION ${eclipsePlatformVersion}" />
+		<extract.platform.properties />
+
 
 		<condition property="conditionRemoteRepo">
 			 <matches pattern="http.*" string="${repositoryLocation}"/>
@@ -34,7 +42,6 @@
 		<antcall target="setupEclipse" />
 		<antcall target="download" />
 		<antcall target="compositeRepository" />
-
 	</target>
 
 

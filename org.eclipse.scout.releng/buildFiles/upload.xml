@@ -61,7 +61,7 @@
 
 	<target name="prepare.zip">
 		<!-- download zip -->
-		<property name="zipLocation" location="${buildDataDir}/upload/input/${repository}/zip" />
+		<property name="zipLocation" location="${buildDataDir}/upload/input/${repository}/${resultFolder}/zip" />
 		<mkdir dir="${zipLocation}" />
 		<copy todir="${zipLocation}" failonerror="false">
 			<fileset dir="${buildDataDir}/step010/output/zip">
@@ -77,14 +77,13 @@
 
 
 	<target name="prepare.p2">
-		<property name="p2Location" location="${buildDataDir}/upload/input/${repository}/update" />
+		<property name="p2Location" location="${buildDataDir}/upload/input/" />
 		<copy todir="${p2Location}">
-			<fileset dir="${buildDataDir}/step230/output">
+			<fileset dir="${buildDataDir}/step240/output">
 				<include name="**/**" />
 				<exclude name="*.created" />
 			</fileset>
 		</copy>
-
 	</target>
 
 	<target name="createEclipseVersionFile">

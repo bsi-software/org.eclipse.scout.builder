@@ -59,7 +59,7 @@
 				<arg line="-DjavacDebugInfo=true" />
 				<classpath>
 					<fileset dir="@{eclipseBaseDir}/plugins">
-						<include name="org.eclipse.equinox.launcher_*.jar"/>
+						<include name="org.eclipse.equinox.launcher_*.jar" />
 					</fileset>
 				</classpath>
 			</java>
@@ -105,7 +105,7 @@
 				<arg line="-nosplash " />
 				<classpath>
 					<fileset dir="@{eclipseBaseDir}/plugins">
-						<include name="org.eclipse.equinox.launcher_*.jar"/>
+						<include name="org.eclipse.equinox.launcher_*.jar" />
 					</fileset>
 				</classpath>
 			</java>
@@ -133,6 +133,52 @@
 			<property name="orbitJarPattern" value="**/${orbitDownloadPluginReplaced}" />
 			<propertyregex property="orbitPackPattern" input="${orbitJarPattern}" regexp="jar" replace="jar.pack.gz" global="true" />
 			<propertyregex property="orbitDownloadPackList" input="${orbitDownloadPluginList}" regexp="jar" replace="jar.pack.gz" global="true" />
+		</sequential>
+	</macrodef>
+
+	<macrodef name="pde.update.composite" description="Adds a repository to a composite repository">
+		<attribute name="workspaceBaseDir" />
+		<!-- The base directory of the workspace to use when running the tests. -->
+		<attribute name="eclipseBaseDir" />
+		<!-- The base directory pointing to the eclipse home to use to run the tests. this folder must contain e.g. the "plugins" folder. -->
+		<attribute name="testPluginName" />
+		<!-- The plugin symbolic name that contains the test suite class -->
+		<attribute name="testSuiteClassName" />
+		<!-- The fully qualified class name of the suite to start -->
+		<attribute name="junitReportOutputFile" />
+		<!-- The output filename (incl. path) where to store the test results -->
+		<attribute name="mode" />
+		<!-- add or remove -->
+		<sequential>
+			<java classname="org.eclipse.equinox.launcher.Main" fork="true" failonerror="true">
+				<arg line="-application org.eclipse.ant.core.antRunner " />
+				<arg line="-buildfile ${relengRootDir}/buildFiles/compositeRepository/createRepo.xml" />
+				<arg line="-Dmode mode" />
+				<arg line="-DrelengRootDir=${relengRootDir}" />
+				<arg line="-Djavahome=${env.JAVA_HOME}" />
+				<arg line="-DjavacDebugInfo=true" />
+				<classpath>
+					<fileset dir="@{eclipseBaseDir}/plugins">
+						<include name="org.eclipse.equinox.launcher_*.jar" />
+					</fileset>
+				</classpath>
+			</java>
+
+			
+			
+			<java classname="org.eclipse.equinox.launcher.Main" maxmemory="512m" fork="true" failonerror="false">
+				<arg line="-application org.eclipse.test.uitestapplication " />
+				<arg line="-data @{workspaceBaseDir} " />
+				<arg line="formatter=org.apache.tools.ant.taskdefs.optional.junit.XMLJUnitResultFormatter,@{junitReportOutputFile} " />
+				<arg line="-testPluginName @{testPluginName} " />
+				<arg line="-className @{testSuiteClassName} " />
+				<arg line="-nosplash " />
+				<classpath>
+					<fileset dir="@{eclipseBaseDir}/plugins">
+						<include name="org.eclipse.equinox.launcher_*.jar" />
+					</fileset>
+				</classpath>
+			</java>
 		</sequential>
 	</macrodef>
 

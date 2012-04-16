@@ -1,0 +1,82 @@
+<!--
+   Copyright (c) 2010 BSI Business Systems Integration AG.
+   All rights reserved. This program and the accompanying materials
+   are made available under the terms of the Eclipse Public License v1.0
+   which accompanies this distribution, and is available at
+   http://www.eclipse.org/legal/epl-v10.html
+
+   Contributors:
+       BSI Business Systems Integration AG - initial API and implementation
+ -->
+<!--
+
+	Update the composite updatesite
+
+	The output folder (${buildDataDir}/step230/output) is used by upload.
+-->
+
+<project name="step230.p2categorize" default="build">
+	<property environment="env" />
+	<property file="build.properties" />
+
+	<target name="clean">
+		<delete dir="${buildDataDir}/step240" />
+	</target>
+
+	<target name="build">
+		<available file="${buildDataDir}/step240/output/composite.created" property="skipStep240" />
+		<antcall target="createCompositeRepo" />
+		<delete dir="${buildDataDir}/step240/input" failonerror="false" />
+	</target>
+
+
+	<target name="createCompositeRepo" unless="skipStep240">
+		<antcall target="clean" />
+		<property name="inputFolder" location="${buildDataDir}/step240/input" />
+		<property name="outputFolder" location="${buildDataDir}/step240/output" />
+		<mkdir dir="${inputFolder}" />
+		<copy todir="${inputFolder}">
+			<fileset dir="${buildDataDir}/step230/output">
+				<include name="**/*" />
+				<exclude name="*.created" />
+			</fileset>
+		</copy>
+		<copy todir="${outputFolder}/${scoutRepositoryFolder}/${resultFolder}">
+			<fileset dir="${inputFolder}">
+				<include name="**/*" />
+			</fileset>
+		</copy>
+		<!-- create composite repository-->
+		<echo>Creating composite repository</echo>
+		<antcall target="downloadExisting"></antcall>
+		<antcall target="addToCompositeRepository"></antcall>
+		<!-- TODO: create new, if not exists -->
+	    <!-- TODO: trunkate to nightly number-->
+
+		<touch file="${outputFolder}/composite.created" />
+	</target>
+
+	<target name="downloadExisting">
+		<get dest="${buildDataDir}/step240/output/${scoutRepositoryFolder}/compositeArtifacts.xml" src="${repositoryUrl}${scoutRepositoryFolder}/compositeArtifacts.xml" ignoreerrors="true" />
+		<get dest="${buildDataDir}/step240/output/${scoutRepositoryFolder}/compositeContent.xml" src="${repositoryUrl}${scoutRepositoryFolder}/compositeContent.xml" ignoreerrors="true" />
+	</target>
+
+	<target name="addToCompositeRepository">
+		<java classname="org.eclipse.equinox.launcher.Main" fork="true" failonerror="true">
+			<arg line="-application org.eclipse.ant.core.antRunner " />
+			<arg line="-buildfile ${relengRootDir}/buildFiles/compositeRepository/createRepo.xml" />
+			<arg line="-target=add" />
+			<arg line="-DrelengRootDir=${relengRootDir}" />
+			<arg line="-Djavahome=${env.JAVA_HOME}" />
+			<arg line="-DjavacDebugInfo=true" />
+			<arg line="-Dlocation=${buildDataDir}/step240/output/${scoutRepositoryFolder}" />
+			<arg line="-Drepository=${resultFolder}" />
+			<classpath>
+				<fileset dir="${relengRootDir}/working/eclipse/plugins">
+					<include name="org.eclipse.equinox.launcher_*.jar" />
+				</fileset>
+			</classpath>
+		</java>
+	</target>
+
+</project>

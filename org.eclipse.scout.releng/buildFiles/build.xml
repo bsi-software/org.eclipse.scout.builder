@@ -62,9 +62,10 @@
 
 
 	<target name="build">
+		<property name="resultFolder" value="${versionMilestone}${buildTimestamp}" />
+		<echo>Building Scout to repository ${resultFolder}</echo>
 		<property name="workingDirRap" value="${relengRootDir}/workingRap" />
 		<property name="workingDirNonRap" value="${relengRootDir}/working" />
-
 
 		<!-- prepare junit test report folders -->
 		<delete dir="${testReportsDir}" failonerror="false" />
@@ -187,7 +188,7 @@
 
 	<target name="finalBuild" if="doFinalBuild">
 		<extract.platform.properties />
-		<ant antfile="${buildFileDir}/step010_downloadRepository.xml" target="build" />
+	    <ant antfile="${buildFileDir}/step010_downloadRepository.xml" target="build" />
 		<ant antfile="${buildFileDir}/step030_archiveAll.xml" target="build" />
 		<ant antfile="${buildFileDir}/step050_pack200Normalize.xml" target="build" />
 		<ant antfile="${buildFileDir}/step060_sign.xml" target="build" />
@@ -197,8 +198,9 @@
 		<ant antfile="${buildFileDir}/step210_p2mergeRepository.xml" target="build" />
 		<ant antfile="${buildFileDir}/step220_p2metadata.xml" target="build" />
 		<ant antfile="${buildFileDir}/step230_p2categorize.xml" target="build" />
+		<ant antfile="${buildFileDir}/step240_p2updateComposite.xml" target="build" />
 		<ant antfile="${buildFileDir}/upload.xml" target="build" />
-		<antcall target="clean" />
+		<!--	<antcall target="clean" />-->
 	</target>
 
 	<target name="clean" unless="conditionSkipClean">
