@@ -64,6 +64,8 @@
 	<target name="build">
 		<property name="resultFolder" value="${versionMilestone}${buildTimestamp}" />
 		<echo>Building Scout to repository ${resultFolder}</echo>
+	    <antcall target="precheck" />
+
 		<property name="workingDirRap" value="${relengRootDir}/workingRap" />
 		<property name="workingDirNonRap" value="${relengRootDir}/working" />
 
@@ -87,20 +89,8 @@
 			<param name="compatFragmentVersion" value="v38v42" />
 		</antcall>
 
-		<!-- run test builds -->
-		<antcall target="precheck" />
-		<for list="3.5,3.6,3.7,3.8,4.1,4.2" param="version">
-			<sequential>
-				<propertycopy name="skipValidateBuildVersion" from="@{version}_skipValidateBuild" override="true" />
-				<if><equals arg1="${skipValidateBuildVersion}" arg2="true" /><then></then>
-			 		<else>
-			 			<antcall target="buildVersion">
-							<param name="eclipsePlatformVersion" value="@{version}" />
-						</antcall>
-			 		</else>
-				</if>
-			</sequential>
-		</for>
+		<!-- test build builds-->
+		<antcall target="runTestBuilds"/>
 
 		<!-- run final build -->
 		<property name="doFinalBuild" value="true" />
@@ -124,6 +114,21 @@
 		<delete dir="${preBuildDir}" failonerror="false" />
 	</target>
 
+	<target name="runTestBuilds" unless="skipTestBuilds">
+		<!-- test builds against all supported eclipse versions -->
+		<for list="3.5,3.6,3.7,3.8,4.1,4.2" param="version">
+			<sequential>
+				<propertycopy name="skipValidateBuildVersion" from="@{version}_skipValidateBuild" override="true" />
+				<if><equals arg1="${skipValidateBuildVersion}" arg2="true" /><then></then>
+			 		<else>
+			 			<antcall target="buildVersion">
+							<param name="eclipsePlatformVersion" value="@{version}" />
+						</antcall>
+			 		</else>
+				</if>
+			</sequential>
+		</for>
+	</target>
 
 	<!-- expects property "eclipsePlatformVersion" -->
 	<target name="preBuildVersion" depends="clean">
