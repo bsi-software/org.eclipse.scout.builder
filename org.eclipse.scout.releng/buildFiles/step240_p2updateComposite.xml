@@ -34,6 +34,7 @@
 		<antcall target="clean" />
 		<property name="inputFolder" location="${buildDataDir}/step240/input" />
 		<property name="outputFolder" location="${buildDataDir}/step240/output" />
+		<property name="repository" value="${resultFolder}/update"/>
 		<mkdir dir="${inputFolder}" />
 		<copy todir="${inputFolder}">
 			<fileset dir="${buildDataDir}/step230/output">
@@ -41,7 +42,7 @@
 				<exclude name="*.created" />
 			</fileset>
 		</copy>
-		<copy todir="${outputFolder}/${scoutRepositoryFolder}/${resultFolder}">
+		<copy todir="${outputFolder}/${scoutRepositoryFolder}/${repository}">
 			<fileset dir="${inputFolder}">
 				<include name="**/*" />
 			</fileset>
@@ -62,15 +63,16 @@
 	</target>
 
 	<target name="addToCompositeRepository">
+		<property name="mode" value="add"/>
 		<java classname="org.eclipse.equinox.launcher.Main" fork="true" failonerror="true">
 			<arg line="-application org.eclipse.ant.core.antRunner " />
 			<arg line="-buildfile ${relengRootDir}/buildFiles/compositeRepository/createRepo.xml" />
-			<arg line="-target=add" />
 			<arg line="-DrelengRootDir=${relengRootDir}" />
 			<arg line="-Djavahome=${env.JAVA_HOME}" />
 			<arg line="-DjavacDebugInfo=true" />
 			<arg line="-Dlocation=${buildDataDir}/step240/output/${scoutRepositoryFolder}" />
-			<arg line="-Drepository=${resultFolder}" />
+			<arg line="-Drepository=${repository}" />
+			<arg line="-Dmode=${mode}" />
 			<classpath>
 				<fileset dir="${relengRootDir}/working/eclipse/plugins">
 					<include name="org.eclipse.equinox.launcher_*.jar" />
