@@ -89,7 +89,7 @@
 
 		<echo>Creating temporary updatesite for rap rt target</echo>
 		<echo>${equinoxLauncherPluginVersion}</echo>
-		
+
 		<java classname="org.eclipse.equinox.launcher.Main" fork="true" failonerror="true">
 			<arg line="-application org.eclipse.equinox.p2.publisher.FeaturesAndBundlesPublisher" />
 			<arg line="-metadataRepository file:/${buildDataDir}/step020/output/rtRapUpdatesite" />
@@ -187,7 +187,7 @@
 			</fileset>
 		</unzip>
 	</target>
-	
+
 	<target name="buildScoutRtRapIncubatorFeature" unless="skipScoutRtRapIncubatorFeature">
 		<pde.build.feature eclipseBaseDir="${workingDir}/eclipse" timestamp="${featureTimestamp}" archivePrefix="rtRapIncubatorFeature" featureName="org.eclipse.scout.rt.ui.rap.incubator.filechooser.feature" buildType="${buildType}" pdeBuildPluginVersion="${pdeBuildPluginVersion}" />
 
@@ -212,6 +212,18 @@
 			</fileset>
 		</copy>
 
+		<!-- install required features from staging -->
+		<echo>Installing required features from staging </echo>
+		<java classname="org.eclipse.equinox.launcher.Main" fork="true" failonerror="true">
+			<arg line="-application org.eclipse.equinox.p2.director" />
+			<arg line="-repository ${stagingSite}" />
+			<arg line="-destination ${relengRootDir}/working/eclipse" />
+			<arg line="-installIU org.eclipse.wst.ws_ui.feature.feature.jar" />
+			<classpath>
+				<pathelement location="${relengRootDir}/working/eclipse/plugins/org.eclipse.equinox.launcher_${equinoxLauncherPluginVersion}.jar" />
+			</classpath>
+		</java>
+
 		<pde.build.feature eclipseBaseDir="${workingDir}/eclipse" timestamp="${featureTimestamp}" archivePrefix="sdkFeature" featureName="org.eclipse.scout.sdk.feature" buildType="${buildType}" pdeBuildPluginVersion="${pdeBuildPluginVersion}" />
 
 		<mkdir dir="${buildDataDir}/step020/output" />
@@ -221,6 +233,7 @@
 			</fileset>
 		</unzip>
 	</target>
+
 
 	<target name="buildScoutSdkRapFeature" unless="skipSdkRapFeature">
 		<pde.build.feature eclipseBaseDir="${workingDir}/eclipse" timestamp="${featureTimestamp}" archivePrefix="sdkRapFeature" featureName="org.eclipse.scout.sdk.rap.feature" buildType="${buildType}" pdeBuildPluginVersion="${pdeBuildPluginVersion}" />
@@ -243,11 +256,11 @@
 			</fileset>
 		</unzip>
 	</target>
-	
+
 	<target name="buildScoutRtRapTargetFeature">
 	    <pde.build.feature eclipseBaseDir="${workingDir}/eclipse" timestamp="${featureTimestamp}"
-	      archivePrefix="rtRapTargetFeature" featureName="org.eclipse.scout.rt.rap.target.feature" buildType="${buildType}" pdeBuildPluginVersion="${pdeBuildPluginVersion}" 
-	    />	
+	      archivePrefix="rtRapTargetFeature" featureName="org.eclipse.scout.rt.rap.target.feature" buildType="${buildType}" pdeBuildPluginVersion="${pdeBuildPluginVersion}"
+	    />
 
 		<mkdir dir="${buildDataDir}/step020/output" />
 		<unzip dest="${buildDataDir}/step020/output">
@@ -257,7 +270,7 @@
 		</unzip>
 
 	</target>
-	
+
 
 	<target name="testSdk" unless="conditionSkipTestSdk" depends="setupTestWorkspace">
 		<property name="tmpWs" location="${testWorkspace}/ws" />
@@ -306,11 +319,11 @@
 			</fileset>
 		</copy>
 	</target>
-	
+
 	<target name="setupRapTargetBuildWorkspace">
 		<antcall target="exportTarget" />
 	</target>
-	
+
 	<target name="exportTarget" description="initializes target platform">
 			<property name="outputFolder" value="${relengRootDir}/working/buildData/step020/output/target"/>
 			<copy todir="${outputFolder}">
@@ -323,13 +336,13 @@
 			<property name="targetlocation"  value="${targetplugin}/resources"/>
 
 			<echo>replacing qualifier with ${featureTimestamp}</echo>
-			<replace file="${outputFolder}/org.eclipse.scout.rt.rap.target/META-INF/MANIFEST.MF" token="qualifier" value="${featureTimestamp}"/>			
+			<replace file="${outputFolder}/org.eclipse.scout.rt.rap.target/META-INF/MANIFEST.MF" token="qualifier" value="${featureTimestamp}"/>
 			<mkdir dir="${outputFolder}/"/>
 
 		    <echo>replacing local updatesite with ${outputFolder}/rtRapUpdatesite</echo>
-		    <replace file="${outputFolder}/rapStaging.target" token="@@LOCAL_UPDATESITE@@" value="${relengRootDir}/working/buildData/step020/output/rtRapUpdatesite"/>			
+		    <replace file="${outputFolder}/rapStaging.target" token="@@LOCAL_UPDATESITE@@" value="${relengRootDir}/working/buildData/step020/output/rtRapUpdatesite"/>
       	    <replace file="${outputFolder}/rapStaging.target" token="\" value="/"/>
-		
+
 	        <java classname="org.eclipse.equinox.launcher.Main" maxmemory="512m" fork="true" failonerror="true">
 	  			<arg line="-application org.eclipse.ant.core.antRunner " />
 	  			<arg line="-buildfile ${relengRootDir}/buildFiles/targetBuild/build.xml" />
@@ -341,7 +354,7 @@
 	        		  </fileset>
 	  			</classpath>
 	  		</java>
-		
+
 		<copy todir="${relengRootDir}/working/buildData/step020/input/plugins/org.eclipse.scout.rt.rap.target">
 			<fileset dir="${targetplugin}">
 				<include name="**/*"/>
@@ -431,22 +444,22 @@
 			<param name="featureName" value="Scout Runtime Source"/>
 			<param name="featureId" value="org.eclipse.scout.rt.feature.source"/>
 		</antcall>
-		
+
 		<antcall target="copySourceFeatureTemplate">
 			<param name="featureName" value="Scout Runtime RAP Source"/>
 			<param name="featureId" value="org.eclipse.scout.rt.rap.feature.source"/>
 		</antcall>
-		
+
 		<antcall target="copySourceFeatureTemplate">
 			<param name="featureName" value="Scout SDK Source"/>
 			<param name="featureId" value="org.eclipse.scout.sdk.feature.source"/>
 		</antcall>
-		
+
 		<antcall target="copySourceFeatureTemplate">
 			<param name="featureName" value="Scout SDK RAP Source"/>
 			<param name="featureId" value="org.eclipse.scout.sdk.rap.feature.source"/>
 		</antcall>
-		
+
 		<antcall target="copySourceFeatureTemplate">
 			<param name="featureName" value="Scout SDK Test Source"/>
 			<param name="featureId" value="org.eclipse.scout.sdk.test.feature.source"/>
@@ -457,13 +470,13 @@
 			<param name="featureId" value="org.eclipse.scout.rt.ui.rap.incubator.filechooser.feature.source"/>
 		</antcall>
 	</target>
-	
+
 	<!-- expects params: featureId, featureName -->
 	<target name="copySourceFeatureTemplate">
 		<copy todir="${inputFeatures}/${featureId}/" failonerror="false">
 			<fileset dir="${relengRootDir}/templates/sourceTemplateFeature"><include name="**" /></fileset>
 		</copy>
-		<replace file="${inputFeatures}/${featureId}/feature.properties" token="%%featureName%%" value="${featureName}" />		
+		<replace file="${inputFeatures}/${featureId}/feature.properties" token="%%featureName%%" value="${featureName}" />
 	</target>
-	
+
 </project>
