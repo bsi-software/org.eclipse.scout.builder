@@ -15,7 +15,7 @@
 	The output folder (${buildDataDir}/step230/output) is used by upload.
 -->
 
-<project name="step230.p2categorize" default="build">
+<project name="step240.p2updateComposite" default="build">
 	<property environment="env" />
 	<property file="build.properties" />
 
@@ -58,8 +58,8 @@
 	</target>
 
 	<target name="downloadExisting">
-		<get dest="${buildDataDir}/step240/output/${scoutRepositoryFolder}/compositeArtifacts.xml" src="${repositoryUrl}${scoutRepositoryFolder}/compositeArtifacts.xml" ignoreerrors="true" />
-		<get dest="${buildDataDir}/step240/output/${scoutRepositoryFolder}/compositeContent.xml" src="${repositoryUrl}${scoutRepositoryFolder}/compositeContent.xml" ignoreerrors="true" />
+		<get dest="${buildDataDir}/step240/output/${scoutRepositoryFolder}/compositeArtifacts.jar" src="${repositoryUrl}${scoutRepositoryFolder}/compositeArtifacts.jar" ignoreerrors="true" />
+		<get dest="${buildDataDir}/step240/output/${scoutRepositoryFolder}/compositeContent.jar" src="${repositoryUrl}${scoutRepositoryFolder}/compositeContent.jar" ignoreerrors="true" />
 	</target>
 
 	<target name="addToCompositeRepository">
@@ -79,6 +79,10 @@
 				</fileset>
 			</classpath>
 		</java>
+		<zip destfile="${buildDataDir}/step240/output/${scoutRepositoryFolder}/compositeContent.jar" basedir="${buildDataDir}/step240/output/${scoutRepositoryFolder}/"> <include name="compositeContent.xml"/></zip>
+		<zip destfile="${buildDataDir}/step240/output/${scoutRepositoryFolder}/compositeArtifacts.jar" basedir="${buildDataDir}/step240/output/${scoutRepositoryFolder}/"> <include name="compositeArtifacts.xml"/></zip>
+		<delete>
+			<fileset dir="${buildDataDir}/step240/output/${scoutRepositoryFolder}" ><include name="*.xml"/></fileset>
+		</delete>
 	</target>
-
 </project>

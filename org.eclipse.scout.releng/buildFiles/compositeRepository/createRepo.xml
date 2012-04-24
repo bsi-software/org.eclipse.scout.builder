@@ -33,9 +33,9 @@
 	<target name="add" if="conditionAdd">
 		<echo message="Addding repository ${repository} to  ${location}"></echo>
 		<p2.composite.repository>
-			<repository compressed="false" location="${location}" name="Scout"/>
+			<repository compressed="true" location="${location}" name="Scout"/>
 			<add>
-				<repository location="${repository}" />
+				<repository compressed="true" location="${repository}" />
 			</add>
 		</p2.composite.repository>
 	</target>
@@ -44,9 +44,9 @@
 		<property name="location" value="file:/${relengRootDir}/working/buildData/compositeRepository"/>
 		<echo message="Removing repository ${repository} to  ${location}"></echo>
 		<p2.composite.repository>
-			<repository compressed="false" location="${location}" />
+			<repository compressed="true" location="${location}" />
 			<remove>
-				<repository location="${repository}" />
+				<repository compressed="true" location="${repository}" />
 			</remove>
 		</p2.composite.repository>
 	</target>
