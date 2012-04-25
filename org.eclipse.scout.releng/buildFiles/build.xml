@@ -77,6 +77,10 @@
 		<delete dir="${testReportsDir}" failonerror="false" />
 		<mkdir dir="${testReportsDir}" />
 
+		<!-- prepare p2 eclipse setupP2Eclipse-->
+		<property name="p2eclipse" value="${relengRootDir}/p2eclipse"/>
+        <antcall target="setupP2Eclipse" />
+
 		<!-- run compatibility pre-builds against the defined platform version -->
 		<delete dir="${preBuildDir}" failonerror="false" />
 		<mkdir dir="${preBuildDir}" />
@@ -134,6 +138,21 @@
 		</for>
 	</target>
 
+	<!-- Setup an eclipse for creating p2 updatesites with the p2 eclipse version -->
+	<target name="setupP2Eclipse" depends="clean">
+		<property name="eclipsePlatformVersion" value="${p2EclipseVersion}"/>
+		<extract.platform.properties />
+
+		<antcall target="setupEclipse">
+			<param name="workingDir" value="${relengRootDir}/working" />
+			<param name="buildDataDir" value="${relengRootDir}/working/buildData" />
+		</antcall>
+
+		<move todir="${p2eclipse}">
+		    <fileset dir="${relengRootDir}/working/eclipse"/>
+		</move>
+	</target>
+	
 	<!-- expects property "eclipsePlatformVersion" -->
 	<target name="preBuildVersion" depends="clean">
 		<extract.platform.properties />
@@ -216,6 +235,11 @@
 		<echo message="clean working dirs" />
 		<delete failonerror="false" dir="${relengRootDir}/working" />
 		<delete failonerror="false" dir="${relengRootDir}/workingRap" />
+	</target>
+
+	<target name="cleanAll" depends="clean" unless="conditionSkipClean">
+		<echo message="clean working dirs" />
+		<delete failonerror="false" dir="${relengRootDir}/${p2eclipse}" />
 	</target>
 
 	<target name="precheck" depends="checkStaged">
