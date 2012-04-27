@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -33,7 +33,7 @@ import org.w3c.dom.NodeList;
 
 /**
  * <h4>CategoryTask</h4>
- * 
+ *
  * @author aho
  * @since 1.1.0 (27.01.2011)
  */
@@ -41,6 +41,9 @@ public class CategoryTask extends Task {
 
   private File categoryFile;
   private File featuresFolder;
+  private String label = "Scout Application Development";
+  private String name = "Scout";
+
 
   /**
    * @param categoryFile
@@ -72,6 +75,34 @@ public class CategoryTask extends Task {
     return featuresFolder;
   }
 
+  /**
+   * @return the label
+   */
+  public String getLabel() {
+    return label;
+  }
+
+  /**
+   * @param label the label to set
+   */
+  public void setLabel(String label) {
+    this.label = label;
+  }
+
+  /**
+   * @return the name
+   */
+  public String getName() {
+    return name;
+  }
+
+  /**
+   * @param name the name to set
+   */
+  public void setName(String name) {
+    this.name = name;
+  }
+
   @Override
   public void execute() throws BuildException {
     validate();
@@ -87,10 +118,10 @@ public class CategoryTask extends Task {
         }
       }
       Element categoryDef = document.createElement("category-def");
-      categoryDef.setAttribute("name", "Scout");
-      categoryDef.setAttribute("label", "Scout Application Development");
+      categoryDef.setAttribute("name", getName());
+      categoryDef.setAttribute("label", getLabel());
       rootElement.appendChild(categoryDef);
-      
+
       // write document
       writeXmlFile(document);
     }
@@ -98,7 +129,7 @@ public class CategoryTask extends Task {
       throw new BuildException("could not create category file.", e);
     }
   }
-  
+
   private void validate() throws BuildException {
     if(getCategoryFile() == null){
       throw new BuildException("categoryFile must be set.");
@@ -107,7 +138,7 @@ public class CategoryTask extends Task {
       throw new BuildException("featureFolder must be set");
     }
   }
-  
+
   private void addFeature(Document doc, Element site, File feature) throws Exception{
     Element featureElement = doc.createElement("feature");
     featureElement.setAttribute("url", "features/"+feature.getName());
@@ -116,11 +147,11 @@ public class CategoryTask extends Task {
     // category
 
     Element categoryElement = doc.createElement("category");
-    categoryElement.setAttribute("name", "Scout");
+    categoryElement.setAttribute("name", getName());
     featureElement.appendChild(categoryElement);
   }
-  
-  
+
+
   private void fillFeatureIdVersion(File feature, Element featureElement) throws Exception{
     JarFile jar = null;
     try{
@@ -143,7 +174,6 @@ public class CategoryTask extends Task {
     }
   }
   
-
 
 
   private void writeXmlFile(Document document) throws Exception {
