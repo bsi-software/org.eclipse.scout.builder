@@ -104,13 +104,6 @@
 			<param name="downloadFileDest" value="${eclipseRapFileName}" />
 			<param name="downloadFileSrc" value="${eclipseRapDownloadUrl}" />
 		</antcall>
-		<!-- rap incubator -->
-		<echo>Trying to download ${incubatorDownloadUrl}</echo>
-		<antcall target="downloadIfNotAvailable">
-			<param name="downloadFileDir" value="${downloadDir}" />
-			<param name="downloadFileDest" value="${incubatorFileName}" />
-			<param name="downloadFileSrc" value="${incubatorDownloadUrl}" />
-		</antcall>
 	</target>
 
 	<target name="downloadIfNotAvailable"  depends="checkFileAvailable" unless="skipDownload" >
