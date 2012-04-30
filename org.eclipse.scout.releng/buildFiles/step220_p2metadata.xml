@@ -15,6 +15,7 @@
 -->
 
 <project name="step220.p2metadata" default="build">
+	<property environment="env" />
 	<property file="build.properties" />
 
 
@@ -57,6 +58,7 @@
 			<arg value="Eclipse Scout Site"/>
 			<arg value="-metadataRepositoryName"/>
 			<arg value="Eclipse Scout Site"/>
+			<arg line="-reusePack200Files" />
 			<classpath>
 				<pathelement location="${relengRootDir}/working/eclipse/plugins/org.eclipse.equinox.launcher_${equinoxLauncherPluginVersion}.jar" />
 			</classpath>
