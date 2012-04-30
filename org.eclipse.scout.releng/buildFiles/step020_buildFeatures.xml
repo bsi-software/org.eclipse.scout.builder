@@ -189,6 +189,25 @@
 	</target>
 
 	<target name="buildScoutRtRapIncubatorFeature" unless="skipScoutRtRapIncubatorFeature">
+		<echo> Exporting RAP Incubator Feature</echo>
+        <java classname="org.eclipse.equinox.launcher.Main" maxmemory="512m" fork="true" failonerror="true">
+  			<arg line="-application org.eclipse.ant.core.antRunner " />
+  			<arg line="-buildfile ${relengRootDir}/buildFiles/targetBuild/build.xml" />
+  			<arg line="-Ddestinationdirectory=${workingDir}/incubTarget" />
+  			<arg line="-Dtargetfile=${relengRootDir}/templates/rapTarget/rapIncubator.target" />
+  			<classpath>
+  			  <fileset dir="${relengRootDir}/p2eclipse/plugins">
+                  <include name="org.eclipse.equinox.launcher_*.jar"/>
+        		  </fileset>
+  			</classpath>
+  		</java>
+
+		<copy todir="${workingDir}/eclipse" overwrite="true">
+			<fileset dir="${workingDir}/incubTarget">
+				<include name="**/**" />
+			</fileset>
+		</copy>
+
 		<pde.build.feature eclipseBaseDir="${workingDir}/eclipse" timestamp="${featureTimestamp}" archivePrefix="rtRapIncubatorFeature" featureName="org.eclipse.scout.rt.ui.rap.incubator.filechooser.feature" buildType="${buildType}" pdeBuildPluginVersion="${pdeBuildPluginVersion}" />
 
 		<mkdir dir="${nonRapBuildDataDir}/step020/output" />
@@ -213,7 +232,7 @@
 		</copy>
 
 		<!-- install required features from staging -->
-		<echo>Installing required features from staging </echo>
+		<!-- <echo>Installing required features from staging </echo>
 		<java classname="org.eclipse.equinox.launcher.Main" fork="true" failonerror="true">
 			<arg line="-application org.eclipse.equinox.p2.director" />
 			<arg line="-repository ${stagingSite}" />
@@ -223,6 +242,7 @@
 				<pathelement location="${relengRootDir}/working/eclipse/plugins/org.eclipse.equinox.launcher_${equinoxLauncherPluginVersion}.jar" />
 			</classpath>
 		</java>
+		 -->
 
 		<pde.build.feature eclipseBaseDir="${workingDir}/eclipse" timestamp="${featureTimestamp}" archivePrefix="sdkFeature" featureName="org.eclipse.scout.sdk.feature" buildType="${buildType}" pdeBuildPluginVersion="${pdeBuildPluginVersion}" />
 
@@ -374,9 +394,6 @@
 				<include name="**/org.eclipse.rap*.jar" />
 			</patternset>
 		</unzip>
-
-		<!-- unzip RAP Incubator -->
-		<unzip dest="${workingDir}/eclipse" overwrite="true" src="${downloadDir}/${incubatorFileName}" />
 
 		<!-- setup workspace -->
 		<antcall target="setupBuildWorkspace" />

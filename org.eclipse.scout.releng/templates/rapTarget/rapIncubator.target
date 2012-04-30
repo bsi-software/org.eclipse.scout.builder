@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?pde version="3.6"?>
+
+<target name="rapIncubator">
+<locations>
+<location includeAllPlatforms="false" includeMode="slicer" type="InstallableUnit">
+<unit id="org.eclipse.rap.incubator.supplemental.fileupload.feature.feature.group" version="1.5.0.20120220-1720"/>
+<repository location="http://download.eclipse.org/rt/rap/1.5/incubator"/>
+</location>
+</locations>
+</target>
