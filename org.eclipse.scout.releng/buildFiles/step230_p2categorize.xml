@@ -16,6 +16,7 @@
 -->
 
 <project name="step230.p2categorize" default="build">
+	<property environment="env" />
 	<property file="build.properties" />
 	<taskdef name="custom.categoryXml" classname="org.eclipse.scout.releng.ant.category.CategoryTask" />
 
@@ -24,7 +25,7 @@
 	</target>
 
 	<target name="build">
-		<available file="${buildDataDir}/step230/output/category.created" property="skipStep230" />
+	    <available file="${buildDataDir}/step230/output/category.created" property="skipStep230" />
 		<antcall target="categorize" />
 		<delete dir="${buildDataDir}/step230/input" failonerror="false" />
 		
@@ -32,10 +33,14 @@
 
 
 	<target name="categorize" unless="skipStep230">
-		<antcall target="clean" />
-		<property name="inputFolder" location="${buildDataDir}/step230/input" />
+		<echo>${relengRootDir}/working</echo>
+ 		<property name="inputFolder" location="${buildDataDir}/step230/input" />
 		<property name="outputFolder" location="${buildDataDir}/step230/output" />
-		<mkdir dir="${inputFolder}" />
+
+		<antcall target="clean" />
+ 		<property name="inputFolder" location="${buildDataDir}/step230/input" />
+		<property name="outputFolder" location="${buildDataDir}/step230/output" />
+ 		<mkdir dir="${inputFolder}" />
 		<copy todir="${inputFolder}">
 			<fileset dir="${buildDataDir}/step220/output">
 				<include name="**/*" />
@@ -47,8 +52,15 @@
 				<include name="**/*" />
 			</fileset>
 		</copy>
+		<copy todir="${outputFolder}/categorizedFeatures">
+			<fileset dir="${inputFolder}/features">
+				<include name="**/*" />
+				<exclude name="*rt.rap*"/>
+			</fileset>
+		</copy>
+
 		<!-- create category file -->
-		<custom.categoryXml categoryFile="${outputFolder}/scout.categories" featuresFolder="${outputFolder}/features" />
+		<custom.categoryXml categoryFile="${outputFolder}/scout.categories" featuresFolder="${outputFolder}/categorizedFeatures" />
 		<java classname="org.eclipse.equinox.launcher.Main" fork="true" failonerror="true">
 			<arg line="-application org.eclipse.equinox.p2.publisher.CategoryPublisher" />
 			<arg line="-metadataRepository file:/${outputFolder}" />
@@ -61,7 +73,6 @@
 			</classpath>
 		</java>
 
-		<delete file="${outputFolder}/scout.categories" />
 		<touch file="${outputFolder}/category.created" />
 	</target>
 
