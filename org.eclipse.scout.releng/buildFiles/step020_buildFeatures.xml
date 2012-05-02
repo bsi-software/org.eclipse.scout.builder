@@ -190,17 +190,17 @@
 
 	<target name="buildScoutRtRapIncubatorFeature" unless="skipScoutRtRapIncubatorFeature">
 		<echo> Exporting RAP Incubator Feature</echo>
-        <java classname="org.eclipse.equinox.launcher.Main" maxmemory="512m" fork="true" failonerror="true">
-  			<arg line="-application org.eclipse.ant.core.antRunner " />
-  			<arg line="-buildfile ${relengRootDir}/buildFiles/targetBuild/build.xml" />
-  			<arg line="-Ddestinationdirectory=${workingDir}/incubTarget" />
-  			<arg line="-Dtargetfile=${relengRootDir}/templates/rapTarget/rapIncubator.target" />
-  			<classpath>
-  			  <fileset dir="${relengRootDir}/p2eclipse/plugins">
-                  <include name="org.eclipse.equinox.launcher_*.jar"/>
-        		  </fileset>
-  			</classpath>
-  		</java>
+		<java classname="org.eclipse.equinox.launcher.Main" maxmemory="512m" fork="true" failonerror="true">
+			<arg line="-application org.eclipse.ant.core.antRunner " />
+			<arg line="-buildfile ${relengRootDir}/buildFiles/targetBuild/build.xml" />
+			<arg line="-Ddestinationdirectory=${workingDir}/incubTarget" />
+			<arg line="-Dtargetfile=${relengRootDir}/templates/rapTarget/rapIncubator.target" />
+			<classpath>
+				<fileset dir="${relengRootDir}/p2eclipse/plugins">
+					<include name="org.eclipse.equinox.launcher_*.jar"/>
+				</fileset>
+			</classpath>
+		</java>
 
 		<copy todir="${workingDir}/eclipse" overwrite="true">
 			<fileset dir="${workingDir}/incubTarget">
@@ -278,7 +278,7 @@
 	</target>
 
 	<target name="buildScoutRtRapTargetFeature">
-	    <pde.build.feature eclipseBaseDir="${workingDir}/eclipse" timestamp="${featureTimestamp}"
+		<pde.build.feature eclipseBaseDir="${workingDir}/eclipse" timestamp="${featureTimestamp}"
 	      archivePrefix="rtRapTargetFeature" featureName="org.eclipse.scout.rt.rap.target.feature" buildType="${buildType}" pdeBuildPluginVersion="${pdeBuildPluginVersion}"
 	    />
 
@@ -340,60 +340,84 @@
 		</copy>
 	</target>
 
-	<target name="setupRapTargetBuildWorkspace">
-		<antcall target="exportTarget" />
-	</target>
+	<target name="setupRapTargetBuildWorkspace" description="initializes target platform">
 
-	<target name="exportTarget" description="initializes target platform">
-			<property name="outputFolder" value="${relengRootDir}/working/buildData/step020/output/target"/>
-			<copy todir="${outputFolder}">
-				<fileset dir="${relengRootDir}/templates/rapTarget">
-					<include name="**/*"/>
+		<property name="outputFolder" value="${relengRootDir}/working/buildData/step020/output/target" />
+		<copy todir="${outputFolder}">
+			<fileset dir="${relengRootDir}/templates/rapTarget">
+				<include name="**/*" />
+			</fileset>
+		</copy>
+		<property name="targetplugin" value="${outputFolder}/org.eclipse.scout.rt.rap.target" />
+		<property name="targetfeature" value="${outputFolder}/org.eclipse.scout.rt.rap.target.feature" />
+		<property name="targetlocation" value="${targetplugin}/resources" />
+
+		<echo>replacing qualifier with ${featureTimestamp}</echo>
+		<replace file="${outputFolder}/org.eclipse.scout.rt.rap.target/META-INF/MANIFEST.MF" token="qualifier" value="${featureTimestamp}" />
+		<mkdir dir="${outputFolder}/" />
+
+		<echo>replacing local updatesite with ${outputFolder}/rtRapUpdatesite</echo>
+		<replace file="${outputFolder}/scoutTemp.target" token="@@LOCAL_UPDATESITE@@" value="${relengRootDir}/working/buildData/step020/output/rtRapUpdatesite" />
+		<replace file="${outputFolder}/scoutTemp.target" token="\" value="/" />
+
+		<java classname="org.eclipse.equinox.launcher.Main" maxmemory="512m" fork="true" failonerror="true">
+			<arg line="-application org.eclipse.ant.core.antRunner " />
+			<arg line="-buildfile ${relengRootDir}/buildFiles/targetBuild/build.xml" />
+			<arg line="-Ddestinationdirectory=${targetlocation}" />
+			<arg line="-Dtargetfile=${outputFolder}/scoutTemp.target" />
+			<classpath>
+				<fileset dir="${workingDir}/eclipse/plugins">
+					<include name="org.eclipse.equinox.launcher_*.jar" />
 				</fileset>
-			</copy>
-			<property name="targetplugin"  value="${outputFolder}/org.eclipse.scout.rt.rap.target"/>
-	     	<property name="targetfeature"  value="${outputFolder}/org.eclipse.scout.rt.rap.target.feature"/>
-			<property name="targetlocation"  value="${targetplugin}/resources"/>
+			</classpath>
+		</java>
 
-			<echo>replacing qualifier with ${featureTimestamp}</echo>
-			<replace file="${outputFolder}/org.eclipse.scout.rt.rap.target/META-INF/MANIFEST.MF" token="qualifier" value="${featureTimestamp}"/>
-			<mkdir dir="${outputFolder}/"/>
-
-		    <echo>replacing local updatesite with ${outputFolder}/rtRapUpdatesite</echo>
-		    <replace file="${outputFolder}/rapStaging.target" token="@@LOCAL_UPDATESITE@@" value="${relengRootDir}/working/buildData/step020/output/rtRapUpdatesite"/>
-      	    <replace file="${outputFolder}/rapStaging.target" token="\" value="/"/>
-
-	        <java classname="org.eclipse.equinox.launcher.Main" maxmemory="512m" fork="true" failonerror="true">
-	  			<arg line="-application org.eclipse.ant.core.antRunner " />
-	  			<arg line="-buildfile ${relengRootDir}/buildFiles/targetBuild/build.xml" />
-	  			<arg line="-Ddestinationdirectory=${targetlocation}" />
-	  			<arg line="-Dtargetfile=${outputFolder}/rapStaging.target" />
-	  			<classpath>
-	  			  <fileset dir="${workingDir}/eclipse/plugins">
-	                  <include name="org.eclipse.equinox.launcher_*.jar"/>
-	        		  </fileset>
-	  			</classpath>
-	  		</java>
+		<java classname="org.eclipse.equinox.launcher.Main" maxmemory="512m" fork="true" failonerror="true">
+			<arg line="-application org.eclipse.ant.core.antRunner " />
+			<arg line="-buildfile ${relengRootDir}/buildFiles/targetBuild/build.xml" />
+			<arg line="-Ddestinationdirectory=${targetlocation}" />
+			<arg line="-Dtargetfile=${outputFolder}/rapStaging.target" />
+			<classpath>
+				<fileset dir="${workingDir}/eclipse/plugins">
+					<include name="org.eclipse.equinox.launcher_*.jar" />
+				</fileset>
+			</classpath>
+		</java>
 
 		<copy todir="${relengRootDir}/working/buildData/step020/input/plugins/org.eclipse.scout.rt.rap.target">
 			<fileset dir="${targetplugin}">
-				<include name="**/*"/>
+				<include name="**/*" />
+				<exclude name="**/artifacts.jar" />
+				<exclude name="**/content.jar" />
 			</fileset>
 		</copy>
 		<copy todir="${relengRootDir}/working/buildData/step020/input/features/org.eclipse.scout.rt.rap.target.feature">
 			<fileset dir="${targetfeature}">
-				<include name="**/*"/>
+				<include name="**/*" />
 			</fileset>
 		</copy>
-		 </target>
+	</target>
 
 	<target name="setupRapBuildWorkspace">
+		<echo> Exporting RAP RTFeature</echo>
+		<java classname="org.eclipse.equinox.launcher.Main" maxmemory="512m" fork="true" failonerror="true">
+			<arg line="-application org.eclipse.ant.core.antRunner " />
+			<arg line="-buildfile ${relengRootDir}/buildFiles/targetBuild/build.xml" />
+			<arg line="-Ddestinationdirectory=${workingDir}/rapTarget" />
+			<arg line="-Dtargetfile=${relengRootDir}/templates/rapTarget/rapStaging.target" />
+			<classpath>
+				<fileset dir="${relengRootDir}/p2eclipse/plugins">
+					<include name="org.eclipse.equinox.launcher_*.jar"/>
+				</fileset>
+			</classpath>
+		</java>
+
 		<!-- unzip eclipse rap runtime into existing eclipse platform -->
-		<unzip dest="${workingDir}/eclipse" overwrite="true" src="${downloadDir}/${eclipseRapFileName}">
-			<patternset>
+		<copy todir="${workingDir}/eclipse" overwrite="true">
+			<fileset dir="${workingDir}/rapTarget">
 				<include name="**/org.eclipse.rap*.jar" />
-			</patternset>
-		</unzip>
+			</fileset>
+		</copy>
 
 		<!-- setup workspace -->
 		<antcall target="setupBuildWorkspace" />
@@ -491,7 +515,9 @@
 	<!-- expects params: featureId, featureName -->
 	<target name="copySourceFeatureTemplate">
 		<copy todir="${inputFeatures}/${featureId}/" failonerror="false">
-			<fileset dir="${relengRootDir}/templates/sourceTemplateFeature"><include name="**" /></fileset>
+			<fileset dir="${relengRootDir}/templates/sourceTemplateFeature">
+				<include name="**" />
+			</fileset>
 		</copy>
 		<replace file="${inputFeatures}/${featureId}/feature.properties" token="%%featureName%%" value="${featureName}" />
 	</target>

@@ -4,15 +4,15 @@
    are made available under the terms of the Eclipse Public License v1.0
    which accompanies this distribution, and is available at
    http://www.eclipse.org/legal/epl-v10.html
-   
+
    Contributors:
        BSI Business Systems Integration AG - initial API and implementation
  -->
 <!--
 	Categoriezes the repository. Creates a scout.categories file which is used by the p2 categorize task.
-	The category file is only used in this step and will be deleted after categorizing the repository. 
-	
-	The output folder (${buildDataDir}/step230/output) is used by upload. 
+	The category file is only used in this step and will be deleted after categorizing the repository.
+
+	The output folder (${buildDataDir}/step230/output) is used by upload.
 -->
 
 <project name="step230.p2categorize" default="build">
@@ -28,7 +28,7 @@
 	    <available file="${buildDataDir}/step230/output/category.created" property="skipStep230" />
 		<antcall target="categorize" />
 		<delete dir="${buildDataDir}/step230/input" failonerror="false" />
-		
+
 	</target>
 
 
@@ -73,6 +73,10 @@
 				<pathelement location="${relengRootDir}/working/eclipse/plugins/org.eclipse.equinox.launcher_${equinoxLauncherPluginVersion}.jar" />
 			</classpath>
 		</java>
+
+		<delete file="${outputFolder}/scout.categories"/>
+        <delete dir="${outputFolder}/categorizedFeatures"/>
+
 		<touch file="${outputFolder}/category.created" />
 	</target>
 

@@ -25,7 +25,7 @@
 	<property environment="env" />
 	<property file="build.properties" />
 
-	<target name="setupEclipse" depends="downloadEclipse, downloadRapEclipse, downloadAllDropins">
+	<target name="setupEclipse" depends="downloadEclipse, downloadAllDropins">
 		<!-- setup eclipse to the ${workingDir} -->
 		<!-- unzip eclipse and delta pack and copy all dropins -->
 		<delete dir="${workingDir}/eclipse" />
@@ -94,15 +94,6 @@
 			<param name="downloadFileDir" value="${downloadDir}" />
 			<param name="downloadFileDest" value="${eclipseTestFrameworkName}" />
 			<param name="downloadFileSrc" value="${eclipseTestFrameworkUrl}" />
-		</antcall>
-	</target>
-
-	<target name="downloadRapEclipse" >
-		<!-- rap eclipse -->
-		<antcall target="downloadIfNotAvailable">
-			<param name="downloadFileDir" value="${downloadDir}" />
-			<param name="downloadFileDest" value="${eclipseRapFileName}" />
-			<param name="downloadFileSrc" value="${eclipseRapDownloadUrl}" />
 		</antcall>
 	</target>
 

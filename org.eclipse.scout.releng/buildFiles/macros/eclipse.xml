@@ -117,8 +117,6 @@
 		<sequential>
 			<propertycopy name="eclipseFileName" from="${eclipsePlatformVersion}_eclipseFileName" />
 			<propertycopy name="eclipseDownloadUrl" from="${eclipsePlatformVersion}_eclipseDownloadUrl" />
-			<propertycopy name="eclipseRapDownloadUrl" from="${eclipsePlatformVersion}_eclipseRapDownloadUrl" />
-			<propertycopy name="eclipseRapFileName" from="${eclipsePlatformVersion}_eclipseRapFileName" />
 			<propertycopy name="eclipseDeltapackName" from="${eclipsePlatformVersion}_eclipseDeltapackName" />
 			<propertycopy name="eclipseDeltapackUrl" from="${eclipsePlatformVersion}_eclipseDeltapackUrl" />
 			<propertycopy name="pdeBuildPluginVersion" from="${eclipsePlatformVersion}_pdeBuildPluginVersion" />
@@ -164,8 +162,8 @@
 				</classpath>
 			</java>
 
-			
-			
+
+
 			<java classname="org.eclipse.equinox.launcher.Main" maxmemory="512m" fork="true" failonerror="false">
 				<arg line="-application org.eclipse.test.uitestapplication " />
 				<arg line="-data @{workspaceBaseDir} " />
