@@ -1,0 +1,16 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<?compositeMetadataRepository version='1.0.0'?>
+<repository name='Scout Nightly' type='org.eclipse.equinox.internal.p2.metadata.repository.CompositeMetadataRepository' version='1.0.0'>
+  <properties size='1'>
+    <property name='p2.timestamp' value='1335943530267'/>
+  </properties>
+  <children size='5'>
+    <child location='N20120426-1211/update'/>
+    <child location='N20120426-1211/update'/>
+    <child location='N20120426-1911/update'/>
+    <child location='N20120430-0322/update'/>
+    <child location='N20120430-1911/update'/>
+    <child location='N20120501-1911/update'/>
+    <child location='N20120502-0918/update'/>
+  </children>
+</repository>

@@ -18,6 +18,7 @@
 <project name="step240.p2updateComposite" default="build">
 	<property environment="env" />
 	<property file="build.properties" />
+	<taskdef name="custom.truncateComposite" classname="org.eclipse.scout.releng.ant.p2.TruncateCompositeTask" />
 
 	<target name="clean">
 		<delete dir="${buildDataDir}/step240" />
@@ -25,6 +26,8 @@
 
 	<target name="build">
 		<available file="${buildDataDir}/step240/output/composite.created" property="skipStep240" />
+		<condition property="conditionNightly"> <equals arg1="N" arg2="${buildType}" /></condition>
+
 		<antcall target="createCompositeRepo" />
 		<delete dir="${buildDataDir}/step240/input" failonerror="false" />
 	</target>
@@ -50,11 +53,19 @@
 		<!-- create composite repository-->
 		<echo>Creating composite repository</echo>
 		<antcall target="downloadExisting"></antcall>
+		<unzip src="${outputFolder}/${scoutRepositoryFolder}/compositeArtifacts.jar" dest="${outputFolder}/${scoutRepositoryFolder}"/>
+		<unzip src="${outputFolder}/${scoutRepositoryFolder}/compositeContent.jar" dest="${outputFolder}/${scoutRepositoryFolder}"/>
+		<antcall target="truncateComposite"></antcall>
 		<antcall target="addToCompositeRepository"></antcall>
-		<!-- TODO: create new, if not exists -->
-	    <!-- TODO: trunkate to nightly number-->
-
 		<touch file="${outputFolder}/composite.created" />
+	</target>
+
+	<target name="truncateComposite" if="conditionNightly">
+		<echo>Truncating Nightly Repository</echo>
+		<custom.truncateComposite srcFile="${outputFolder}/${scoutRepositoryFolder}/compositeArtifacts.xml" destFile="${outputFolder}/${scoutRepositoryFolder}/compositeArtifacts.xml" size="${nightlyKeepVersions}"/>
+		<custom.truncateComposite srcFile="${outputFolder}/${scoutRepositoryFolder}/compositeContent.xml" destFile="${outputFolder}/${scoutRepositoryFolder}/compositeContent.xml" size="${nightlyKeepVersions}"/>
+		<zip destfile="${buildDataDir}/step240/output/${scoutRepositoryFolder}/compositeContent.jar" basedir="${buildDataDir}/step240/output/${scoutRepositoryFolder}/"> <include name="compositeContent.xml"/></zip>
+		<zip destfile="${buildDataDir}/step240/output/${scoutRepositoryFolder}/compositeArtifacts.jar" basedir="${buildDataDir}/step240/output/${scoutRepositoryFolder}/"> <include name="compositeArtifacts.xml"/></zip>
 	</target>
 
 	<target name="downloadExisting">
