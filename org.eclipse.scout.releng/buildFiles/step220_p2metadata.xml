@@ -17,7 +17,8 @@
 <project name="step220.p2metadata" default="build">
 	<property environment="env" />
 	<property file="build.properties" />
-
+	<taskdef name="custom.mirrorsURL" classname="org.eclipse.scout.releng.ant.p2.MirrorTask" />
+	<taskdef name="custom.statsURI" classname="org.eclipse.scout.releng.ant.p2.StatsTask" />
 
 	<target name="clean">
 		<delete dir="${buildDataDir}/step220" />
@@ -63,6 +64,29 @@
 				<pathelement location="${relengRootDir}/working/eclipse/plugins/org.eclipse.equinox.launcher_${equinoxLauncherPluginVersion}.jar" />
 			</classpath>
 		</java>
+
+		<unjar src="${outputFolder}/artifacts.jar" dest="${outputFolder}"/>
+
+		<!-- add mirrors -->
+		<custom.mirrorsURL
+		artifactsFile="${outputFolder}/artifacts.xml"
+		outputAtrifactsFile="${outputFolder}/artifacts.xml"
+		mirrorsURL="http://www.eclipse.org/downloads/download.php?format=xml&amp;file=/scout/${scoutRepositoryFolder}&amp;format=xml"/>
+
+		<!-- add stats -->
+		<custom.statsURI
+		artifactsFile="${outputFolder}/artifacts.xml"
+		outputAtrifactsFile="${outputFolder}/artifacts.xml"
+		statsURI="http://download.eclipse.org/stats/scout/${scoutRepositoryFolder}"/>
+
+		<!-- zip artifacts-->
+		<zip  destfile="${outputFolder}/artifacts.jar" >
+			<fileset dir="${outputFolder}">
+				<include name="*artifacts.xml"/>
+			</fileset>
+		</zip>
+		<delete file="${outputFolder}/artifacts.xml"/>
+
 		<touch file="${outputFolder}/metadata.created" />
 	</target>
 
