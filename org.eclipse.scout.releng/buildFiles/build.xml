@@ -65,7 +65,7 @@
 	</condition>
 
 
-	<target name="build">
+	<target name="build" depends="cleanAll">
 		<property name="resultFolder" value="${versionMilestone}${buildTimestamp}" />
 		<echo>Building Scout to repository ${resultFolder}</echo>
 	    <antcall target="precheck" />
@@ -152,7 +152,7 @@
 		    <fileset dir="${relengRootDir}/working/eclipse"/>
 		</move>
 	</target>
-	
+
 	<!-- expects property "eclipsePlatformVersion" -->
 	<target name="preBuildVersion" depends="clean">
 		<extract.platform.properties />
@@ -228,7 +228,6 @@
 		<ant antfile="${buildFileDir}/step230_p2categorize.xml" target="build" />
 		<ant antfile="${buildFileDir}/step240_p2updateComposite.xml" target="build" />
 		<ant antfile="${buildFileDir}/upload.xml" target="build" />
-		<antcall target="clean" />
 	</target>
 
 	<target name="clean" unless="conditionSkipClean">
@@ -238,8 +237,7 @@
 	</target>
 
 	<target name="cleanAll" depends="clean" unless="conditionSkipClean">
-		<echo message="clean working dirs" />
-		<delete failonerror="false" dir="${relengRootDir}/${p2eclipse}" />
+		<delete failonerror="false" dir="${relengRootDir}/p2eclipse" />
 	</target>
 
 	<target name="precheck" depends="checkStaged">
