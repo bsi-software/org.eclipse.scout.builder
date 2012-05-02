@@ -55,7 +55,8 @@
 		<copy todir="${outputFolder}/categorizedFeatures">
 			<fileset dir="${inputFolder}/features">
 				<include name="**/*" />
-				<exclude name="*rt.rap*"/>
+				<exclude name="*rt.rap.feature*"/>
+				<exclude name="*rt.ui.rap.incubator*"/>
 			</fileset>
 		</copy>
 
@@ -72,7 +73,6 @@
 				<pathelement location="${relengRootDir}/working/eclipse/plugins/org.eclipse.equinox.launcher_${equinoxLauncherPluginVersion}.jar" />
 			</classpath>
 		</java>
-
 		<touch file="${outputFolder}/category.created" />
 	</target>
 
