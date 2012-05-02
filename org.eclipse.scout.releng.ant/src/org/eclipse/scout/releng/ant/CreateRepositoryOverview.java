@@ -130,6 +130,8 @@ public class CreateRepositoryOverview extends Task {
       rootElement.setAttribute("name", "Scout");
       document.appendChild(rootElement);
       findReleases(document, rootElement);
+      rootElement.appendChild(getLegacyRelease(document));
+      rootElement.appendChild(getStableRelease(document));
       // write xml
       writeXmlFile(document);
     }
@@ -251,6 +253,24 @@ public class CreateRepositoryOverview extends Task {
     }
   }
 
+  private Element getLegacyRelease(Document doc){
+    //TODO remove juno release
+    Element releaseElement = doc.createElement("release");
+    releaseElement.setAttribute("url", rootUrl + "/3.7/update" );
+    releaseElement.setAttribute("version","3.7");
+    releaseElement.setAttribute("eclipseMinVersion", "3.5");
+    releaseElement.setAttribute("eclipseMaxVersion", "3.8");
+    return releaseElement;
+  }
+
+  private Element getStableRelease(Document doc){
+    Element releaseElement = doc.createElement("release");
+    releaseElement.setAttribute("url", rootUrl + "/releases" );
+    releaseElement.setAttribute("eclipseMinVersion", "3.5");
+    releaseElement.setAttribute("eclipseMaxVersion", "4.2");
+    return releaseElement;
+  }
+
   private void validate() throws BuildException {
     if (getRepositoryDir() == null && getUploadDir() == null) {
       throw new BuildException("parameter repositoryDir (Folder) or uploadDir (Folder) must be specified.");
@@ -265,7 +285,9 @@ public class CreateRepositoryOverview extends Task {
 
     @Override
     public boolean accept(File dir, String name) {
-      if (name.matches("([0-9]{1,2}\\.[0-9]{1,2}|nightly|[N0-9]+?)")) {
+//      String relPattern = "([0-9]{1,2}\\.[0-9]{1,2}|nightly|[N0-9]+?)";
+      String relPattern = "(nightly|[N0-9]+?)";
+      if (name.matches(relPattern)) {
         releses.put("z" + name, new ReleaseFile(new File(dir.getAbsoluteFile() + File.separator + name), dir.toURI()));
       }
       return false;
