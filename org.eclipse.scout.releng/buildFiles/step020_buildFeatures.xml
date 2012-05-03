@@ -351,6 +351,7 @@
 		<property name="targetplugin" value="${outputFolder}/org.eclipse.scout.rt.rap.target" />
 		<property name="targetfeature" value="${outputFolder}/org.eclipse.scout.rt.rap.target.feature" />
 		<property name="targetlocation" value="${targetplugin}/resources" />
+		<property name="scoutTarget" value="${outputFolder}/scoutTarget" />
 
 		<echo>replacing qualifier with ${featureTimestamp}</echo>
 		<replace file="${outputFolder}/org.eclipse.scout.rt.rap.target/META-INF/MANIFEST.MF" token="qualifier" value="${featureTimestamp}" />
@@ -363,7 +364,7 @@
 		<java classname="org.eclipse.equinox.launcher.Main" maxmemory="512m" fork="true" failonerror="true">
 			<arg line="-application org.eclipse.ant.core.antRunner " />
 			<arg line="-buildfile ${relengRootDir}/buildFiles/targetBuild/build.xml" />
-			<arg line="-Ddestinationdirectory=${targetlocation}" />
+			<arg line="-Ddestinationdirectory=${scoutTarget}" />
 			<arg line="-Dtargetfile=${outputFolder}/scoutTemp.target" />
 			<classpath>
 				<fileset dir="${workingDir}/eclipse/plugins">
@@ -383,6 +384,12 @@
 				</fileset>
 			</classpath>
 		</java>
+
+		<copy todir="${targetlocation}">
+			<fileset dir="${scoutTarget}">
+				<include name="**/*" />
+			</fileset>
+		</copy>
 
 		<copy todir="${relengRootDir}/working/buildData/step020/input/plugins/org.eclipse.scout.rt.rap.target">
 			<fileset dir="${targetplugin}">
