@@ -130,7 +130,6 @@ public class CreateRepositoryOverview extends Task {
       rootElement.setAttribute("name", "Scout");
       document.appendChild(rootElement);
       findReleases(document, rootElement);
-      rootElement.appendChild(getLegacyRelease(document));
       rootElement.appendChild(getStableRelease(document));
       // write xml
       writeXmlFile(document);
@@ -253,18 +252,9 @@ public class CreateRepositoryOverview extends Task {
     }
   }
 
-  private Element getLegacyRelease(Document doc){
-    //TODO remove juno release
-    Element releaseElement = doc.createElement("release");
-    releaseElement.setAttribute("url", rootUrl + "/3.7/update" );
-    releaseElement.setAttribute("version","3.7");
-    releaseElement.setAttribute("eclipseMinVersion", "3.5");
-    releaseElement.setAttribute("eclipseMaxVersion", "3.8");
-    return releaseElement;
-  }
-
   private Element getStableRelease(Document doc){
     Element releaseElement = doc.createElement("release");
+    releaseElement.setAttribute("version", "Current Release");
     releaseElement.setAttribute("url", rootUrl + "/releases" );
     releaseElement.setAttribute("eclipseMinVersion", "3.5");
     releaseElement.setAttribute("eclipseMaxVersion", "4.2");
