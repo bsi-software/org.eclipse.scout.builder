@@ -1,3 +1,4 @@
+#!/bin/sh
 workingDir=/home/data/httpd/download.eclipse.org/scout
 stagingArea=$workingDir/stagingArea
 repositoriesDir=$workingDir
@@ -32,33 +33,37 @@ processZipFile()
             cp -r $repositoriesDir/$d $repositoriesDir/$d""_backup
           fi
           # copy new repository
-          cp -f $repositoriesDir/$d""_new/*.xml $repositoriesDir/$d
+          cp -f $repositoriesDir/$d""_new/*.jar $repositoriesDir/$d
           cp -rf $repositoriesDir/$d""_new/N* $repositoriesDir/$d
           rm -rf $repositoriesDir/$d""_new
         fi
      done
 
       ## remove old nightly repositories that are not contained in the composite updateiste
-      cd $workingDir/nightly
-      for sub in N*
-      do
-        if [ -d "$sub" ]; then
-          if ! (grep -q "$sub" compositeContent.xml);
-            then
-             echo "$sub is not contained in composite. Removing..";
-             rm -rf $sub
-          fi
-        fi
-      done
+       cd $workingDir/nightly
+       unzip compositeContent.jar
+       for sub in N*
+       do
+         if [ -d "$sub" ]; then
+           if ! (grep -q "$sub" compositeContent.xml);
+             then
+              echo "$sub is not contained in composite. Removing..";
+              rm -rf $sub
+           fi
+         fi
+       done
+     rm compositeContent.xml
+     cd $stagingArea/working
 
      #cleanup stagingArea
-     cp -n $stagingArea/working/* $repositoriesDir/
+     cp  $stagingArea/working/*.xml $repositoriesDir/
      rm -rf $stagingArea/working
     cd $backupDir
   else
     echo "md5 not valid for $zipFile!"
   fi
 }
+
 
 if [ -f $stagingArea/$stageTriggerFileName ]; then
   backupDir=$(pwd)
