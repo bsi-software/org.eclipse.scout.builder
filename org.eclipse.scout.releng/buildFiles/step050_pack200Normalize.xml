@@ -50,8 +50,16 @@
 		<repack outputDir="${outputFolder}" dropinDir="${templateDir}/dropins/eclipse/plugins">
 			<fileset id="jars2pack" dir="${inputFolder}">
 				<include name="**/*.jar" />
+				<exclude name="**/plugins/org.eclipse.scout.rt.rap.target*.jar" />
 			</fileset>
 		</repack>
+
+		<copy todir="${outputFolder}/rtRapTargetFeature/plugins">
+			<fileset dir="${inputFolder}/rtRapTargetFeature/plugins">
+				<include name="**/*" />
+			</fileset>
+		</copy>
+
 
 		<touch file="${outputFolder}/pack200Repack.created" />
 	</target>
