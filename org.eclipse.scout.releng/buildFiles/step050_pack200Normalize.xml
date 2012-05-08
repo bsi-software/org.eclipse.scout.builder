@@ -54,8 +54,8 @@
 			</fileset>
 		</repack>
 
-		<copy todir="${outputFolder}/rapTargetFeature/plugins">
-			<fileset dir="${inputFolder}/plugins">
+		<copy todir="${outputFolder}/rtRapTargetFeature/plugins">
+			<fileset dir="${inputFolder}/rtRapTargetFeature/plugins">
 				<include name="**/*" />
 			</fileset>
 		</copy>
