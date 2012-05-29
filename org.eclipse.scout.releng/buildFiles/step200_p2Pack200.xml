@@ -57,7 +57,7 @@
 		<custom.pack dropinDir="${templateDir}/dropins/eclipse/plugins">
 			<fileset dir="${outputFolder}">
 				<include name="**/*.jar" />
-				<exclude name="**/plugins/org.eclipse.scout.rt.rap.target*.jar" />
+<!--				<exclude name="**/plugins/org.eclipse.scout.rt.rap.target*.jar" /> -->
 			</fileset>
 		</custom.pack>
 		<touch file="${outputFolder}/pack200.created" />
