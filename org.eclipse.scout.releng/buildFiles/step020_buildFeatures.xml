@@ -20,6 +20,9 @@
 	<property environment="env" />
 	<property file="build.properties" />
 	<import file="${basedir}/macros/eclipse.xml" />
+	<taskdef name="waitForFile" classname="org.eclipse.scout.releng.ant.WaitForFile" />
+	<taskdef name="moveSignedFiles" classname="org.eclipse.scout.releng.ant.sign.MoveSignedFiles" />
+
 
 	<target name="clean">
 		<delete dir="${buildDataDir}/step020" />
