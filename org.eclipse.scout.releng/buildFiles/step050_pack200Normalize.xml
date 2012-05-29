@@ -50,7 +50,7 @@
 		<repack outputDir="${outputFolder}" dropinDir="${templateDir}/dropins/eclipse/plugins">
 			<fileset id="jars2pack" dir="${inputFolder}">
 				<include name="**/*.jar" />
-				<exclude name="**/plugins/org.eclipse.scout.rt.rap.target*.jar" />
+<!--				<exclude name="**/plugins/org.eclipse.scout.rt.rap.target*.jar" /> -->
 			</fileset>
 		</repack>
 
