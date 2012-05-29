@@ -404,7 +404,7 @@
 		<mkdir dir="${signOutputFolder}" />
 
 		<zip destfile="${signInputFolder}/sign.zip">
-			<fileset dir="${inputFolder}">
+			<fileset dir="${scoutTarget}">
 				<include name="**/**" />
 			</fileset>
 		</zip>
