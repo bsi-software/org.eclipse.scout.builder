@@ -352,6 +352,7 @@
 		<property name="targetfeature" value="${outputFolder}/org.eclipse.scout.rt.rap.target.feature" />
 		<property name="targetlocation" value="${targetplugin}/resources" />
 		<property name="scoutTarget" value="${outputFolder}/scoutTarget" />
+		<property name="scoutTargetSigned" value="${outputFolder}/scoutTargetSigned" />
 
 		<echo>replacing qualifier with ${featureTimestamp}</echo>
 		<replace file="${outputFolder}/org.eclipse.scout.rt.rap.target/META-INF/MANIFEST.MF" token="qualifier" value="${featureTimestamp}" />
@@ -384,6 +385,34 @@
 				</fileset>
 			</classpath>
 		</java>
+
+		<!-- skip already signed files (e.g. from orbit) -->
+		<mkdir dir="${scoutTargetSigned}" />
+		<moveSignedFiles outputDir="${scoutTargetSigned}">
+			<fileset dir="${scoutTarget}" >
+				<include name="**/*.jar" />
+			</fileset>
+		</moveSignedFiles>
+
+		<!--sign files in ${scoutTarget} -->
+		<delete dir="${signInputFolder}" />
+		<delete dir="${signOutputFolder}" />
+		<mkdir dir="${signInputFolder}" />
+		<mkdir dir="${signOutputFolder}" />
+
+		<zip destfile="${signInputFolder}/sign.zip">
+			<fileset dir="${inputFolder}">
+				<include name="**/**" />
+			</fileset>
+		</zip>
+		<exec executable="sign" failifexecutionfails="no">
+			<arg value="${signInputFolder}/sign.zip" />
+			<arg value="nomail" />
+			<arg value="${signOutputFolder}" />
+		</exec>
+		<waitForFile file="${signOutputFolder}/sign.zip" maxMinutes="30" maxSecounds="0" pollSecounds="10"/>
+		<mkdir dir="${scoutTargetSigned}"/>
+		<unzip dest="${scoutTargetSigned}" src="${signOutputFolder}/sign.zip" />
 
 		<copy todir="${targetlocation}">
 			<fileset dir="${scoutTarget}">
