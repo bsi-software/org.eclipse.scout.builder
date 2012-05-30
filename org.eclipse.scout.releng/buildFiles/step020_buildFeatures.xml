@@ -389,7 +389,36 @@
 			</classpath>
 		</java>
 
+		<condition property="conditionSkipSign">
+			<istrue value="${skipSign}"/>
+		</condition>
+		<antcall target="skipSign" />
+		<antcall target="sign" />
+
+		<copy todir="${targetlocation}">
+			<fileset dir="${scoutTargetSigned}">
+				<include name="**/*" />
+			</fileset>
+		</copy>
+
+		<copy todir="${relengRootDir}/working/buildData/step020/input/plugins/org.eclipse.scout.rt.rap.target">
+			<fileset dir="${targetplugin}">
+				<include name="**/*" />
+				<exclude name="**/artifacts.jar" />
+				<exclude name="**/content.jar" />
+			</fileset>
+		</copy>
+		<copy todir="${relengRootDir}/working/buildData/step020/input/features/org.eclipse.scout.rt.rap.target.feature">
+			<fileset dir="${targetfeature}">
+				<include name="**/*" />
+			</fileset>
+		</copy>
+	</target>
+
+	<!-- sign nested jars separately-->
+	<target name="sign" unless="conditionSkipSign">
 		<!-- skip already signed files (e.g. from orbit) -->
+		<delete dir="${scoutTargetSigned}" />
 		<mkdir dir="${scoutTargetSigned}" />
 		<moveSignedFiles outputDir="${scoutTargetSigned}">
 			<fileset dir="${scoutTarget}" >
@@ -408,6 +437,8 @@
 				<include name="**/**" />
 			</fileset>
 		</zip>
+		<!--sign -->
+		<echo> sign</echo>
 		<exec executable="sign" failifexecutionfails="no">
 			<arg value="${signInputFolder}/sign.zip" />
 			<arg value="nomail" />
@@ -416,22 +447,15 @@
 		<waitForFile file="${signOutputFolder}/sign.zip" maxMinutes="30" maxSecounds="0" pollSecounds="10"/>
 		<mkdir dir="${scoutTargetSigned}"/>
 		<unzip dest="${scoutTargetSigned}" src="${signOutputFolder}/sign.zip" />
+	</target>
 
-		<copy todir="${targetlocation}">
+	<target name="skipSign" if="conditionSkipSign">
+		<echo message="skip sign" />
+		<delete dir="${scoutTargetSigned}" />
+		<mkdir dir="${scoutTargetSigned}" />
+
+		<copy todir="${scoutTargetSigned}">
 			<fileset dir="${scoutTarget}">
-				<include name="**/*" />
-			</fileset>
-		</copy>
-
-		<copy todir="${relengRootDir}/working/buildData/step020/input/plugins/org.eclipse.scout.rt.rap.target">
-			<fileset dir="${targetplugin}">
-				<include name="**/*" />
-				<exclude name="**/artifacts.jar" />
-				<exclude name="**/content.jar" />
-			</fileset>
-		</copy>
-		<copy todir="${relengRootDir}/working/buildData/step020/input/features/org.eclipse.scout.rt.rap.target.feature">
-			<fileset dir="${targetfeature}">
 				<include name="**/*" />
 			</fileset>
 		</copy>
