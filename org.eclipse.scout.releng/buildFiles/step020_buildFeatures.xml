@@ -570,7 +570,7 @@
 		</antcall>
 
 		<antcall target="copySourceFeatureTemplate">
-			<param name="featureName" value="Scout RT Rap Filedialog (Incubator)"/>
+			<param name="featureName" value="Scout RAP Filechooser (Incubaton) Source"/>
 			<param name="featureId" value="org.eclipse.scout.rt.ui.rap.incubator.filechooser.feature.source"/>
 		</antcall>
 	</target>
