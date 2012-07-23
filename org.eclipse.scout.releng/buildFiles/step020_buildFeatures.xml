@@ -562,6 +562,11 @@
     </antcall>
 
     <antcall target="copySourceFeatureTemplate">
+      <param name="featureName" value="Scout Runtime Testing Source"/>
+      <param name="featureId" value="org.eclipse.scout.rt.testing.feature.source"/>
+    </antcall>
+
+    <antcall target="copySourceFeatureTemplate">
       <param name="featureName" value="Scout Runtime RAP Source"/>
       <param name="featureId" value="org.eclipse.scout.rt.rap.feature.source"/>
     </antcall>
