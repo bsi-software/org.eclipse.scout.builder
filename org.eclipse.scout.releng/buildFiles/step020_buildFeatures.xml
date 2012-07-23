@@ -17,572 +17,584 @@
 -->
 
 <project name="step020.buildFeatures" default="build">
-	<property environment="env" />
-	<property file="build.properties" />
-	<import file="${basedir}/macros/eclipse.xml" />
-	<taskdef name="waitForFile" classname="org.eclipse.scout.releng.ant.WaitForFile" />
-	<taskdef name="moveSignedFiles" classname="org.eclipse.scout.releng.ant.sign.MoveSignedFiles" />
-
-
-	<target name="clean">
-		<delete dir="${buildDataDir}/step020" />
-		<mkdir dir="${buildDataDir}/step020" />
-	</target>
-
-	<target name="build">
-		<available file="${buildDataDir}/step020/output/features.created" property="skipCreateFeatures" />
-		<condition property="conditionSkipTestSdk">
-			<istrue value="${skipTestSdk}" />
-		</condition>
-		<antcall target="createFeatures" />
-	</target>
-
-	<target name="buildRap">
-		<available file="${buildDataDir}/step020/output/features.created" property="skipCreateFeatures" />
-		<antcall target="createRapFeatures" />
-	</target>
-
-	<target name="buildRapTarget">
-		<available file="${buildDataDir}/step020/output/features.created" property="skipCreateFeatures" />
-		<antcall target="createRapTargetFeatures" />
-	</target>
-
-	<target name="preBuild">
-		<antcall target="clean" />
-		<antcall target="setupBuildWorkspace" />
-		<antcall target="createCompatFragments" />
-	</target>
-
-
-	<target name="createRapTargetFeatures" unless="skipCreateRapFeatures">
-		<antcall target="createRapRTUpdateSite" />
-		<antcall target="setupRapTargetBuildWorkspace" />
-		<antcall target="buildScoutRtRapTargetFeature" />
-
-		<mkdir dir="${buildDataDir}/step020/output" />
-		<touch file="${buildDataDir}/step020/output/features.created" />
-		<delete dir="${buildDataDir}/step020/input" failonerror="false" />
-		<delete dir="${nonRapBuildInputDir}" failonerror="false" />
-	</target>
-
-	<target name="createRapFeatures" unless="skipCreateRapFeatures">
-		<antcall target="clean" />
-		<antcall target="setupRapBuildWorkspace" />
-		<antcall target="buildScoutRtRapFeature" />
-		<antcall target="buildScoutRtRapIncubatorFeature" />
-		<mkdir dir="${buildDataDir}/step020/output" />
-		<touch file="${buildDataDir}/step020/output/features.created" />
-		<delete dir="${buildDataDir}/step020/input" failonerror="false" />
-		<delete dir="${nonRapBuildInputDir}" failonerror="false" />
-	</target>
-
-	<target name="createRapRTUpdateSite">
-		<echo>Creating temporary updatesite for rap rt target</echo>
-		<mkdir dir="${buildDataDir}/step020/output/rtRapUpdatesiteSource" />
-		<mkdir dir="${buildDataDir}/step020/output/rtRapUpdatesite" />
-
-		<copy todir="${buildDataDir}/step020/output/rtRapUpdatesiteSource" failonerror="false">
-			<fileset dir="${buildDataDir}/step020/output/rtRapFeature">
-				<include name="**" />
-			</fileset>
-			<fileset dir="${buildDataDir}/step020/output/rtFeature">
-				<include name="**" />
-			</fileset>
-		</copy>
-
-		<echo>Creating temporary updatesite for rap rt target</echo>
-		<echo>${equinoxLauncherPluginVersion}</echo>
-
-		<java classname="org.eclipse.equinox.launcher.Main" fork="true" failonerror="true">
-			<arg line="-application org.eclipse.equinox.p2.publisher.FeaturesAndBundlesPublisher" />
-			<arg line="-metadataRepository file:/${buildDataDir}/step020/output/rtRapUpdatesite" />
-			<arg line="-artifactRepository file:/${buildDataDir}/step020/output/rtRapUpdatesite" />
-			<arg line="-source ${buildDataDir}/step020/output/rtRapUpdatesiteSource" />
-			<arg line="-compress" />
-			<arg line="-publishArtifacts" />
-			<arg value="-artifactRepositoryName" />
-			<arg value="Eclipse Scout TEMP" />
-			<arg value="-metadataRepositoryName" />
-			<arg value="Eclipse Scout TEMP" />
-			<classpath>
-				<pathelement location="${relengRootDir}/working/eclipse/plugins/org.eclipse.equinox.launcher_${equinoxLauncherPluginVersion}.jar" />
-			</classpath>
-		</java>
-	</target>
-
-	<target name="createFeatures" unless="skipCreateFeatures">
-		<antcall target="clean" />
-		<antcall target="setupBuildWorkspace" />
-		<antcall target="buildScoutRtFeature" />
-		<antcall target="buildScoutSdkFeature" />
-		<antcall target="buildScoutSdkRapFeature" />
-		<antcall target="buildScoutSdkTestFeature" />
-		<antcall target="testSdk" />
-		<touch file="${buildDataDir}/step020/output/features.created" />
-		<delete dir="${buildDataDir}/step020/input" failonerror="false" />
-	</target>
-
-	<target name="createCompatFragments">
-		<property name="preBuildFragmentName" value="org.eclipse.scout.sdk.compatibility.${compatFragmentVersion}.fragment" />
-		<property name="preBuildFeatureName" value="${preBuildFragmentName}.feature" />
-
-		<!-- temp pre build feature -->
-		<property name="preBuildFeatureFolder" value="${buildDataDir}/step020/input/features/${preBuildFeatureName}" />
-		<mkdir dir="${preBuildFeatureFolder}" />
-		<copy todir="${preBuildFeatureFolder}" failonerror="false">
-			<fileset dir="${relengRootDir}/templates/templateFeature">
-				<include name="**" />
-			</fileset>
-		</copy>
-		<replace file="${preBuildFeatureFolder}/build.properties" token="%%preBuildFeatureName%%" value="${preBuildFeatureName}" />
-		<replace file="${preBuildFeatureFolder}/feature.xml" token="%%preBuildFeatureName%%" value="${preBuildFeatureName}" />
-		<replace file="${preBuildFeatureFolder}/feature.xml" token="%%preBuildFragmentName%%" value="${preBuildFragmentName}" />
-
-		<!-- temp pre build source feature -->
-		<property name="preBuildSourceFeatureFolder" value="${preBuildFeatureFolder}.source" />
-		<mkdir dir="${preBuildSourceFeatureFolder}" />
-		<copy todir="${preBuildSourceFeatureFolder}" failonerror="false">
-			<fileset dir="${relengRootDir}/templates/sourceTemplateFeature">
-				<include name="**" />
-			</fileset>
-		</copy>
-		<replace file="${preBuildSourceFeatureFolder}/feature.properties" token="%%featureName%%" value="Temp Compatibility Source Feature" />
-
-
-		<!-- start build -->
-		<pde.build.feature eclipseBaseDir="${workingDir}/eclipse" timestamp="${featureTimestamp}" archivePrefix="sdkPreBuiltFeature" featureName="${preBuildFeatureName}" buildType="${buildType}" pdeBuildPluginVersion="${pdeBuildPluginVersion}" />
-
-		<!-- unzip the feature -->
-		<unzip dest="${buildDataDir}/step020/output">
-			<fileset dir="${buildDataDir}/step020/input/${buildType}">
-				<include name="${preBuildFeatureName}-${buildType}.zip" />
-			</fileset>
-		</unzip>
-
-		<!-- store the pre built compatibility fragment for later use -->
-		<copy todir="${preBuildDir}">
-			<fileset dir="${buildDataDir}/step020/output/sdkPreBuiltFeature/plugins">
-				<include name="**/*${preBuildFragmentName}*.jar" />
-			</fileset>
-		</copy>
-
-		<antcall target="clean" />
-	</target>
-
-	<target name="buildScoutRtFeature" unless="skipRtFeature">
-		<pde.build.feature eclipseBaseDir="${workingDir}/eclipse" timestamp="${featureTimestamp}" archivePrefix="rtFeature" featureName="org.eclipse.scout.rt.feature" buildType="${buildType}" pdeBuildPluginVersion="${pdeBuildPluginVersion}" />
-
-		<mkdir dir="${buildDataDir}/step020/output" />
-		<unzip dest="${buildDataDir}/step020/output">
-			<fileset dir="${buildDataDir}/step020/input/${buildType}">
-				<include name="org.eclipse.scout.rt.feature-${buildType}.zip" />
-			</fileset>
-		</unzip>
-	</target>
-
-	<target name="buildScoutRtRapFeature" unless="skipRtRapFeature">
-		<pde.build.feature eclipseBaseDir="${workingDir}/eclipse" timestamp="${featureTimestamp}" archivePrefix="rtRapFeature" featureName="org.eclipse.scout.rt.rap.feature" buildType="${buildType}" pdeBuildPluginVersion="${pdeBuildPluginVersion}" />
-
-		<mkdir dir="${nonRapBuildDataDir}/step020/output" />
-		<unzip dest="${nonRapBuildDataDir}/step020/output">
-			<fileset dir="${nonRapBuildDataDir}/step020/input/${buildType}">
-				<include name="org.eclipse.scout.rt.rap.feature-${buildType}.zip" />
-			</fileset>
-		</unzip>
-	</target>
-
-	<target name="buildScoutRtRapIncubatorFeature" unless="skipScoutRtRapIncubatorFeature">
-		<echo> Exporting RAP Incubator Feature</echo>
-		<java classname="org.eclipse.equinox.launcher.Main" maxmemory="512m" fork="true" failonerror="true">
-			<arg line="-application org.eclipse.ant.core.antRunner " />
-			<arg line="-buildfile ${relengRootDir}/buildFiles/targetBuild/build.xml" />
-			<arg line="-Ddestinationdirectory=${workingDir}/incubTarget" />
-			<arg line="-Dtargetfile=${relengRootDir}/templates/rapTarget/rapIncubator.target" />
-			<classpath>
-				<fileset dir="${relengRootDir}/p2eclipse/plugins">
-					<include name="org.eclipse.equinox.launcher_*.jar"/>
-				</fileset>
-			</classpath>
-		</java>
-
-		<copy todir="${workingDir}/eclipse" overwrite="true">
-			<fileset dir="${workingDir}/incubTarget">
-				<include name="**/**" />
-			</fileset>
-		</copy>
-
-		<pde.build.feature eclipseBaseDir="${workingDir}/eclipse" timestamp="${featureTimestamp}" archivePrefix="rtRapIncubatorFeature" featureName="org.eclipse.scout.rt.ui.rap.incubator.filechooser.feature" buildType="${buildType}" pdeBuildPluginVersion="${pdeBuildPluginVersion}" />
-
-		<mkdir dir="${nonRapBuildDataDir}/step020/output" />
-		<unzip dest="${nonRapBuildDataDir}/step020/output">
-			<fileset dir="${nonRapBuildDataDir}/step020/input/${buildType}">
-				<include name="org.eclipse.scout.rt.ui.rap.incubator.filechooser.feature-${buildType}.zip" />
-			</fileset>
-		</unzip>
-	</target>
-
-	<target name="buildScoutSdkFeature" unless="skipSdkFeature">
-		<!-- first delete all compat fragment sources. these have been prebuild against the correct platform: copy the pre-built version into the platform -->
-		<delete includeemptydirs="true">
-			<fileset dir="${buildDataDir}/step020/input/plugins">
-				<include name="**/org.eclipse.scout.sdk.compatibility.*.fragment/**" />
-			</fileset>
-		</delete>
-		<copy todir="${workingDir}/eclipse/plugins">
-			<fileset dir="${preBuildDir}">
-				<include name="**/**.jar" />
-			</fileset>
-		</copy>
-
-		<!-- install required features from staging -->
-		<!-- <echo>Installing required features from staging </echo>
-		<java classname="org.eclipse.equinox.launcher.Main" fork="true" failonerror="true">
-			<arg line="-application org.eclipse.equinox.p2.director" />
-			<arg line="-repository ${stagingSite}" />
-			<arg line="-destination ${relengRootDir}/working/eclipse" />
-			<arg line="-installIU org.eclipse.wst.ws_ui.feature.feature.jar" />
-			<classpath>
-				<pathelement location="${relengRootDir}/working/eclipse/plugins/org.eclipse.equinox.launcher_${equinoxLauncherPluginVersion}.jar" />
-			</classpath>
-		</java>
-		 -->
-
-		<pde.build.feature eclipseBaseDir="${workingDir}/eclipse" timestamp="${featureTimestamp}" archivePrefix="sdkFeature" featureName="org.eclipse.scout.sdk.feature" buildType="${buildType}" pdeBuildPluginVersion="${pdeBuildPluginVersion}" />
-
-		<mkdir dir="${buildDataDir}/step020/output" />
-		<unzip dest="${buildDataDir}/step020/output">
-			<fileset dir="${buildDataDir}/step020/input/${buildType}">
-				<include name="org.eclipse.scout.sdk.feature-${buildType}.zip" />
-			</fileset>
-		</unzip>
-	</target>
-
-
-	<target name="buildScoutSdkRapFeature" unless="skipSdkRapFeature">
-		<pde.build.feature eclipseBaseDir="${workingDir}/eclipse" timestamp="${featureTimestamp}" archivePrefix="sdkRapFeature" featureName="org.eclipse.scout.sdk.rap.feature" buildType="${buildType}" pdeBuildPluginVersion="${pdeBuildPluginVersion}" />
-
-		<mkdir dir="${buildDataDir}/step020/output" />
-		<unzip dest="${buildDataDir}/step020/output">
-			<fileset dir="${buildDataDir}/step020/input/${buildType}">
-				<include name="org.eclipse.scout.sdk.rap.feature-${buildType}.zip" />
-			</fileset>
-		</unzip>
-	</target>
-
-	<target name="buildScoutSdkTestFeature" unless="skipSdkFeature">
-		<pde.build.feature eclipseBaseDir="${workingDir}/eclipse" timestamp="${featureTimestamp}" archivePrefix="sdkTestFeature" featureName="org.eclipse.scout.sdk.test.feature" buildType="${buildType}" pdeBuildPluginVersion="${pdeBuildPluginVersion}" />
-
-		<mkdir dir="${buildDataDir}/step020/output" />
-		<unzip dest="${buildDataDir}/step020/output">
-			<fileset dir="${buildDataDir}/step020/input/${buildType}">
-				<include name="org.eclipse.scout.sdk.test.feature-${buildType}.zip" />
-			</fileset>
-		</unzip>
-	</target>
-
-	<target name="buildScoutRtRapTargetFeature">
-		<pde.build.feature eclipseBaseDir="${workingDir}/eclipse" timestamp="${featureTimestamp}"
-	      archivePrefix="rtRapTargetFeature" featureName="org.eclipse.scout.rt.rap.target.feature" buildType="${buildType}" pdeBuildPluginVersion="${pdeBuildPluginVersion}"
-	    />
-
-		<mkdir dir="${buildDataDir}/step020/output" />
-		<unzip dest="${buildDataDir}/step020/output">
-			<fileset dir="${buildDataDir}/step020/input/${buildType}">
-				<include name="org.eclipse.scout.rt.rap.target.feature-${buildType}.zip" />
-			</fileset>
-		</unzip>
-
-	</target>
-
-
-	<target name="testSdk" unless="conditionSkipTestSdk" depends="setupTestWorkspace">
-		<property name="tmpWs" location="${testWorkspace}/ws" />
-		<property name="outputFile" location="${testReportsDir}/result.${eclipsePlatformVersion}.org.eclipse.scout.sdk.test.xml" />
-
-		<pde.launch.test.suite workspaceBaseDir="${tmpWs}" eclipseBaseDir="${testEclipse}" testPluginName="org.eclipse.scout.sdk.test" testSuiteClassName="org.eclipse.scout.sdk.internal.test._SuiteInternalTest" junitReportOutputFile="${outputFile}" />
-	</target>
-
-	<target name="setupTestWorkspace" unless="conditionSkipTestSdk">
-		<property name="testWorkspace" location="${buildDataDir}/step020/testWs" />
-		<property name="testEclipse" location="${testWorkspace}/eclipse" />
-		<delete dir="${testWorkspace}" failonerror="false" />
-		<mkdir dir="${testEclipse}" />
-
-		<!-- copy eclipse (includes eclipse, deltapack, test-framework) -->
-		<unzip dest="${testWorkspace}" overwrite="true" src="${downloadDir}/${eclipseFileName}" />
-		<unzip dest="${testWorkspace}" overwrite="true" src="${downloadDir}/${eclipseDeltapackName}" />
-		<unzip dest="${testWorkspace}${eclipseTestFrameworkSubFolder}" overwrite="true" src="${downloadDir}/${eclipseTestFrameworkName}">
-			<patternset>
-				<exclude name="artifacts.xml" />
-			</patternset>
-		</unzip>
-		<copy todir="${testWorkspace}" failonerror="false">
-			<fileset dir="${templateDir}/dropins" />
-		</copy>
-
-		<!-- copy built fragments to workspace -->
-		<copy todir="${testEclipse}" overwrite="true">
-			<fileset dir="${buildDataDir}/step020/output/rtFeature">
-				<include name="**/**" />
-			</fileset>
-		</copy>
-		<copy todir="${testEclipse}" overwrite="true">
-			<fileset dir="${buildDataDir}/step020/output/sdkFeature">
-				<include name="**/**" />
-			</fileset>
-		</copy>
-		<copy todir="${testEclipse}" overwrite="true">
-			<fileset dir="${buildDataDir}/step020/output/sdkRapFeature">
-				<include name="**/**" />
-			</fileset>
-		</copy>
-		<copy todir="${testEclipse}" overwrite="true">
-			<fileset dir="${buildDataDir}/step020/output/sdkTestFeature">
-				<include name="**/**" />
-			</fileset>
-		</copy>
-	</target>
-
-	<target name="setupRapTargetBuildWorkspace" description="initializes target platform">
-
-		<property name="outputFolder" value="${relengRootDir}/working/buildData/step020/output/target" />
-		<copy todir="${outputFolder}">
-			<fileset dir="${relengRootDir}/templates/rapTarget">
-				<include name="**/*" />
-			</fileset>
-		</copy>
-		<property name="targetplugin" value="${outputFolder}/org.eclipse.scout.rt.rap.target" />
-		<property name="targetfeature" value="${outputFolder}/org.eclipse.scout.rt.rap.target.feature" />
-		<property name="targetlocation" value="${targetplugin}/resources" />
-		<property name="scoutTarget" value="${outputFolder}/scoutTarget" />
-		<property name="scoutTargetSigned" value="${outputFolder}/scoutTargetSigned" />
-
-		<echo>replacing qualifier with ${featureTimestamp}</echo>
-		<replace file="${outputFolder}/org.eclipse.scout.rt.rap.target/META-INF/MANIFEST.MF" token="qualifier" value="${featureTimestamp}" />
-		<mkdir dir="${outputFolder}/" />
-
-		<echo>replacing local updatesite with ${outputFolder}/rtRapUpdatesite</echo>
-		<replace file="${outputFolder}/scoutTemp.target" token="@@LOCAL_UPDATESITE@@" value="${relengRootDir}/working/buildData/step020/output/rtRapUpdatesite" />
-		<replace file="${outputFolder}/scoutTemp.target" token="\" value="/" />
-
-		<java classname="org.eclipse.equinox.launcher.Main" maxmemory="512m" fork="true" failonerror="true">
-			<arg line="-application org.eclipse.ant.core.antRunner " />
-			<arg line="-buildfile ${relengRootDir}/buildFiles/targetBuild/build.xml" />
-			<arg line="-Ddestinationdirectory=${scoutTarget}" />
-			<arg line="-Dtargetfile=${outputFolder}/scoutTemp.target" />
-			<classpath>
-				<fileset dir="${workingDir}/eclipse/plugins">
-					<include name="org.eclipse.equinox.launcher_*.jar" />
-				</fileset>
-			</classpath>
-		</java>
-
-		<java classname="org.eclipse.equinox.launcher.Main" maxmemory="512m" fork="true" failonerror="true">
-			<arg line="-application org.eclipse.ant.core.antRunner " />
-			<arg line="-buildfile ${relengRootDir}/buildFiles/targetBuild/build.xml" />
-			<arg line="-Ddestinationdirectory=${targetlocation}" />
-			<arg line="-Dtargetfile=${outputFolder}/rapStaging.target" />
-			<classpath>
-				<fileset dir="${workingDir}/eclipse/plugins">
-					<include name="org.eclipse.equinox.launcher_*.jar" />
-				</fileset>
-			</classpath>
-		</java>
-
-		<condition property="conditionSkipSign">
-			<istrue value="${skipSign}"/>
-		</condition>
-		<antcall target="skipSign" />
-		<antcall target="sign" />
-
-		<copy todir="${targetlocation}">
-			<fileset dir="${scoutTargetSigned}">
-				<include name="**/*" />
-			</fileset>
-		</copy>
-
-		<copy todir="${relengRootDir}/working/buildData/step020/input/plugins/org.eclipse.scout.rt.rap.target">
-			<fileset dir="${targetplugin}">
-				<include name="**/*" />
-				<exclude name="**/artifacts.jar" />
-				<exclude name="**/content.jar" />
-			</fileset>
-		</copy>
-		<copy todir="${relengRootDir}/working/buildData/step020/input/features/org.eclipse.scout.rt.rap.target.feature">
-			<fileset dir="${targetfeature}">
-				<include name="**/*" />
-			</fileset>
-		</copy>
-	</target>
-
-	<!-- sign nested jars separately-->
-	<target name="sign" unless="conditionSkipSign">
-		<!-- skip already signed files (e.g. from orbit) -->
-		<delete dir="${scoutTargetSigned}" />
-		<mkdir dir="${scoutTargetSigned}" />
-		<moveSignedFiles outputDir="${scoutTargetSigned}">
-			<fileset dir="${scoutTarget}" >
-				<include name="**/*.jar" />
-			</fileset>
-		</moveSignedFiles>
-
-		<!--sign files in ${scoutTarget} -->
-		<delete dir="${signInputFolder}" />
-		<delete dir="${signOutputFolder}" />
-		<mkdir dir="${signInputFolder}" />
-		<mkdir dir="${signOutputFolder}" />
-
-		<zip destfile="${signInputFolder}/sign.zip">
-			<fileset dir="${scoutTarget}">
-				<include name="**/**" />
-			</fileset>
-		</zip>
-		<!--sign -->
-		<echo> sign</echo>
-		<exec executable="sign" failifexecutionfails="no">
-			<arg value="${signInputFolder}/sign.zip" />
-			<arg value="nomail" />
-			<arg value="${signOutputFolder}" />
-		</exec>
-		<waitForFile file="${signOutputFolder}/sign.zip" maxMinutes="30" maxSecounds="0" pollSecounds="10"/>
-		<mkdir dir="${scoutTargetSigned}"/>
-		<unzip dest="${scoutTargetSigned}" src="${signOutputFolder}/sign.zip" />
-	</target>
-
-	<target name="skipSign" if="conditionSkipSign">
-		<echo message="skip sign" />
-		<delete dir="${scoutTargetSigned}" />
-		<mkdir dir="${scoutTargetSigned}" />
-
-		<copy todir="${scoutTargetSigned}">
-			<fileset dir="${scoutTarget}">
-				<include name="**/*" />
-			</fileset>
-		</copy>
-	</target>
-
-	<target name="setupRapBuildWorkspace">
-		<echo> Exporting RAP RTFeature</echo>
-		<java classname="org.eclipse.equinox.launcher.Main" maxmemory="512m" fork="true" failonerror="true">
-			<arg line="-application org.eclipse.ant.core.antRunner " />
-			<arg line="-buildfile ${relengRootDir}/buildFiles/targetBuild/build.xml" />
-			<arg line="-Ddestinationdirectory=${workingDir}/rapTarget" />
-			<arg line="-Dtargetfile=${relengRootDir}/templates/rapTarget/rapStaging.target" />
-			<classpath>
-				<fileset dir="${relengRootDir}/p2eclipse/plugins">
-					<include name="org.eclipse.equinox.launcher_*.jar"/>
-				</fileset>
-			</classpath>
-		</java>
-
-		<!-- unzip eclipse rap runtime into existing eclipse platform -->
-		<copy todir="${workingDir}/eclipse" overwrite="true">
-			<fileset dir="${workingDir}/rapTarget">
-				<include name="**/org.eclipse.rap*.jar" />
-			</fileset>
-		</copy>
-
-		<!-- setup workspace -->
-		<antcall target="setupBuildWorkspace" />
-
-		<!-- copy already built scout rt into the build workspace -->
-		<property name="nonRapBuildOutputDir" value="${nonRapBuildDataDir}/step020/output" />
-		<copy todir="${workingDir}/eclipse" overwrite="true">
-			<fileset dir="${nonRapBuildOutputDir}/rtFeature">
-				<include name="**/**" />
-			</fileset>
-		</copy>
-
-		<!-- copy the sources from workingRap to working folder because the featureBuild properties expects the sources there -->
-		<property name="nonRapBuildInputDir" value="${nonRapBuildDataDir}/step020/input" />
-		<copy todir="${nonRapBuildInputDir}" overwrite="true">
-			<fileset dir="${workingDir}/buildData/step020/input">
-				<include name="**/*scout*rap*/**" />
-			</fileset>
-		</copy>
-
-	</target>
-
-	<target name="setupBuildWorkspace">
-		<delete dir="${buildDataDir}/step020/input" />
-		<property name="inputPlugins" location="${buildDataDir}/step020/input/plugins" />
-		<property name="inputFeatures" location="${buildDataDir}/step020/input/features" />
-
-		<!-- mkdirs -->
-		<mkdir dir="${inputPlugins}" />
-		<mkdir dir="${inputFeatures}" />
-
-		<!-- copy plugins to build to the buildDirectory -->
-		<copy todir="${inputPlugins}">
-			<fileset dir="${workspace}/scout.rt">
-				<include name="org.eclipse.scout.*/**" />
-				<include name="org.apache.derby.jdbc*/**" />
-				<exclude name="org.eclipse.scout*build*/**" />
-				<exclude name="*feature/**" />
-				<exclude name="*feature.source/**" />
-			</fileset>
-			<fileset dir="${workspace}/scout.rt.incubator">
-				<include name="org.eclipse.scout.*/**" />
-				<exclude name="*feature*/**" />
-			</fileset>
-			<fileset dir="${workspace}/scout.sdk">
-				<include name="org.eclipse.scout.*/**" />
-				<exclude name="*feature*/**" />
-			</fileset>
-		</copy>
-		<copy todir="${inputFeatures}">
-			<fileset dir="${workspace}/scout.rt">
-				<include name="*scout.*feature*/**" />
-				<exclude name="*scout.*feature.about/**" />
-			</fileset>
-			<fileset dir="${workspace}/scout.rt.incubator">
-				<include name="*scout.*feature*/**" />
-			</fileset>
-			<fileset dir="${workspace}/scout.sdk">
-				<include name="*scout.*feature*/**" />
-			</fileset>
-		</copy>
-
-		<!-- copy source feature templates -->
-		<antcall target="copySourceFeatureTemplate">
-			<param name="featureName" value="Scout Runtime Source"/>
-			<param name="featureId" value="org.eclipse.scout.rt.feature.source"/>
-		</antcall>
-
-		<antcall target="copySourceFeatureTemplate">
-			<param name="featureName" value="Scout Runtime RAP Source"/>
-			<param name="featureId" value="org.eclipse.scout.rt.rap.feature.source"/>
-		</antcall>
-
-		<antcall target="copySourceFeatureTemplate">
-			<param name="featureName" value="Scout SDK Source"/>
-			<param name="featureId" value="org.eclipse.scout.sdk.feature.source"/>
-		</antcall>
-
-		<antcall target="copySourceFeatureTemplate">
-			<param name="featureName" value="Scout SDK RAP Source"/>
-			<param name="featureId" value="org.eclipse.scout.sdk.rap.feature.source"/>
-		</antcall>
-
-		<antcall target="copySourceFeatureTemplate">
-			<param name="featureName" value="Scout SDK Test Source"/>
-			<param name="featureId" value="org.eclipse.scout.sdk.test.feature.source"/>
-		</antcall>
-
-		<antcall target="copySourceFeatureTemplate">
-			<param name="featureName" value="Scout RAP Filechooser (Incubaton) Source"/>
-			<param name="featureId" value="org.eclipse.scout.rt.ui.rap.incubator.filechooser.feature.source"/>
-		</antcall>
-	</target>
-
-	<!-- expects params: featureId, featureName -->
-	<target name="copySourceFeatureTemplate">
-		<copy todir="${inputFeatures}/${featureId}/" failonerror="false">
-			<fileset dir="${relengRootDir}/templates/sourceTemplateFeature">
-				<include name="**" />
-			</fileset>
-		</copy>
-		<replace file="${inputFeatures}/${featureId}/feature.properties" token="%%featureName%%" value="${featureName}" />
-	</target>
+  <property environment="env" />
+  <property file="build.properties" />
+  <import file="${basedir}/macros/eclipse.xml" />
+  <taskdef name="waitForFile" classname="org.eclipse.scout.releng.ant.WaitForFile" />
+  <taskdef name="moveSignedFiles" classname="org.eclipse.scout.releng.ant.sign.MoveSignedFiles" />
+
+
+  <target name="clean">
+    <delete dir="${buildDataDir}/step020" />
+    <mkdir dir="${buildDataDir}/step020" />
+  </target>
+
+  <target name="build">
+    <available file="${buildDataDir}/step020/output/features.created" property="skipCreateFeatures" />
+    <condition property="conditionSkipTestSdk">
+      <istrue value="${skipTestSdk}" />
+    </condition>
+    <antcall target="createFeatures" />
+  </target>
+
+  <target name="buildRap">
+    <available file="${buildDataDir}/step020/output/features.created" property="skipCreateFeatures" />
+    <antcall target="createRapFeatures" />
+  </target>
+
+  <target name="buildRapTarget">
+    <available file="${buildDataDir}/step020/output/features.created" property="skipCreateFeatures" />
+    <antcall target="createRapTargetFeatures" />
+  </target>
+
+  <target name="preBuild">
+    <antcall target="clean" />
+    <antcall target="setupBuildWorkspace" />
+    <antcall target="createCompatFragments" />
+  </target>
+
+
+  <target name="createRapTargetFeatures" unless="skipCreateRapFeatures">
+    <antcall target="createRapRTUpdateSite" />
+    <antcall target="setupRapTargetBuildWorkspace" />
+    <antcall target="buildScoutRtRapTargetFeature" />
+
+    <mkdir dir="${buildDataDir}/step020/output" />
+    <touch file="${buildDataDir}/step020/output/features.created" />
+    <delete dir="${buildDataDir}/step020/input" failonerror="false" />
+    <delete dir="${nonRapBuildInputDir}" failonerror="false" />
+  </target>
+
+  <target name="createRapFeatures" unless="skipCreateRapFeatures">
+    <antcall target="clean" />
+    <antcall target="setupRapBuildWorkspace" />
+    <antcall target="buildScoutRtRapFeature" />
+    <antcall target="buildScoutRtRapIncubatorFeature" />
+    <mkdir dir="${buildDataDir}/step020/output" />
+    <touch file="${buildDataDir}/step020/output/features.created" />
+    <delete dir="${buildDataDir}/step020/input" failonerror="false" />
+    <delete dir="${nonRapBuildInputDir}" failonerror="false" />
+  </target>
+
+  <target name="createRapRTUpdateSite">
+    <echo>Creating temporary updatesite for rap rt target</echo>
+    <mkdir dir="${buildDataDir}/step020/output/rtRapUpdatesiteSource" />
+    <mkdir dir="${buildDataDir}/step020/output/rtRapUpdatesite" />
+
+    <copy todir="${buildDataDir}/step020/output/rtRapUpdatesiteSource" failonerror="false">
+      <fileset dir="${buildDataDir}/step020/output/rtRapFeature">
+        <include name="**" />
+      </fileset>
+      <fileset dir="${buildDataDir}/step020/output/rtFeature">
+        <include name="**" />
+      </fileset>
+    </copy>
+
+    <echo>Creating temporary updatesite for rap rt target</echo>
+    <echo>${equinoxLauncherPluginVersion}</echo>
+
+    <java classname="org.eclipse.equinox.launcher.Main" fork="true" failonerror="true">
+      <arg line="-application org.eclipse.equinox.p2.publisher.FeaturesAndBundlesPublisher" />
+      <arg line="-metadataRepository file:/${buildDataDir}/step020/output/rtRapUpdatesite" />
+      <arg line="-artifactRepository file:/${buildDataDir}/step020/output/rtRapUpdatesite" />
+      <arg line="-source ${buildDataDir}/step020/output/rtRapUpdatesiteSource" />
+      <arg line="-compress" />
+      <arg line="-publishArtifacts" />
+      <arg value="-artifactRepositoryName" />
+      <arg value="Eclipse Scout TEMP" />
+      <arg value="-metadataRepositoryName" />
+      <arg value="Eclipse Scout TEMP" />
+      <classpath>
+        <pathelement location="${relengRootDir}/working/eclipse/plugins/org.eclipse.equinox.launcher_${equinoxLauncherPluginVersion}.jar" />
+      </classpath>
+    </java>
+  </target>
+
+  <target name="createFeatures" unless="skipCreateFeatures">
+    <antcall target="clean" />
+    <antcall target="setupBuildWorkspace" />
+    <antcall target="buildScoutRtFeature" />
+    <antcall target="buildScoutRtTestingFeature" />
+    <antcall target="buildScoutSdkFeature" />
+    <antcall target="buildScoutSdkRapFeature" />
+    <antcall target="buildScoutSdkTestFeature" />
+    <antcall target="testSdk" />
+    <touch file="${buildDataDir}/step020/output/features.created" />
+    <delete dir="${buildDataDir}/step020/input" failonerror="false" />
+  </target>
+
+  <target name="createCompatFragments">
+    <property name="preBuildFragmentName" value="org.eclipse.scout.sdk.compatibility.${compatFragmentVersion}.fragment" />
+    <property name="preBuildFeatureName" value="${preBuildFragmentName}.feature" />
+
+    <!-- temp pre build feature -->
+    <property name="preBuildFeatureFolder" value="${buildDataDir}/step020/input/features/${preBuildFeatureName}" />
+    <mkdir dir="${preBuildFeatureFolder}" />
+    <copy todir="${preBuildFeatureFolder}" failonerror="false">
+      <fileset dir="${relengRootDir}/templates/templateFeature">
+        <include name="**" />
+      </fileset>
+    </copy>
+    <replace file="${preBuildFeatureFolder}/build.properties" token="%%preBuildFeatureName%%" value="${preBuildFeatureName}" />
+    <replace file="${preBuildFeatureFolder}/feature.xml" token="%%preBuildFeatureName%%" value="${preBuildFeatureName}" />
+    <replace file="${preBuildFeatureFolder}/feature.xml" token="%%preBuildFragmentName%%" value="${preBuildFragmentName}" />
+
+    <!-- temp pre build source feature -->
+    <property name="preBuildSourceFeatureFolder" value="${preBuildFeatureFolder}.source" />
+    <mkdir dir="${preBuildSourceFeatureFolder}" />
+    <copy todir="${preBuildSourceFeatureFolder}" failonerror="false">
+      <fileset dir="${relengRootDir}/templates/sourceTemplateFeature">
+        <include name="**" />
+      </fileset>
+    </copy>
+    <replace file="${preBuildSourceFeatureFolder}/feature.properties" token="%%featureName%%" value="Temp Compatibility Source Feature" />
+
+
+    <!-- start build -->
+    <pde.build.feature eclipseBaseDir="${workingDir}/eclipse" timestamp="${featureTimestamp}" archivePrefix="sdkPreBuiltFeature" featureName="${preBuildFeatureName}" buildType="${buildType}" pdeBuildPluginVersion="${pdeBuildPluginVersion}" />
+
+    <!-- unzip the feature -->
+    <unzip dest="${buildDataDir}/step020/output">
+      <fileset dir="${buildDataDir}/step020/input/${buildType}">
+        <include name="${preBuildFeatureName}-${buildType}.zip" />
+      </fileset>
+    </unzip>
+
+    <!-- store the pre built compatibility fragment for later use -->
+    <copy todir="${preBuildDir}">
+      <fileset dir="${buildDataDir}/step020/output/sdkPreBuiltFeature/plugins">
+        <include name="**/*${preBuildFragmentName}*.jar" />
+      </fileset>
+    </copy>
+
+    <antcall target="clean" />
+  </target>
+
+  <target name="buildScoutRtFeature" unless="skipRtFeature">
+    <pde.build.feature eclipseBaseDir="${workingDir}/eclipse" timestamp="${featureTimestamp}" archivePrefix="rtFeature" featureName="org.eclipse.scout.rt.feature" buildType="${buildType}" pdeBuildPluginVersion="${pdeBuildPluginVersion}" />
+
+    <mkdir dir="${buildDataDir}/step020/output" />
+    <unzip dest="${buildDataDir}/step020/output">
+      <fileset dir="${buildDataDir}/step020/input/${buildType}">
+        <include name="org.eclipse.scout.rt.feature-${buildType}.zip" />
+      </fileset>
+    </unzip>
+  </target>
+
+  <target name="buildScoutRtTestingFeature" unless="skipRtTestingFeature">
+    <pde.build.feature eclipseBaseDir="${workingDir}/eclipse" timestamp="${featureTimestamp}" archivePrefix="rtTestingFeature" featureName="org.eclipse.scout.rt.testing.feature" buildType="${buildType}" pdeBuildPluginVersion="${pdeBuildPluginVersion}" />
+
+    <mkdir dir="${buildDataDir}/step020/output" />
+    <unzip dest="${buildDataDir}/step020/output">
+      <fileset dir="${buildDataDir}/step020/input/${buildType}">
+        <include name="org.eclipse.scout.rt.testing.feature-${buildType}.zip" />
+      </fileset>
+    </unzip>
+  </target>
+
+  <target name="buildScoutRtRapFeature" unless="skipRtRapFeature">
+    <pde.build.feature eclipseBaseDir="${workingDir}/eclipse" timestamp="${featureTimestamp}" archivePrefix="rtRapFeature" featureName="org.eclipse.scout.rt.rap.feature" buildType="${buildType}" pdeBuildPluginVersion="${pdeBuildPluginVersion}" />
+
+    <mkdir dir="${nonRapBuildDataDir}/step020/output" />
+    <unzip dest="${nonRapBuildDataDir}/step020/output">
+      <fileset dir="${nonRapBuildDataDir}/step020/input/${buildType}">
+        <include name="org.eclipse.scout.rt.rap.feature-${buildType}.zip" />
+      </fileset>
+    </unzip>
+  </target>
+
+  <target name="buildScoutRtRapIncubatorFeature" unless="skipScoutRtRapIncubatorFeature">
+    <echo> Exporting RAP Incubator Feature</echo>
+    <java classname="org.eclipse.equinox.launcher.Main" maxmemory="512m" fork="true" failonerror="true">
+      <arg line="-application org.eclipse.ant.core.antRunner " />
+      <arg line="-buildfile ${relengRootDir}/buildFiles/targetBuild/build.xml" />
+      <arg line="-Ddestinationdirectory=${workingDir}/incubTarget" />
+      <arg line="-Dtargetfile=${relengRootDir}/templates/rapTarget/rapIncubator.target" />
+      <classpath>
+        <fileset dir="${relengRootDir}/p2eclipse/plugins">
+          <include name="org.eclipse.equinox.launcher_*.jar"/>
+        </fileset>
+      </classpath>
+    </java>
+
+    <copy todir="${workingDir}/eclipse" overwrite="true">
+      <fileset dir="${workingDir}/incubTarget">
+        <include name="**/**" />
+      </fileset>
+    </copy>
+
+    <pde.build.feature eclipseBaseDir="${workingDir}/eclipse" timestamp="${featureTimestamp}" archivePrefix="rtRapIncubatorFeature" featureName="org.eclipse.scout.rt.ui.rap.incubator.filechooser.feature" buildType="${buildType}" pdeBuildPluginVersion="${pdeBuildPluginVersion}" />
+
+    <mkdir dir="${nonRapBuildDataDir}/step020/output" />
+    <unzip dest="${nonRapBuildDataDir}/step020/output">
+      <fileset dir="${nonRapBuildDataDir}/step020/input/${buildType}">
+        <include name="org.eclipse.scout.rt.ui.rap.incubator.filechooser.feature-${buildType}.zip" />
+      </fileset>
+    </unzip>
+  </target>
+
+  <target name="buildScoutSdkFeature" unless="skipSdkFeature">
+    <!-- first delete all compat fragment sources. these have been prebuild against the correct platform: copy the pre-built version into the platform -->
+    <delete includeemptydirs="true">
+      <fileset dir="${buildDataDir}/step020/input/plugins">
+        <include name="**/org.eclipse.scout.sdk.compatibility.*.fragment/**" />
+      </fileset>
+    </delete>
+    <copy todir="${workingDir}/eclipse/plugins">
+      <fileset dir="${preBuildDir}">
+        <include name="**/**.jar" />
+      </fileset>
+    </copy>
+
+    <!-- install required features from staging -->
+    <!-- <echo>Installing required features from staging </echo>
+    <java classname="org.eclipse.equinox.launcher.Main" fork="true" failonerror="true">
+      <arg line="-application org.eclipse.equinox.p2.director" />
+      <arg line="-repository ${stagingSite}" />
+      <arg line="-destination ${relengRootDir}/working/eclipse" />
+      <arg line="-installIU org.eclipse.wst.ws_ui.feature.feature.jar" />
+      <classpath>
+        <pathelement location="${relengRootDir}/working/eclipse/plugins/org.eclipse.equinox.launcher_${equinoxLauncherPluginVersion}.jar" />
+      </classpath>
+    </java>
+    -->
+
+    <pde.build.feature eclipseBaseDir="${workingDir}/eclipse" timestamp="${featureTimestamp}" archivePrefix="sdkFeature" featureName="org.eclipse.scout.sdk.feature" buildType="${buildType}" pdeBuildPluginVersion="${pdeBuildPluginVersion}" />
+
+    <mkdir dir="${buildDataDir}/step020/output" />
+    <unzip dest="${buildDataDir}/step020/output">
+      <fileset dir="${buildDataDir}/step020/input/${buildType}">
+        <include name="org.eclipse.scout.sdk.feature-${buildType}.zip" />
+      </fileset>
+    </unzip>
+  </target>
+
+
+  <target name="buildScoutSdkRapFeature" unless="skipSdkRapFeature">
+    <pde.build.feature eclipseBaseDir="${workingDir}/eclipse" timestamp="${featureTimestamp}" archivePrefix="sdkRapFeature" featureName="org.eclipse.scout.sdk.rap.feature" buildType="${buildType}" pdeBuildPluginVersion="${pdeBuildPluginVersion}" />
+
+    <mkdir dir="${buildDataDir}/step020/output" />
+    <unzip dest="${buildDataDir}/step020/output">
+      <fileset dir="${buildDataDir}/step020/input/${buildType}">
+        <include name="org.eclipse.scout.sdk.rap.feature-${buildType}.zip" />
+      </fileset>
+    </unzip>
+  </target>
+
+  <target name="buildScoutSdkTestFeature" unless="skipSdkFeature">
+    <pde.build.feature eclipseBaseDir="${workingDir}/eclipse" timestamp="${featureTimestamp}" archivePrefix="sdkTestFeature" featureName="org.eclipse.scout.sdk.test.feature" buildType="${buildType}" pdeBuildPluginVersion="${pdeBuildPluginVersion}" />
+
+    <mkdir dir="${buildDataDir}/step020/output" />
+    <unzip dest="${buildDataDir}/step020/output">
+      <fileset dir="${buildDataDir}/step020/input/${buildType}">
+        <include name="org.eclipse.scout.sdk.test.feature-${buildType}.zip" />
+      </fileset>
+    </unzip>
+  </target>
+
+  <target name="buildScoutRtRapTargetFeature">
+    <pde.build.feature eclipseBaseDir="${workingDir}/eclipse" timestamp="${featureTimestamp}"
+        archivePrefix="rtRapTargetFeature" featureName="org.eclipse.scout.rt.rap.target.feature" buildType="${buildType}" pdeBuildPluginVersion="${pdeBuildPluginVersion}"
+      />
+
+    <mkdir dir="${buildDataDir}/step020/output" />
+    <unzip dest="${buildDataDir}/step020/output">
+      <fileset dir="${buildDataDir}/step020/input/${buildType}">
+        <include name="org.eclipse.scout.rt.rap.target.feature-${buildType}.zip" />
+      </fileset>
+    </unzip>
+
+  </target>
+
+
+  <target name="testSdk" unless="conditionSkipTestSdk" depends="setupTestWorkspace">
+    <property name="tmpWs" location="${testWorkspace}/ws" />
+    <property name="outputFile" location="${testReportsDir}/result.${eclipsePlatformVersion}.org.eclipse.scout.sdk.test.xml" />
+
+    <pde.launch.test.suite workspaceBaseDir="${tmpWs}" eclipseBaseDir="${testEclipse}" testPluginName="org.eclipse.scout.sdk.test" testSuiteClassName="org.eclipse.scout.sdk.internal.test._SuiteInternalTest" junitReportOutputFile="${outputFile}" />
+  </target>
+
+  <target name="setupTestWorkspace" unless="conditionSkipTestSdk">
+    <property name="testWorkspace" location="${buildDataDir}/step020/testWs" />
+    <property name="testEclipse" location="${testWorkspace}/eclipse" />
+    <delete dir="${testWorkspace}" failonerror="false" />
+    <mkdir dir="${testEclipse}" />
+
+    <!-- copy eclipse (includes eclipse, deltapack, test-framework) -->
+    <unzip dest="${testWorkspace}" overwrite="true" src="${downloadDir}/${eclipseFileName}" />
+    <unzip dest="${testWorkspace}" overwrite="true" src="${downloadDir}/${eclipseDeltapackName}" />
+    <unzip dest="${testWorkspace}${eclipseTestFrameworkSubFolder}" overwrite="true" src="${downloadDir}/${eclipseTestFrameworkName}">
+      <patternset>
+        <exclude name="artifacts.xml" />
+      </patternset>
+    </unzip>
+    <copy todir="${testWorkspace}" failonerror="false">
+      <fileset dir="${templateDir}/dropins" />
+    </copy>
+
+    <!-- copy built fragments to workspace -->
+    <copy todir="${testEclipse}" overwrite="true">
+      <fileset dir="${buildDataDir}/step020/output/rtFeature">
+        <include name="**/**" />
+      </fileset>
+    </copy>
+    <copy todir="${testEclipse}" overwrite="true">
+      <fileset dir="${buildDataDir}/step020/output/sdkFeature">
+        <include name="**/**" />
+      </fileset>
+    </copy>
+    <copy todir="${testEclipse}" overwrite="true">
+      <fileset dir="${buildDataDir}/step020/output/sdkRapFeature">
+        <include name="**/**" />
+      </fileset>
+    </copy>
+    <copy todir="${testEclipse}" overwrite="true">
+      <fileset dir="${buildDataDir}/step020/output/sdkTestFeature">
+        <include name="**/**" />
+      </fileset>
+    </copy>
+  </target>
+
+  <target name="setupRapTargetBuildWorkspace" description="initializes target platform">
+
+    <property name="outputFolder" value="${relengRootDir}/working/buildData/step020/output/target" />
+    <copy todir="${outputFolder}">
+      <fileset dir="${relengRootDir}/templates/rapTarget">
+        <include name="**/*" />
+      </fileset>
+    </copy>
+    <property name="targetplugin" value="${outputFolder}/org.eclipse.scout.rt.rap.target" />
+    <property name="targetfeature" value="${outputFolder}/org.eclipse.scout.rt.rap.target.feature" />
+    <property name="targetlocation" value="${targetplugin}/resources" />
+    <property name="scoutTarget" value="${outputFolder}/scoutTarget" />
+    <property name="scoutTargetSigned" value="${outputFolder}/scoutTargetSigned" />
+
+    <echo>replacing qualifier with ${featureTimestamp}</echo>
+    <replace file="${outputFolder}/org.eclipse.scout.rt.rap.target/META-INF/MANIFEST.MF" token="qualifier" value="${featureTimestamp}" />
+    <mkdir dir="${outputFolder}/" />
+
+    <echo>replacing local updatesite with ${outputFolder}/rtRapUpdatesite</echo>
+    <replace file="${outputFolder}/scoutTemp.target" token="@@LOCAL_UPDATESITE@@" value="${relengRootDir}/working/buildData/step020/output/rtRapUpdatesite" />
+    <replace file="${outputFolder}/scoutTemp.target" token="\" value="/" />
+
+    <java classname="org.eclipse.equinox.launcher.Main" maxmemory="512m" fork="true" failonerror="true">
+      <arg line="-application org.eclipse.ant.core.antRunner " />
+      <arg line="-buildfile ${relengRootDir}/buildFiles/targetBuild/build.xml" />
+      <arg line="-Ddestinationdirectory=${scoutTarget}" />
+      <arg line="-Dtargetfile=${outputFolder}/scoutTemp.target" />
+      <classpath>
+        <fileset dir="${workingDir}/eclipse/plugins">
+          <include name="org.eclipse.equinox.launcher_*.jar" />
+        </fileset>
+      </classpath>
+    </java>
+
+    <java classname="org.eclipse.equinox.launcher.Main" maxmemory="512m" fork="true" failonerror="true">
+      <arg line="-application org.eclipse.ant.core.antRunner " />
+      <arg line="-buildfile ${relengRootDir}/buildFiles/targetBuild/build.xml" />
+      <arg line="-Ddestinationdirectory=${targetlocation}" />
+      <arg line="-Dtargetfile=${outputFolder}/rapStaging.target" />
+      <classpath>
+        <fileset dir="${workingDir}/eclipse/plugins">
+          <include name="org.eclipse.equinox.launcher_*.jar" />
+        </fileset>
+      </classpath>
+    </java>
+
+    <condition property="conditionSkipSign">
+      <istrue value="${skipSign}"/>
+    </condition>
+    <antcall target="skipSign" />
+    <antcall target="sign" />
+
+    <copy todir="${targetlocation}">
+      <fileset dir="${scoutTargetSigned}">
+        <include name="**/*" />
+      </fileset>
+    </copy>
+
+    <copy todir="${relengRootDir}/working/buildData/step020/input/plugins/org.eclipse.scout.rt.rap.target">
+      <fileset dir="${targetplugin}">
+        <include name="**/*" />
+        <exclude name="**/artifacts.jar" />
+        <exclude name="**/content.jar" />
+      </fileset>
+    </copy>
+    <copy todir="${relengRootDir}/working/buildData/step020/input/features/org.eclipse.scout.rt.rap.target.feature">
+      <fileset dir="${targetfeature}">
+        <include name="**/*" />
+      </fileset>
+    </copy>
+  </target>
+
+  <!-- sign nested jars separately-->
+  <target name="sign" unless="conditionSkipSign">
+    <!-- skip already signed files (e.g. from orbit) -->
+    <delete dir="${scoutTargetSigned}" />
+    <mkdir dir="${scoutTargetSigned}" />
+    <moveSignedFiles outputDir="${scoutTargetSigned}">
+      <fileset dir="${scoutTarget}" >
+        <include name="**/*.jar" />
+      </fileset>
+    </moveSignedFiles>
+
+    <!--sign files in ${scoutTarget} -->
+    <delete dir="${signInputFolder}" />
+    <delete dir="${signOutputFolder}" />
+    <mkdir dir="${signInputFolder}" />
+    <mkdir dir="${signOutputFolder}" />
+
+    <zip destfile="${signInputFolder}/sign.zip">
+      <fileset dir="${scoutTarget}">
+        <include name="**/**" />
+      </fileset>
+    </zip>
+    <!--sign -->
+    <echo> sign</echo>
+    <exec executable="sign" failifexecutionfails="no">
+      <arg value="${signInputFolder}/sign.zip" />
+      <arg value="nomail" />
+      <arg value="${signOutputFolder}" />
+    </exec>
+    <waitForFile file="${signOutputFolder}/sign.zip" maxMinutes="30" maxSecounds="0" pollSecounds="10"/>
+    <mkdir dir="${scoutTargetSigned}"/>
+    <unzip dest="${scoutTargetSigned}" src="${signOutputFolder}/sign.zip" />
+  </target>
+
+  <target name="skipSign" if="conditionSkipSign">
+    <echo message="skip sign" />
+    <delete dir="${scoutTargetSigned}" />
+    <mkdir dir="${scoutTargetSigned}" />
+
+    <copy todir="${scoutTargetSigned}">
+      <fileset dir="${scoutTarget}">
+        <include name="**/*" />
+      </fileset>
+    </copy>
+  </target>
+
+  <target name="setupRapBuildWorkspace">
+    <echo> Exporting RAP RTFeature</echo>
+    <java classname="org.eclipse.equinox.launcher.Main" maxmemory="512m" fork="true" failonerror="true">
+      <arg line="-application org.eclipse.ant.core.antRunner " />
+      <arg line="-buildfile ${relengRootDir}/buildFiles/targetBuild/build.xml" />
+      <arg line="-Ddestinationdirectory=${workingDir}/rapTarget" />
+      <arg line="-Dtargetfile=${relengRootDir}/templates/rapTarget/rapStaging.target" />
+      <classpath>
+        <fileset dir="${relengRootDir}/p2eclipse/plugins">
+          <include name="org.eclipse.equinox.launcher_*.jar"/>
+        </fileset>
+      </classpath>
+    </java>
+
+    <!-- unzip eclipse rap runtime into existing eclipse platform -->
+    <copy todir="${workingDir}/eclipse" overwrite="true">
+      <fileset dir="${workingDir}/rapTarget">
+        <include name="**/org.eclipse.rap*.jar" />
+      </fileset>
+    </copy>
+
+    <!-- setup workspace -->
+    <antcall target="setupBuildWorkspace" />
+
+    <!-- copy already built scout rt into the build workspace -->
+    <property name="nonRapBuildOutputDir" value="${nonRapBuildDataDir}/step020/output" />
+    <copy todir="${workingDir}/eclipse" overwrite="true">
+      <fileset dir="${nonRapBuildOutputDir}/rtFeature">
+        <include name="**/**" />
+      </fileset>
+    </copy>
+
+    <!-- copy the sources from workingRap to working folder because the featureBuild properties expects the sources there -->
+    <property name="nonRapBuildInputDir" value="${nonRapBuildDataDir}/step020/input" />
+    <copy todir="${nonRapBuildInputDir}" overwrite="true">
+      <fileset dir="${workingDir}/buildData/step020/input">
+        <include name="**/*scout*rap*/**" />
+      </fileset>
+    </copy>
+
+  </target>
+
+  <target name="setupBuildWorkspace">
+    <delete dir="${buildDataDir}/step020/input" />
+    <property name="inputPlugins" location="${buildDataDir}/step020/input/plugins" />
+    <property name="inputFeatures" location="${buildDataDir}/step020/input/features" />
+
+    <!-- mkdirs -->
+    <mkdir dir="${inputPlugins}" />
+    <mkdir dir="${inputFeatures}" />
+
+    <!-- copy plugins to build to the buildDirectory -->
+    <copy todir="${inputPlugins}">
+      <fileset dir="${workspace}/scout.rt">
+        <include name="org.eclipse.scout.*/**" />
+        <include name="org.apache.derby.jdbc*/**" />
+        <exclude name="org.eclipse.scout*build*/**" />
+        <exclude name="*feature/**" />
+        <exclude name="*feature.source/**" />
+      </fileset>
+      <fileset dir="${workspace}/scout.rt.incubator">
+        <include name="org.eclipse.scout.*/**" />
+        <exclude name="*feature*/**" />
+      </fileset>
+      <fileset dir="${workspace}/scout.sdk">
+        <include name="org.eclipse.scout.*/**" />
+        <exclude name="*feature*/**" />
+      </fileset>
+    </copy>
+    <copy todir="${inputFeatures}">
+      <fileset dir="${workspace}/scout.rt">
+        <include name="*scout.*feature*/**" />
+        <exclude name="*scout.*feature.about/**" />
+      </fileset>
+      <fileset dir="${workspace}/scout.rt.incubator">
+        <include name="*scout.*feature*/**" />
+      </fileset>
+      <fileset dir="${workspace}/scout.sdk">
+        <include name="*scout.*feature*/**" />
+      </fileset>
+    </copy>
+
+    <!-- copy source feature templates -->
+    <antcall target="copySourceFeatureTemplate">
+      <param name="featureName" value="Scout Runtime Source"/>
+      <param name="featureId" value="org.eclipse.scout.rt.feature.source"/>
+    </antcall>
+
+    <antcall target="copySourceFeatureTemplate">
+      <param name="featureName" value="Scout Runtime RAP Source"/>
+      <param name="featureId" value="org.eclipse.scout.rt.rap.feature.source"/>
+    </antcall>
+
+    <antcall target="copySourceFeatureTemplate">
+      <param name="featureName" value="Scout SDK Source"/>
+      <param name="featureId" value="org.eclipse.scout.sdk.feature.source"/>
+    </antcall>
+
+    <antcall target="copySourceFeatureTemplate">
+      <param name="featureName" value="Scout SDK RAP Source"/>
+      <param name="featureId" value="org.eclipse.scout.sdk.rap.feature.source"/>
+    </antcall>
+
+    <antcall target="copySourceFeatureTemplate">
+      <param name="featureName" value="Scout SDK Test Source"/>
+      <param name="featureId" value="org.eclipse.scout.sdk.test.feature.source"/>
+    </antcall>
+
+    <antcall target="copySourceFeatureTemplate">
+      <param name="featureName" value="Scout RAP Filechooser (Incubaton) Source"/>
+      <param name="featureId" value="org.eclipse.scout.rt.ui.rap.incubator.filechooser.feature.source"/>
+    </antcall>
+  </target>
+
+  <!-- expects params: featureId, featureName -->
+  <target name="copySourceFeatureTemplate">
+    <copy todir="${inputFeatures}/${featureId}/" failonerror="false">
+      <fileset dir="${relengRootDir}/templates/sourceTemplateFeature">
+        <include name="**" />
+      </fileset>
+    </copy>
+    <replace file="${inputFeatures}/${featureId}/feature.properties" token="%%featureName%%" value="${featureName}" />
+  </target>
 
 </project>
