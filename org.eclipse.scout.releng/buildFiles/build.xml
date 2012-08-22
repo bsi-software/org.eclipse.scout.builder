@@ -124,7 +124,7 @@
 
 	<target name="runTestBuilds" unless="conditionSkipTestBuilds">
 		<!-- test builds against all supported eclipse versions -->
-		<for list="3.5,3.6,3.7,3.8,4.1,4.2" param="version">
+		<for list="3.5,3.6,3.7,3.8,4.1,4.2,4.3" param="version">
 			<sequential>
 				<propertycopy name="skipValidateBuildVersion" from="@{version}_skipValidateBuild" override="true" />
 				<if><equals arg1="${skipValidateBuildVersion}" arg2="true" /><then></then>
