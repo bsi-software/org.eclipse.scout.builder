@@ -90,7 +90,11 @@
 		</antcall>
 		<antcall target="preBuildVersion">
 			<param name="eclipsePlatformVersion" value="3.6" />
-			<param name="compatFragmentVersion" value="v36v37v41" />
+			<param name="compatFragmentVersion" value="v36" />
+		</antcall>
+		<antcall target="preBuildVersion">
+			<param name="eclipsePlatformVersion" value="3.7" />
+			<param name="compatFragmentVersion" value="v37v41" />
 		</antcall>
 		<antcall target="preBuildVersion">
 			<param name="eclipsePlatformVersion" value="3.8" />
