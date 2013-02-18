@@ -50,7 +50,7 @@
 	<target name="upload" unless="conditionSkipUpload">
 		<antcall target="clean" />
 		<mkdir dir="${buildDataDir}/upload/input" />
-		<antcall target="prepare.zip" />
+		<!--	<antcall target="prepare.zip" /> -->
 		<antcall target="prepare.p2" />
 		<antcall target="createEclipseVersionFile" />
 		<antcall target="createRepositoryOverview" />
